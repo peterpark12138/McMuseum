@@ -98,7 +98,12 @@ def report_vote(product_id, vtype, value, city=None):
 
 
 def setup(repo=None):
-    """为每个怀旧单品建一个 Issue，并把 issue_number 写入 issue_map.json。仅作者执行一次。"""
+    """为每个怀旧单品建一个 Issue，并把 issue_number 写入 issue_map.json。仅作者执行一次。
+
+    具备幂等恢复：
+    - 每成功建一个 Issue 立即存盘，中途出错不丢进度；
+    - 若仓库已有带 `revival` 标签的同名 Issue（标题含 product_id），自动复用，不重复创建。
+    """
     repo = repo or os.environ.get("GITHUB_REPO")
     token = os.environ.get("GITHUB_TOKEN")
     if not repo or not token:
@@ -106,6 +111,22 @@ def setup(repo=None):
         return
     products = _load_products()
     m = _load_map()
+    # 幂等恢复：从仓库现有 revival Issue 反查 product_id（标题格式 [复活赛] 名称（product_id））
+    if len(m) < len(products):
+        try:
+            issues = _req(f"{API}/repos/{repo}/issues?labels=revival&state=all&per_page=100",
+                          "GET", token=token)
+            for it in issues:
+                title = it.get("title", "")
+                # 标题格式 [复活赛] 名称（可能含括号昵称）（product_id）；取【最后一个】括号才是 product_id
+                ids = re.findall(r"[（(]([\w-]+)[）)]", title)
+                pid = ids[-1] if ids else None
+                if pid and pid not in m:
+                    m[pid] = it.get("number")
+                    print(f"  复用已有 Issue #{it.get('number')} <- {title}")
+            _save_map(m)
+        except RuntimeError as e:
+            print(f"  读取已有 Issue 失败（不影响新建）: {e}")
     for p in products:
         if p["id"] in m:
             continue
@@ -121,10 +142,11 @@ def setup(repo=None):
             r = _req(f"{API}/repos/{repo}/issues", "POST",
                      {"title": title, "body": body, "labels": ["revival"]}, token)
             m[p["id"]] = r.get("number")
+            _save_map(m)  # 每成功一个立即存盘，避免中途崩溃丢失进度
             print(f"  已建 Issue #{r.get('number')} <- {p['name']}")
         except RuntimeError as e:
-            print(f"  建 Issue 失败 {p['name']}: {e}")
-    _save_map(m)
+            print(f"  建 Issue 失败 {p['name']}: {e}（继续下一个）")
+            continue
     print("data/issue_map.json 已更新。")
 
 
