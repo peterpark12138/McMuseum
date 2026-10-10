@@ -69,11 +69,14 @@ MEMBER_ID_KEYS = [
     "memberno", "member_no", "memberid", "member_id", "membernumber", "member_number",
     "cardno", "card_no", "cardnumber", "loyaltyid", "loyalty_id",
     "openid", "unionid", "userid", "user_id", "customerid", "customer_id", "mid", "mcdmemberid",
+    "accountid", "account_id", "accountno", "account_no", "accountcode",
 ]
 POINTS_KEYS = [
     "积分", "可用积分", "会员积分", "积分余额", "积分值",
     "points", "point", "pointbalance", "availablepoints", "balance", "score",
 ]
+# 优先使用的积分字段（可用积分）；accumulative/expired/frozen/used 为历史/过期/冻结/已用，不计入投票
+POINTS_PREF_KEYS = ["availablepoint", "available_point", "可用积分", "points", "point", "pointbalance"]
 
 
 def _walk_find(obj, keys):
@@ -95,16 +98,35 @@ def _walk_find(obj, keys):
     return found
 
 
-def extract_member_id(raw):
-    """从 query-my-account 返回（可能是 JSON 文本）中稳健解析会员唯一标识。"""
-    obj = None
+def _to_obj(raw):
+    """若 raw 是 JSON 文本则解析为对象；已是 dict/list 则原样返回；否则 None。"""
+    if isinstance(raw, (dict, list)):
+        return raw
+    if isinstance(raw, str):
+        try:
+            return json.loads(raw)
+        except Exception:
+            return None
+    return None
+
+
+def _as_int(v):
     try:
-        obj = json.loads(raw)
-    except Exception:
-        obj = None
+        return int(v)
+    except (TypeError, ValueError):
+        return None
+
+
+def extract_member_id(raw):
+    """从 query-my-account 返回（对象或 JSON 文本）中稳健解析会员唯一标识。
+
+    真实返回优先位于 result.structuredContent.data.accountId（UUID 形式），
+    此处对对象/文本均兼容，并保留中文文本兜底正则。
+    """
+    obj = _to_obj(raw)
     candidates = _walk_find(obj, MEMBER_ID_KEYS) if obj else []
     # 文本兜底正则（JSON 解析失败或字段名未命中时）
-    if not candidates:
+    if not candidates and isinstance(raw, str):
         for pat in [
             r"会员[号识ID:： ]{0,6}[:：]?\s*([A-Za-z0-9_-]{4,})",
             r"member[ _-]?id\s*[:：]?\s*['\"]?([A-Za-z0-9_-]{4,})",
@@ -124,31 +146,62 @@ def extract_member_id(raw):
 
 
 def extract_points(raw):
-    """稳健解析积分余额（仅读取），解析不到返回 0，绝不臆造。"""
-    obj = None
-    try:
-        obj = json.loads(raw)
-    except Exception:
-        obj = None
-    nums = [int(v) for v in _walk_find(obj, POINTS_KEYS) if isinstance(v, (int, float)) and v >= 0] if obj else []
-    if not nums:
-        for m in re.finditer(r"(?:积分|points?)\D{0,8}?(\d+)", raw, re.I):
-            nums.append(int(m.group(1)))
-    return max(nums) if nums else 0
+    """稳健解析可用于投票的积分余额（优先可用积分），仅读取，解析不到返回 0。"""
+    obj = _to_obj(raw)
+    if obj:
+        # 优先可用积分字段
+        for kk in POINTS_PREF_KEYS:
+            for v in _walk_find(obj, [kk]):
+                iv = _as_int(v)
+                if iv is not None and iv >= 0:
+                    return iv
+        # 兜底：任意积分类字段取最大
+        allp = [iv for iv in (_as_int(v) for v in _walk_find(obj, POINTS_KEYS))
+                if iv is not None and iv >= 0]
+        if allp:
+            return max(allp)
+    # 文本兜底
+    s = raw if isinstance(raw, str) else ""
+    for m in re.finditer(r"(?:积分|points?)\D{0,8}?(\d+)", s, re.I):
+        return int(m.group(1))
+    return 0
 
 
 def real_account_info():
-    """真实调用麦当劳 MCP query-my-account，返回 (积分, 会员唯一标识)。仅读取不扣减。"""
+    """真实调用麦当劳 MCP query-my-account，返回 (积分, 会员唯一标识)。仅读取不扣减。
+
+    真实返回结构：
+      result.structuredContent.data.{accountId, availablePoint, ...}
+      result.content[].text 为可读文本（兜底解析用）。
+    优先读取结构化字段，确保稳定拿到会员唯一标识与可用积分。
+    """
     try:
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         from mcp_client import McDonaldMCPClient
         c = McDonaldMCPClient()
         c.initialize()
-        text = c.get_my_points()
+        out = c.call_tool("query-my-account", {})
     except Exception as e:  # noqa: BLE001
         raise RuntimeError(f"调用 query-my-account 失败：{e}")
-    raw = text if isinstance(text, str) else json.dumps(text, ensure_ascii=False)
-    return extract_points(raw), extract_member_id(raw)
+
+    result = (out or {}).get("result", {})
+    # 结构化数据（首选）
+    data = {}
+    sc = result.get("structuredContent") if isinstance(result, dict) else None
+    if isinstance(sc, dict):
+        data = sc.get("data") or {}
+    # 文本兜底
+    content = result.get("content", []) if isinstance(result, dict) else []
+    raw_text = "\n".join(
+        x.get("text", "") for x in content
+        if isinstance(x, dict) and x.get("type") == "text"
+    )
+
+    # 会员唯一标识：优先结构化字段，其次文本兜底
+    member_id = extract_member_id(data) or extract_member_id(raw_text)
+    # 积分：优先可用积分，其次文本兜底
+    points = extract_points(data) or extract_points(raw_text)
+    return points, member_id
 
 
 def show_meals_vs_museum():

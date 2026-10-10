@@ -18,8 +18,32 @@ MCP_URL = "https://mcp.mcd.cn"
 PROTOCOL_VERSION = "2024-11-05"
 
 
+def _load_env_file():
+    """从项目根目录 .env 读取环境变量（不覆盖已存在的系统环境变量）。
+
+    这样用户无需在终端手动 export，把 token 写进 .env 文件即可，
+    .env 已被 .gitignore 排除，不会误提交。
+    """
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    p = os.path.join(root, ".env")
+    try:
+        with open(p, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                if "=" in line:
+                    k, _, v = line.partition("=")
+                    k, v = k.strip(), v.strip().strip('"').strip("'")
+                    if k and k not in os.environ:
+                        os.environ[k] = v
+    except FileNotFoundError:
+        pass
+
+
 class McDonaldMCPClient:
     def __init__(self, token=None):
+        _load_env_file()
         self.token = token or os.environ.get("MCD_MCP_TOKEN")
         if not self.token:
             raise RuntimeError("缺少 MCD_MCP_TOKEN，请先 export MCD_MCP_TOKEN=你的Token")
