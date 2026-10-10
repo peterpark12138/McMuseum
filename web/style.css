@@ -1,0 +1,185 @@
+:root{
+  --red:#E4002B;
+  --red-deep:#C8102E;
+  --yellow:#FFC72C;
+  --yellow-soft:#FFE39A;
+  --cream:#FFF6E5;
+  --paper:#FFFFFF;
+  --ink:#2B2522;
+  --muted:#8A7F76;
+  --line:#F0E2C8;
+  --shadow:0 10px 30px rgba(196,16,46,.12);
+  --shadow-hover:0 16px 40px rgba(196,16,46,.22);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  background:
+    radial-gradient(1200px 400px at 80% -10%, var(--yellow-soft) 0%, transparent 60%),
+    var(--cream);
+  color:var(--ink);
+  min-height:100vh;
+  padding-bottom:48px;
+}
+
+/* 顶栏 */
+.topbar{
+  position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 22px;
+  background:linear-gradient(100deg,var(--red) 0%,var(--red-deep) 60%,#a50f25 100%);
+  box-shadow:0 6px 20px rgba(196,16,46,.35);
+}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{font-size:30px;filter:drop-shadow(0 2px 0 rgba(0,0,0,.15))}
+.brand-text{display:flex;flex-direction:column;line-height:1.1}
+.brand-name{font-family:"ZCOOL KuaiLe",sans-serif;font-size:22px;color:#fff;letter-spacing:1px}
+.brand-sub{font-size:12px;color:var(--yellow)}
+.tabs{display:flex;gap:8px}
+.tab{
+  font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;
+  border:none;border-radius:999px;padding:9px 18px;
+  background:rgba(255,255,255,.18);color:#fff;transition:.2s;
+}
+.tab:hover{background:rgba(255,255,255,.32)}
+.tab.active{background:var(--yellow);color:var(--red-deep);box-shadow:0 4px 12px rgba(0,0,0,.2)}
+
+/* Hero */
+.hero{
+  text-align:center;padding:34px 20px 22px;
+}
+.hero h1{
+  font-family:"ZCOOL KuaiLe",sans-serif;
+  font-size:clamp(26px,5vw,44px);line-height:1.25;color:var(--ink);
+}
+.hero h1 .hl{
+  color:var(--red);
+  text-shadow:2px 2px 0 var(--yellow);
+}
+.hero-sub{
+  margin-top:14px;font-size:13px;color:var(--muted);
+  background:#fff;border:1px solid var(--line);
+  display:inline-block;padding:8px 16px;border-radius:999px;box-shadow:var(--shadow);
+}
+
+/* 视图 */
+.view{max-width:1080px;margin:0 auto;padding:0 18px}
+.hidden{display:none!important}
+
+/* 卡片网格 */
+.grid{
+  display:grid;gap:18px;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  margin-top:10px;
+}
+.card{
+  position:relative;background:var(--paper);border-radius:20px;overflow:hidden;
+  box-shadow:var(--shadow);transition:.22s;display:flex;flex-direction:column;
+  border:1px solid #fff;
+}
+.card:hover{transform:translateY(-6px) rotate(-.4deg);box-shadow:var(--shadow-hover)}
+.card-ribbon{
+  position:absolute;top:12px;right:-30px;transform:rotate(38deg);
+  background:var(--yellow);color:var(--red-deep);
+  font-size:11px;font-weight:800;padding:3px 34px;letter-spacing:1px;
+  box-shadow:0 2px 6px rgba(0,0,0,.15);
+}
+.card-band{
+  height:78px;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:linear-gradient(120deg,var(--yellow) 0%,#ffd966 100%);
+  font-size:34px;
+}
+.card-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card-name{font-family:"ZCOOL KuaiLe",sans-serif;font-size:20px;color:var(--ink)}
+.card-era{
+  align-self:flex-start;font-size:11px;color:var(--red-deep);
+  background:#fff0f2;border:1px solid #ffd5dc;padding:2px 10px;border-radius:999px;
+}
+.card-story{
+  font-size:13px;color:var(--muted);line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+  min-height:58px;
+}
+.card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:8px}
+.votes-pill{
+  font-size:13px;font-weight:800;color:var(--red-deep);
+  background:#fff0f2;border-radius:999px;padding:5px 12px;
+}
+.votes-pill b{font-size:16px}
+.vote-btn{
+  font-family:inherit;font-weight:800;font-size:14px;cursor:pointer;border:none;
+  background:var(--red);color:#fff;padding:9px 18px;border-radius:999px;
+  box-shadow:0 6px 14px rgba(228,0,43,.35);transition:.18s;
+}
+.vote-btn:hover{background:var(--red-deep);transform:scale(1.04)}
+.vote-btn:active{transform:scale(.96)}
+.vote-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* 复活榜 */
+.rank-head{display:flex;align-items:center;justify-content:space-between;max-width:680px;margin:18px auto 6px;padding:0 4px}
+.rank-head h2{font-family:"ZCOOL KuaiLe",sans-serif;font-size:24px;color:var(--ink)}
+.ghost-btn{
+  font-family:inherit;font-weight:700;cursor:pointer;border:1px solid var(--line);
+  background:#fff;color:var(--red-deep);padding:8px 16px;border-radius:999px;transition:.18s;
+}
+.ghost-btn:hover{background:var(--yellow);border-color:var(--yellow)}
+.rank-list{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+.rank-row{
+  display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;
+  padding:12px 16px;box-shadow:var(--shadow);border:1px solid #fff;
+}
+.rank-no{
+  flex:none;width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  font-family:"ZCOOL KuaiLe",sans-serif;font-size:18px;color:#fff;background:var(--red);
+}
+.rank-row.top1 .rank-no{background:linear-gradient(135deg,#FFD700,#F0A500)}
+.rank-row.top2 .rank-no{background:linear-gradient(135deg,#C0C0C0,#9aa0a6)}
+.rank-row.top3 .rank-no{background:linear-gradient(135deg,#CD7F32,#aRts)}
+.rank-row.top3 .rank-no{background:linear-gradient(135deg,#CD7F32,#a05a2c)}
+.rank-main{flex:1;min-width:0}
+.rank-name{font-weight:800;font-size:15px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-bar{height:8px;border-radius:999px;background:#f3e6cf;margin-top:6px;overflow:hidden}
+.rank-bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--yellow),var(--red));border-radius:999px}
+.rank-votes{flex:none;font-weight:800;color:var(--red-deep);font-size:15px}
+
+/* 状态 */
+.state{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px}
+.state.empty{background:#fff;border:1px dashed var(--line);border-radius:16px;margin-top:16px}
+
+/* 弹窗 */
+.modal{position:fixed;inset:0;background:rgba(43,37,34,.5);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px}
+.modal-card{
+  position:relative;background:#fff;border-radius:24px;max-width:420px;width:100%;
+  padding:28px 24px;box-shadow:0 24px 60px rgba(0,0,0,.3);text-align:center;
+  animation:pop .25s ease;
+}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-close{position:absolute;top:10px;right:14px;border:none;background:none;font-size:24px;color:var(--muted);cursor:pointer;line-height:1}
+#modal-body h3{font-family:"ZCOOL KuaiLe",sans-serif;font-size:22px;color:var(--ink);margin-bottom:8px}
+#modal-body p{font-size:14px;color:var(--muted);line-height:1.6;margin:6px 0}
+#modal-body .big{font-family:"ZCOOL KuaiLe",sans-serif;font-size:30px;color:var(--red);margin:10px 0}
+#modal-body .ok-emoji{font-size:46px}
+#modal-body .confirm-btn{
+  margin-top:16px;font-family:inherit;font-weight:800;font-size:15px;cursor:pointer;border:none;
+  background:var(--red);color:#fff;padding:11px 22px;border-radius:999px;box-shadow:0 6px 14px rgba(228,0,43,.35);transition:.18s;
+}
+#modal-body .confirm-btn:hover{background:var(--red-deep)}
+#modal-body .confirm-btn:disabled{opacity:.6;cursor:wait}
+#modal-body .cancel-btn{
+  margin-top:10px;display:block;width:100%;font-family:inherit;font-weight:700;cursor:pointer;
+  border:none;background:none;color:var(--muted);padding:8px;font-size:13px;
+}
+
+/* Toast */
+.toast{
+  position:fixed;left:50%;bottom:32px;transform:translateX(-50%);
+  background:var(--ink);color:#fff;padding:12px 22px;border-radius:999px;font-size:14px;
+  box-shadow:0 10px 30px rgba(0,0,0,.3);z-index:60;max-width:88vw;text-align:center;
+}
+.toast.ok{background:var(--red)}
+.toast.err{background:#b23a2e}
+
+@media(max-width:560px){
+  .grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+  .brand-sub{display:none}
+}

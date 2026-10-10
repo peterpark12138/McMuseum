@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>🍟 麦麦复活赛 · 老麦返场许愿池</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">
+      <span class="logo">🍟</span>
+      <div class="brand-text">
+        <span class="brand-name">麦麦复活赛</span>
+        <span class="brand-sub">老麦返场许愿池</span>
+      </div>
+    </div>
+    <nav class="tabs">
+      <button class="tab active" data-view="hall">投票大厅</button>
+      <button class="tab" data-view="rank">复活榜</button>
+    </nav>
+  </div>
+
+  <header class="hero">
+    <h1>为你怀念的那一口，<br/>打一场<span class="hl">复活赛</span> 🎉</h1>
+    <p class="hero-sub">仅麦当劳会员可投票 · 1 票基础身份票 + 每 100 积分再加 1 票 · 按会员号强身份去重，不刷票</p>
+  </header>
+
+  <!-- 投票大厅 -->
+  <main id="view-hall" class="view">
+    <div id="grid" class="grid"></div>
+    <div id="hall-empty" class="state empty hidden">暂时加载不到单品，请确认服务已启动。</div>
+  </main>
+
+  <!-- 复活榜 -->
+  <main id="view-rank" class="view hidden">
+    <div class="rank-head">
+      <h2>🏆 复活榜 Top</h2>
+      <button id="refresh-rank" class="ghost-btn">刷新</button>
+    </div>
+    <div id="rank-list" class="rank-list"></div>
+    <div id="rank-empty" class="state empty hidden">还没有人投票，快来当第一个！</div>
+  </main>
+
+  <!-- 投票确认弹窗 -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <button class="modal-close" id="modal-close">×</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
