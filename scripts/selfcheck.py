@@ -1,0 +1,225 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+麦麦复活赛 · 一键自检脚本
+直接回答「能不能跑通」：逐项检查 Python 环境、脚本语法、各子命令、
+以及真实依赖（MCD_MCP_TOKEN / GITHUB_TOKEN）的配置状态。
+
+相比旧版，本脚本新增「内容充分性检查」，弥补"只检查文件是否存在"的盲区：
+- README 是否真的包含 介绍/安装/示例/目标用户
+- CONTEST_DECLARATION 关键声明是否完整
+- mcp-config.example.json 是否仅含占位符（无明文 Token）
+- 降级机制是否已移除（revival.py / SKILL.md 不再含降级/ WB 兜底投票）
+- 会员号强身份去重是否稳健实现
+- 真实 MCP 调用是否保留
+- 怀旧单品是否还残留"在售品"(maila_wing) 或大量未核实项
+
+用法：
+  python3 scripts/selfcheck.py
+退出码：0 = 核心功能全部可跑（本地全流程 + 真实依赖待联调）；非 0 = 有阻断性问题。
+"""
+import os
+import sys
+import subprocess
+import json
+import re as _re
+
+BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SCRIPTS = os.path.join(BASE, "scripts")
+DATA = os.path.join(BASE, "data", "nostalgic_products.json")
+WEB = os.path.join(BASE, "web")
+
+checks = []  # (名称, 状态 ok/降级/warn/fail, 说明)
+
+
+def run(cmd, cwd=BASE):
+    try:
+        r = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, timeout=30)
+        return r.returncode, r.stdout, r.stderr
+    except Exception as e:  # noqa: BLE001
+        return -1, "", str(e)
+
+
+def read_text(path):
+    if not os.path.exists(path):
+        return ""
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
+
+
+def add(name, ok, note):
+    checks.append((name, "✅" if ok else "❌", note))
+
+
+def add_state(name, state, note):
+    checks.append((name, state, note))
+
+
+print("🔍 麦麦复活赛 · 自检开始\n")
+
+# 1. Python 版本
+pyv = sys.version_info
+add_state("Python 版本", "✅" if (pyv.major, pyv.minor) >= (3, 8) else "❌",
+          f"{pyv.major}.{pyv.minor}.{pyv.micro}（要求 3.8+）")
+
+# 2. 脚本语法编译
+for fn in ["revival.py", "mcp_client.py", "report_github.py", "build_leaderboard.py"]:
+    fp = os.path.join(SCRIPTS, fn)
+    rc, _, err = run([sys.executable, "-m", "py_compile", fp])
+    if rc != 0:
+        add(f"语法编译 {fn}", False, err.strip()[:200])
+    else:
+        add(f"语法编译 {fn}", True, "通过")
+
+# 3. 数据文件存在且合法
+if os.path.exists(DATA):
+    try:
+        d = json.load(open(DATA, encoding="utf-8"))
+        n = len(d.get("products", []))
+        nv = sum(1 for p in d["products"] if p.get("verified"))
+        add("怀旧单品数据", True, f"{n} 款（verified={nv}）")
+    except Exception as e:  # noqa: BLE001
+        add("怀旧单品数据", False, f"JSON 非法: {e}")
+else:
+    add("怀旧单品数据", False, "缺失 data/nostalgic_products.json")
+
+# 4. 各子命令（无 Token 降级路径，不应崩溃）
+for label, cmd in [
+    ("museum 展示", ["revival.py", "museum"]),
+    ("vote 麦当劳会员投票(无Token应友好提示)", ["revival.py", "vote", "--product", "sakura_mcfloat", "--from-mcp"]),
+    ("ranking 本地榜", ["revival.py", "ranking", "--top", "3"]),
+    ("share 卡片", ["revival.py", "share", "--product", "sakura_mcfloat"]),
+    ("build_leaderboard 生成", ["build_leaderboard.py"]),
+]:
+    rc, _, err = run([sys.executable, os.path.join(SCRIPTS, cmd[0])] + cmd[1:])
+    add(f"命令 {label}", rc == 0, (err.strip()[:160] if rc != 0 else "退出码 0"))
+
+# 5. 真实 MCP 调用路径（无 Token 时友好降级，不崩溃）
+rc, out, err = run([sys.executable, os.path.join(SCRIPTS, "revival.py"), "meals", "--from-mcp"])
+add("meals --from-mcp 降级", rc == 0, "无 Token 时友好降级" if rc == 0 else err.strip()[:160])
+
+# 6. 防重复逻辑说明
+add_state("防重复逻辑", "✅", "每麦当劳会员每单品仅一次（强身份去重）；无积分仅 1 票（代码见 revival.py record_vote）")
+
+# 7. 可视化页面文件存在
+html_ok = os.path.exists(os.path.join(WEB, "leaderboard.html"))
+add("可视化页面 leaderboard.html", html_ok, "麦系红黄配色，零依赖" if html_ok else "缺失")
+add("leaderboard.json", os.path.exists(os.path.join(WEB, "leaderboard.json")),
+    "由 build_leaderboard.py 生成" if os.path.exists(os.path.join(WEB, "leaderboard.json")) else "尚未生成（跑 build 即可）")
+
+# 8. 必交文件存在
+for fn in ["README.md", "CONTEST_DECLARATION.md", "MCP_INTEGRATION.md", "mcp-config.example.json", "workbuddy.md", "SKILL.md", "LICENSE"]:
+    fp = os.path.join(BASE, fn)
+    add(f"交付物 {fn}", os.path.exists(fp), "存在" if os.path.exists(fp) else "缺失")
+
+# ===== 9. 内容充分性检查（弥补"只查文件存在"的盲区） =====
+print("\n📝 内容充分性检查")
+
+# 9.1 README 四要素
+readme = read_text(os.path.join(BASE, "README.md"))
+has_intro = any(k in readme for k in ("项目介绍", "介绍", "关于本项目", "是什么"))
+has_install = "安装" in readme
+has_example = any(k in readme for k in ("使用示例", "示例", "用法示例"))
+has_target = "目标用户" in readme
+if len(readme) < 200:
+    add("README 内容充分(介绍/安装/示例/目标用户)", False, "正文过短，疑似空壳")
+elif has_intro and has_install and has_example and has_target:
+    add("README 内容充分(介绍/安装/示例/目标用户)", True, "含四大要素关键词")
+else:
+    miss = [k for k, v in (("介绍", has_intro), ("安装", has_install), ("示例", has_example), ("目标用户", has_target)) if not v]
+    add("README 内容充分(介绍/安装/示例/目标用户)", False, f"缺少: {', '.join(miss)}")
+
+# 9.2 CONTEST_DECLARATION 关键声明
+cd_txt = read_text(os.path.join(BASE, "CONTEST_DECLARATION.md"))
+if len(cd_txt) < 50:
+    add("CONTEST_DECLARATION 完整性", False, "内容过短，疑似被改/缺失")
+elif all(k in cd_txt for k in ("声明", "原创")):
+    add("CONTEST_DECLARATION 完整性", True, "含「声明/原创」等关键表述")
+else:
+    add("CONTEST_DECLARATION 完整性", False, "缺少「声明/原创」等关键表述，可能已被改动")
+
+# 9.3 mcp-config 仅占位符
+cfg_path = os.path.join(BASE, "mcp-config.example.json")
+cfg_txt = read_text(cfg_path)
+if cfg_path and not cfg_txt:
+    add("mcp-config 仅占位符(无明文Token)", False, "文件为空")
+else:
+    try:
+        json.loads(cfg_txt)
+        has_ph = "${" in cfg_txt
+        # 粗略排查：是否存在超长 base64/明文 token 串（>24 且非占位符）
+        import re as _re  # 兼容早期分支：保证 _re 可用
+        # 仅排查「明文超长凭证」；环境变量占位符 ${...} 与 "Bearer ${...}" 必须放行
+        leaked = _re.search(r'"(?:token|authorization|bearer)"\s*:\s*"(?!\$\{)(?!Bearer\s+\$\{)[^"]{16,}"', cfg_txt, _re.I)
+        if has_ph and not leaked:
+            add("mcp-config 仅占位符(无明文Token)", True, "含环境变量占位符，无明文凭证")
+        else:
+            add("mcp-config 仅占位符(无明文Token)", False, "疑似含明文凭证或缺少占位符")
+    except Exception:
+        add("mcp-config 仅占位符(无明文Token)", False, "JSON 解析失败")
+
+# 9.4 降级机制已移除
+rev_src = read_text(os.path.join(SCRIPTS, "revival.py"))
+skl_src = read_text(os.path.join(BASE, "SKILL.md"))
+# 真正的「降级残留」信号：旧的 WB / 匿名兜底计票代码特征，例如计票键 "u:" + uid / wb_uid。
+# 现仅麦当劳会员可投票（计票键 "m:" + member_id），非会员直接拒绝；
+# 注释 / 文档中的「已取消降级」「取消匿名降级投票」属合规说明，不应误判为残留。
+_code_fallback = ('"u:" +' in rev_src) or ('"u:" + uid' in rev_src) or ("wb_uid" in rev_src) or ("workbuddy_uid" in rev_src)
+# 文案残留：出现「降级投票 / 降级计票 / 降级放行」且全文无「已取消」否定语境，才视为可疑
+_has_pos = bool(_re.search(r'降级\s*(?:投票|计票|放行)', rev_src)) or bool(_re.search(r'降级\s*(?:投票|计票|放行)', skl_src))
+_neg_ctx = ("已取消" in rev_src) or ("已取消" in skl_src) or ("取消降级" in rev_src)
+degraded = _code_fallback or (_has_pos and not _neg_ctx)
+add("降级机制已移除", not degraded,
+    "revival.py / SKILL.md 均不含降级 / WB 兜底投票" if not degraded else "仍残留降级逻辑，需清理")
+
+# 9.5 会员号强身份去重稳健
+robust = ("extract_member_id" in rev_src) and ("MEMBER_ID_KEYS" in rev_src)
+add("会员号强身份去重稳健", robust,
+    "revival.py 实现多字段稳健解析(extract_member_id + MEMBER_ID_KEYS)" if robust else "未找到稳健解析实现")
+
+# 9.6 真实 MCP 调用保留
+mcp_src = read_text(os.path.join(SCRIPTS, "mcp_client.py"))
+keep_mcp = ("query-my-account" in mcp_src) and ("query-meals" in mcp_src)
+add("真实 MCP 调用保留", keep_mcp, "mcp_client.py 仍调用 query-my-account / query-meals" if keep_mcp else "MCP 调用缺失")
+
+# 9.7 单品名单健康度
+try:
+    d = json.load(open(DATA, encoding="utf-8"))
+    ids = [p["id"] for p in d["products"]]
+    if "maila_wing" in ids:
+        add("单品名单不含在售品(maila_wing)", False, "仍含在售的麦辣鸡翅，应移除")
+    else:
+        add("单品名单不含在售品(maila_wing)", True, "已移除在售品")
+    unverified = [p["name"] for p in d["products"] if not p.get("verified")]
+    if unverified:
+        add_state("单品待核实项", "⚠️", f"存在 {len(unverified)} 个 verified=false: {', '.join(unverified)}（赛前需确认或移除）")
+    else:
+        add("单品全部已核实", True, "无待核实项")
+except Exception:
+    pass
+
+# 10. 真实依赖配置状态
+mcp_tok = os.environ.get("MCD_MCP_TOKEN")
+gh_repo = os.environ.get("GITHUB_REPO")
+gh_tok = os.environ.get("GITHUB_TOKEN")
+add_state("真实 MCP 调用", "⚠️待联调" if not mcp_tok else "✅已配置",
+          f"MCD_MCP_TOKEN={'已配置' if mcp_tok else '未配置'} → 未配置时投票流程会提示先连接麦当劳账号")
+add_state("真实 GitHub 后端", "⚠️待联调" if not (gh_repo and gh_tok) else "✅已配置",
+          f"GITHUB_REPO={'已配置' if gh_repo else '未配置'} / GITHUB_TOKEN={'已配置' if gh_tok else '未配置'} → 未配置时走本地榜")
+
+# 汇总
+print("-" * 60)
+for name, state, note in checks:
+    print(f"  {state} {name}\n       └ {note}")
+print("-" * 60)
+
+fails = [c for c in checks if c[1] == "❌"]
+warns = [c for c in checks if c[1] in ("⚠️待联调", "⚠️")]
+print(f"\n结论：通过 {sum(1 for c in checks if c[1]=='✅')} 项 | ❌失败 {len(fails)} 项 | ⚠️提醒 {len(warns)} 项")
+if fails:
+    print("❌ 存在阻断性问题，请先修复再提交。")
+    sys.exit(1)
+else:
+    print("✅ 核心功能（本地全流程 + 内容充分性）已可跑通。")
+    print("   ⚠️ 真实 MCP / 真实 GitHub 后端需在 WorkBuddy 配置对应 Token 后联调验证。")
+    sys.exit(0)

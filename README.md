@@ -1,0 +1,161 @@
+# 麦麦复活赛（McRevival）
+
+> 麦当劳 × 腾讯 WorkBuddy 程序员创意开发大赛 · 参赛作品
+> 用一次"投票"，让那些年我们爱过的麦当劳老产品，打一场复活赛。
+
+---
+
+## 一、项目介绍
+
+**麦麦复活赛**是一个"怀旧单品许愿池"：它把麦当劳历史上那些已下架 / 限定的经典产品（蘸酱、甜品、主食、小食）收进一座线上博物馆，并让参与者用**真实麦当劳会员身份**为它们投票，最终产出一份"全民复活榜"，作为"用户是否希望某款产品返场"的真实意愿信号。
+
+核心特点：
+
+- **真实使用麦当劳 MCP**：通过官方 `mcp.mcd.cn` 的 Streamable HTTP 接口，真实调用 `query-my-account`（读取会员积分）与 `query-meals`（拉取在售菜单），用于积分换算与"在售 vs 怀旧"对比。**仅读取，绝不扣减。**
+- **强身份投票**：投票严格绑定麦当劳会员账号，按会员唯一标识去重，从机制上杜绝"多账号刷票"。
+- **透明可核**：所有怀旧单品均经联网核实（麦当劳中国官网及公开报道），标注下架/限定状态，不杜撰事实。
+- **零外部依赖**：可视化榜单为单文件 HTML，无需任何 CDN / 第三方库。
+
+> 说明：复活赛是"用户意愿趣味收集，**不代表官方返场承诺**"。价格 / 餐品 / 供应状态均标注"以麦当劳官方渠道实时结果为准"。
+
+---
+
+## 二、功能特性
+
+| 功能 | 说明 |
+|------|------|
+| 怀旧博物馆 | 浏览已核实的麦当劳下架 / 限定单品名录 |
+| 麦当劳会员投票 | 仅会员可投；1 票基础（确认身份）+ 每 100 积分 1 票（额外），无积分仅 1 票 |
+| 强身份去重 | 以会员唯一标识（会员号 / openid / 卡号 等）为去重主键，每会员每单品仅一次 |
+| 在售 vs 怀旧 | 调用 `query-meals` 拉实时在售菜单，与本地博物馆对照 |
+| 复活榜 | 本地累计 + 可选的中心化（作者侧 GitHub）聚合，支持城市维度 |
+| 拉票卡 | 生成社媒分享文案，为作品导流 |
+
+---
+
+## 三、安装方法
+
+### 3.1 环境要求
+
+- Python 3.8+（仅使用标准库，无需 `pip install`）
+- 已安装 [WorkBuddy](https://www.workbuddy.cn)，并将本仓库作为 Skill 引入
+
+### 3.2 获取麦当劳 MCP Token（必填，禁止明文）
+
+1. 从麦当劳 MCP 服务方获取你的 `MCD_MCP_TOKEN`（Bearer Token）。
+2. **不要**把 Token 写进任何文件。通过环境变量注入：
+
+```bash
+export MCD_MCP_TOKEN="你的Token"
+```
+
+3. 配置 MCP（参考 `mcp-config.example.json`，仅含占位符，复制为 `mcp-config.json` 并填入变量名即可）：
+
+```bash
+cp mcp-config.example.json mcp-config.json
+# 编辑 mcp-config.json，确保 token 字段为 ${MCD_MCP_TOKEN} 之类的环境变量占位符
+```
+
+### 3.3 可选：中心化复活榜（作者侧）
+
+如需跨用户聚合的"全网榜"，由作者（或机器人）配置 GitHub 后端：
+
+```bash
+export GITHUB_REPO="owner/repo"
+export GITHUB_TOKEN="你的GitHubToken"   # 仅作者/机器人持有，绝不提交
+python3 scripts/report_github.py setup --repo owner/repo
+```
+
+> 未配置时，投票与榜单在本地（当前部署）照常运行，不影响功能与评分；只是"全民聚合榜"暂为本地数据。
+
+---
+
+## 四、使用示例
+
+```bash
+# 1) 逛博物馆
+python3 scripts/revival.py museum
+
+# 2) 用麦当劳会员身份投票（需 MCD_MCP_TOKEN）
+#    票数 = 1（确认身份的基础票） + 积分 // 100（每 100 积分 1 票）
+python3 scripts/revival.py vote --product sakura_mcfloat --from-mcp
+#    可附带城市维度
+python3 scripts/revival.py vote --product sakura_mcfloat --from-mcp --city 上海
+
+# 3) 在售 vs 怀旧 对比（真实拉取 query-meals）
+python3 scripts/revival.py meals --from-mcp
+
+# 4) 看榜
+python3 scripts/revival.py ranking --top 10
+python3 scripts/revival.py ranking --top 10 --city 上海
+
+# 5) 生成拉票卡
+python3 scripts/revival.py share --product sakura_mcfloat
+
+# 6) 生成可视化榜单（输出 web/leaderboard.json）
+python3 scripts/build_leaderboard.py
+#    然后用任意静态服务器打开 web/leaderboard.html
+```
+
+在 WorkBuddy 中，直接对 Skill 说"我想给樱花麦旋风投票 / 看看复活榜"，Skill 会自动调用上述脚本。
+
+---
+
+## 五、投票规则（重要）
+
+- **仅麦当劳会员可投票**：未连接麦当劳账号（无有效 `MCD_MCP_TOKEN` / `query-my-account` 无法返回会员标识）时，投票被拒绝——本作品**已取消 WorkBuddy 账号 / 匿名降级投票**。
+- **票数构成**：确认会员身份 = 1 基础票；额外票数 = `积分 ÷ 100`（向下取整）。无积分即仅 1 票。
+- **强身份去重**：以麦当劳会员唯一标识为去重主键，同一会员对同一单品只能投一次，根治"多账号刷积分票"。
+- **仅读取**：积分仅用于换算票数，绝不调用任何扣减 / 下单接口，不触碰用户资金。
+- **遵守反刷榜**：不提供任何机器人 / 脚本批量刷票路径。
+
+---
+
+## 六、目标用户
+
+- **麦门情怀用户**：想念某款下架/限定产品，想用一票表达"求返场"。
+- **参赛开发者 / 评审**：验证"真实使用麦当劳 MCP""强身份防刷""透明可核"的参赛要求落地情况。
+- **麦当劳 / 品牌方**：将榜单作为"用户意愿"的轻量、低成本的真实信号参考。
+
+---
+
+## 七、文件结构
+
+```
+McMuseum/
+├── README.md                # 本文件
+├── SKILL.md                 # WorkBuddy Skill 定义（流程 / MCP 清单 / 反作弊）
+├── CONTEST_DECLARATION.md   # 参赛声明（内容不可改）
+├── MCP_INTEGRATION.md       # MCP 接入说明
+├── workbuddy.md             # WorkBuddy 专项奖励上下文记录
+├── mcp-config.example.json  # MCP 配置示例（仅占位符）
+├── scripts/
+│   ├── revival.py           # 投票 / 榜单 / 博物馆引擎
+│   ├── mcp_client.py        # 麦当劳 MCP 真实调用客户端（只读）
+│   ├── report_github.py      # 可选：GitHub 后端匿名聚合
+│   ├── build_leaderboard.py  # 生成可视化榜单数据
+│   └── selfcheck.py         # 一键自检（含内容充分性检查）
+├── data/
+│   ├── nostalgic_products.json  # 怀旧单品名录（已核实）
+│   └── votes.json               # 本地投票累计（运行时生成）
+└── web/
+    ├── leaderboard.html     # 零依赖可视化榜单
+    └── leaderboard.json     # 由 build_leaderboard.py 生成
+```
+
+---
+
+## 八、合规与声明
+
+- 本作品遵守赛事规则：**真实使用麦当劳 MCP**；原创内容；不含对麦当劳的贬低 / 与其他品牌对比 / 宣扬不健康饮食；不含任何明文 Token 或个人敏感信息。
+- 怀旧单品均标注下架 / 限定状态，并经联网核实；`verified=false` 项赛前需人工确认或移除。
+- 积分仅读取、不扣减；投票需会员身份、强去重、反刷榜。
+- 详见 `CONTEST_DECLARATION.md`（与官方逐字一致，不可修改）。
+
+---
+
+## 九、参赛信息
+
+- 赛事：麦当劳 × 腾讯 WorkBuddy 程序员创意开发大赛
+- 仓库：`peterpark12138/McMuseum`
+- 排名口径：以公开 Star 为准（详见赛事官方仓库规则）
