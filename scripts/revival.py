@@ -235,17 +235,63 @@ def show_meals_vs_museum():
     print("👉 对比可见：你怀念的老麦，回来了吗？")
 
 
-def record_vote(product, province=None, from_mcp=False):
+def find_province_in_text(text):
+    """从任意文本中匹配 34 个省级行政区名，返回规范省份名，匹配不到返回 ''。
+
+    子串匹配即可覆盖「广东省深圳市…」这类写法，无需额外别名表。
+    """
+    s = str(text or "")
+    if not s:
+        return ""
+    for p in PROVINCES:
+        if p in s:
+            return p
+    return ""
+
+
+def auto_detect_province():
+    """自动探测用户所在省份（隐私安全：只取省份名，不落盘任何地址原文）。
+
+    策略：调麦当劳 MCP 的「地址类」工具（自适应发现，工具名可能随服务端变化）解析省份；
+    任何一步失败都静默返回 ''，由调用方降级为「全国」，绝不阻塞投票。仅读取，不修改账号数据。
+    """
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from mcp_client import McDonaldMCPClient
+        c = McDonaldMCPClient()
+        c.initialize()
+        prefer = [t for t in c.list_tools() if "address" in t.lower()]
+        for name in prefer:
+            try:
+                resp = c.call_tool(name, {})
+                p = find_province_in_text(json.dumps(resp, ensure_ascii=False))
+                if p:
+                    return p
+            except Exception:  # noqa: BLE001
+                continue
+    except Exception:  # noqa: BLE001
+        pass
+    return ""
+
+
+def record_vote(product, province=None, from_mcp=False, auto_province=True):
     """记录一票。仅麦当劳会员账号可投票（已取消降级）。
 
     返回 (msg, ok, val)。
     票数 = 1（确认会员身份的基础票） + 积分票（积分 // POINTS_RATE）。
     去重主键 = 麦当劳会员唯一标识（强身份），每会员每单品仅一次。
     province 为可选地域维度，必须是 PROVINCES 受控枚举之一，否则拒绝（防脏数据）。
+    province 为 None 且 auto_province=True 时，自动从麦当劳 MCP 地址解析（仅取省份，不存地址）。
     """
     votes = load_json(VOTES, {"totals": {}, "province_totals": {}, "member_voted": {}})
     pid = product
     name = next((p["name"] for p in get_products() if p["id"] == pid), pid)
+
+    # 省份维度：未提供时自动探测（仅麦当劳会员路径，因需 MCP 连接）
+    auto_detected = False
+    if not province and auto_province and from_mcp:
+        province = auto_detect_province() or None
+        auto_detected = bool(province)
 
     # 省份维度：受控枚举校验，避免脏数据
     if province and province not in PROVINCES:
@@ -283,9 +329,13 @@ def record_vote(product, province=None, from_mcp=False):
         votes["province_totals"].setdefault(province, {})
         votes["province_totals"][province][pid] = votes["province_totals"][province].get(pid, 0) + val
     save_json(VOTES, votes)
+    region_line = ""
+    if province:
+        tag = "自动识别" if auto_detected else "手动选择"
+        region_line = f"\n   地域：{province}（{tag}，仅统计到省级，不存储地址）"
     return (f"✅ 麦当劳会员投票成功！《{name}》\n"
             f"   基础票 1（登录确认）+ 积分票 {extra}（{points} 积分 ÷ {POINTS_RATE}） = 共 {total} 票。\n"
-            f"   （仅读取积分，未扣减；按会员号强身份去重）"), True, val
+            f"   （仅读取积分，未扣减；按会员号强身份去重）{region_line}"), True, val
 
 
 def show_github_ranking(top=10):

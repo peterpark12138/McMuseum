@@ -131,6 +131,8 @@ body{
 .modal-field label{display:block;font-size:12px;font-weight:800;color:var(--red-deep);margin-bottom:6px}
 .modal-field .province-select{width:100%;border-radius:14px}
 .state.notice{background:var(--yellow-soft);border:none;color:var(--red-deep);font-weight:700;text-align:center}
+.auto-hint{margin:8px 0 0;font-size:12px;color:var(--red-deep);background:var(--yellow-soft);border-radius:10px;padding:7px 10px}
+.auto-hint.dim{background:#f6f6f6;color:#8a7f78}
 .rank-list{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
 .rank-row{
   display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;

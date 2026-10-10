@@ -6,6 +6,7 @@ const ICONS = ["🍔","🍟","🥤","🍦","🍗","🌭","🥟","🥞","🍩","�
 
 let PRODUCTS = [];
 let PROVINCES = [];
+let AUTO_PROVINCE = "";
 
 function iconFor(p, i) {
   if (/甜品|麦旋风|派|奶昔|圣代|冰淇淋|雪/.test(p.category || "")) return "🍦";
@@ -36,6 +37,16 @@ async function loadProvinces() {
   const sel = $("#province-filter");
   if (sel) {
     PROVINCES.forEach(p => sel.add(new Option(p, p)));
+  }
+}
+
+// ---- 自动识别省份（仅省级，不取地址）----
+async function detectProvince() {
+  try {
+    const d = await (await fetch("/api/detect-province")).json();
+    AUTO_PROVINCE = d.province || "";
+  } catch (e) {
+    AUTO_PROVINCE = "";
   }
 }
 
@@ -118,16 +129,21 @@ $("#province-filter").addEventListener("change", loadRank);
 let current = null;
 function openVote(p) {
   current = p;
-  const opts = PROVINCES.map(x => `<option value="${x}">${x}</option>`).join("");
+  const opts = PROVINCES.map(x =>
+    `<option value="${x}"${x === AUTO_PROVINCE ? " selected" : ""}>${x}</option>`).join("");
+  const hint = AUTO_PROVINCE
+    ? `<p class="auto-hint">📍 已自动识别为 <b>${escapeHtml(AUTO_PROVINCE)}</b>，可修改（仅统计到省级，不保存地址）</p>`
+    : `<p class="auto-hint dim">未自动识别到省份，默认计入全国；也可手动选择</p>`;
   $("#modal-body").innerHTML = `
     <h3>给《${p.name}》打 call？</h3>
     <p>将以你的 <b>麦当劳会员身份</b> 投票：<br/>1 票基础身份票 + 每 100 积分再加 1 票。</p>
     <div class="modal-field">
-      <label for="vote-province">省份（可选 · 分省看榜）</label>
+      <label for="vote-province">省份（自动识别 · 可修改）</label>
       <select id="vote-province" class="province-select">
         <option value="">全国（不分省）</option>
         ${opts}
       </select>
+      ${hint}
     </div>
     <button class="confirm-btn" id="do-vote">确认投票</button>
     <button class="cancel-btn" id="cancel-vote">再想想</button>`;
@@ -197,5 +213,5 @@ function toast(msg, kind) {
   toastTimer = setTimeout(() => t.classList.add("hidden"), 2600);
 }
 
-loadProvinces();
+loadProvinces().then(detectProvince);
 loadProducts();

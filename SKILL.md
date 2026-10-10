@@ -19,6 +19,7 @@ description: 当用户想参加「麦麦复活赛」、为怀念的麦当劳下�
 2. **选选手**：用户选定要支持的老产品（输入 id 或名称，可用 `revival.py museum` 列出）。
 3. **麦当劳会员投票**（统一调用 `scripts/revival.py` 记录；要求用户已配置 `MCD_MCP_TOKEN`）：
    - 命令：`python3 scripts/revival.py vote --product <id> --from-mcp [--province <省份>]`
+   - **省份自动识别**：不传 `--province` 时，自动从麦当劳 MCP 的「地址类」工具解析出省份（**仅取省级，不读取/不保存任何地址原文**）；识别不到则计入「全国」，前端仍可手动选择或清空。可用 `python3 scripts/detect_province.py` 验证（脱敏输出）。
    - 票数构成：**确认麦当劳会员身份 = 1 基础票** + **每 100 积分额外 1 票**（`积分 // 100`，向下取整）；**无积分 = 仅 1 票**。
    - 脚本经 `scripts/mcp_client.py` 完成 MCP 握手并调用 `query-my-account` 读取积分与会员标识。**仅读取余额换算，未真实扣减**。
    - **强身份去重**：去重主键 = 麦当劳会员唯一标识（会员号 / openid / 卡号 等，从 `query-my-account` 返回稳健解析），每会员每单品仅可投 1 次——同一人换 WorkBuddy 账号但只要连同一会员号仍只计一次，根治「多账号刷票」。

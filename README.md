@@ -79,8 +79,11 @@ python3 scripts/revival.py museum
 # 2) 用麦当劳会员身份投票（需 MCD_MCP_TOKEN）
 #    票数 = 1（确认身份的基础票） + 积分 // 100（每 100 积分 1 票）
 python3 scripts/revival.py vote --product sakura_mcfloat --from-mcp
-#    可附带省份维度（34 个省级行政区之一，受控枚举防脏数据）
+#    省份维度：不传 --province 时自动识别（从麦当劳账号地址解析，仅取省级、不保存地址）
+#    识别不到则计入「全国」；也可手动指定（34 个省级行政区受控枚举，防脏数据）
 python3 scripts/revival.py vote --product sakura_mcfloat --from-mcp --province 上海
+#    验证自动识别是否可用（脱敏输出，不打印地址）：
+python3 scripts/detect_province.py
 
 # 3) 在售 vs 怀旧 对比（真实拉取 query-meals）
 python3 scripts/revival.py meals --from-mcp

@@ -107,6 +107,15 @@ class McDonaldMCPClient:
             pass
         return resp
 
+    def list_tools(self):
+        """列出 MCP 服务端暴露的工具名（用于自适应发现地址/门店类工具）。失败返回 []。"""
+        try:
+            resp = self._post({"method": "tools/list", "params": {}})
+            tools = (resp or {}).get("result", {}).get("tools", [])
+            return [t.get("name") for t in tools if t.get("name")]
+        except Exception:
+            return []
+
     def call_tool(self, name, arguments=None):
         return self._post({
             "method": "tools/call",

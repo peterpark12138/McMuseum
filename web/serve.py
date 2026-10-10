@@ -78,6 +78,14 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/provinces":
             self._send(*_json(revival.PROVINCES))
             return
+        if path == "/api/detect-province":
+            # 自动识别省份（仅取省级，不返回/不存储任何地址原文）；识别不到返回 ""
+            try:
+                p = revival.auto_detect_province()
+            except Exception:
+                p = ""
+            self._send(*_json({"province": p}))
+            return
         if path == "/api/leaderboard":
             qs = urllib.parse.parse_qs(parsed.query)
             province = qs.get("province", [None])[0]
