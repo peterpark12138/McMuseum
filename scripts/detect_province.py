@@ -43,10 +43,14 @@ def main():
     for t in tools:
         print(f"  - {t}")
 
-    addr_tools = [t for t in tools if "address" in t.lower()]
-    print("\n=== 地址类工具 ===")
+    addr_tools = revival.address_read_tools(tools)
+    skipped = [t for t in tools
+               if "address" in str(t).lower() and t not in addr_tools]
+    print("\n=== 地址类工具（仅只读，写操作已排除）===")
+    if skipped:
+        print(f"  已跳过写操作工具（绝不调用）：{', '.join(skipped)}")
     if not addr_tools:
-        print("  未发现名称含 address 的工具 → 无法自动识别省份（将降级为「全国」）")
+        print("  未发现只读地址工具 → 无法自动识别省份（将降级为「全国」）")
     else:
         for t in addr_tools:
             print(f"  尝试调用：{t}")

@@ -249,18 +249,51 @@ def find_province_in_text(text):
     return ""
 
 
+# 自动探测省份时**只允许调用只读工具**：绝不能触碰 create/add/update/delete 等写操作工具。
+# （麦当劳 MCP 同时暴露了 delivery-query-addresses 与 delivery-create-address，
+#   若不过滤，探测逻辑可能会去调用「创建地址」接口，违反本作品「仅读取」的红线。）
+ADDR_READ_HINTS = ("query", "get", "list", "read")
+ADDR_WRITE_HINTS = ("create", "add", "update", "delete", "remove",
+                    "modify", "bind", "cancel", "pay", "submit", "set")
+
+
+def _tool_tokens(name):
+    """把工具名切成单词（kebab/snake 分隔）。
+
+    必须用「整词」而非子串判断：如 write 词 `add` 是 `address` 的子串，
+    用子串会把 delivery-query-addresses 自己误判成写操作而排除。
+    """
+    return [t for t in re.split(r"[-_\s.]+", str(name).lower()) if t]
+
+
+def address_read_tools(tools):
+    """从工具名列表中筛出「只读」的地址类工具。"""
+    out = []
+    for t in tools or []:
+        low = str(t).lower()
+        if "address" not in low:
+            continue
+        toks = _tool_tokens(low)
+        if any(tok in ADDR_WRITE_HINTS for tok in toks):
+            continue          # 写操作工具一律跳过
+        if not any(tok in ADDR_READ_HINTS for tok in toks):
+            continue          # 非读取语义，跳过
+        out.append(t)
+    return out
+
+
 def auto_detect_province():
     """自动探测用户所在省份（隐私安全：只取省份名，不落盘任何地址原文）。
 
-    策略：调麦当劳 MCP 的「地址类」工具（自适应发现，工具名可能随服务端变化）解析省份；
-    任何一步失败都静默返回 ''，由调用方降级为「全国」，绝不阻塞投票。仅读取，不修改账号数据。
+    策略：调麦当劳 MCP 的**只读**地址类工具解析省份；任何一步失败都静默返回 ''，
+    由调用方降级为「全国」，绝不阻塞投票。仅读取，绝不修改/创建任何账号数据。
     """
     try:
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         from mcp_client import McDonaldMCPClient
         c = McDonaldMCPClient()
         c.initialize()
-        prefer = [t for t in c.list_tools() if "address" in t.lower()]
+        prefer = address_read_tools(c.list_tools())
         for name in prefer:
             try:
                 resp = c.call_tool(name, {})

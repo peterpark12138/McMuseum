@@ -198,6 +198,26 @@ try:
 except Exception:
     pass
 
+# 9.8 省份自动探测必须是「只读」的
+# 麦当劳 MCP 同时暴露 delivery-query-addresses(读) 与 delivery-create-address(写)，
+# 若过滤器失效，自动探测可能会去调用「创建地址」接口，违反本作品仅读取的红线。
+try:
+    sys.path.insert(0, SCRIPTS)
+    import revival as _rv
+    _sample = ["delivery-query-addresses", "delivery-create-address",
+               "query-my-account", "cancel-order", "create-order"]
+    _sel = _rv.address_read_tools(_sample)
+    _ok = ("delivery-query-addresses" in _sel
+           and "delivery-create-address" not in _sel
+           and "create-order" not in _sel)
+    add("省份自动探测仅调用只读工具", _ok,
+        f"只读工具筛选正常：选中 {_sel}" if _ok else f"筛选异常，可能误调写操作工具：{_sel}")
+    # 省份枚举与解析
+    _p = _rv.find_province_in_text("吉林省长春市朝阳区某路")
+    add("省份文本解析正确", _p == "吉林", f"地址文本 -> {_p or '(未识别)'}")
+except Exception as _e:
+    add("省份自动探测仅调用只读工具", False, f"检查失败: {_e}")
+
 # 10. 真实依赖配置状态
 mcp_tok = os.environ.get("MCD_MCP_TOKEN")
 gh_repo = os.environ.get("GITHUB_REPO")
