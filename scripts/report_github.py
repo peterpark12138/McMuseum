@@ -24,6 +24,12 @@ import argparse
 import urllib.request
 import urllib.error
 
+try:
+    from mcp_client import _load_env_file
+except Exception:  # noqa: BLE001
+    def _load_env_file():
+        pass
+
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PRODUCTS = os.path.join(BASE, "data", "nostalgic_products.json")
 ISSUE_MAP = os.path.join(BASE, "data", "issue_map.json")
@@ -146,6 +152,7 @@ def aggregate():
 
 
 def main():
+    _load_env_file()
     ap = argparse.ArgumentParser(description="麦麦复活赛 · 后台真实统计（GitHub Issue 后端）")
     sub = ap.add_subparsers(dest="action")
     p_s = sub.add_parser("setup", help="为每个怀旧单品建 Issue 并写 issue_map.json（仅作者执行一次）")
