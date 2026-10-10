@@ -75,18 +75,23 @@ class Handler(BaseHTTPRequestHandler):
                 out.append(d)
             self._send(*_json(out))
             return
+        if path == "/api/provinces":
+            self._send(*_json(revival.PROVINCES))
+            return
         if path == "/api/leaderboard":
             qs = urllib.parse.parse_qs(parsed.query)
-            city = qs.get("city", [None])[0]
-            votes = revival.load_json(revival.VOTES, {"totals": {}, "city_totals": {}})
+            province = qs.get("province", [None])[0]
+            votes = revival.load_json(revival.VOTES, {"totals": {}, "province_totals": {}})
             name = {p["id"]: p["name"] for p in revival.get_products()}
-            if city and city in votes.get("city_totals", {}):
-                totals = votes["city_totals"][city]
+            if province and province in votes.get("province_totals", {}):
+                totals = votes["province_totals"][province]
+                used_fallback = False
             else:
                 totals = votes.get("totals", {})
+                used_fallback = bool(province)  # 该省暂无投票 -> 回退全国榜（前端会提示）
             items = sorted(totals.items(), key=lambda x: -x[1])
             out = [{"id": i, "name": name.get(i, i), "votes": v} for i, v in items]
-            self._send(*_json({"city": city, "items": out}))
+            self._send(*_json({"province": province, "items": out, "fallback": used_fallback}))
             return
         self._send(*_json({"error": "not found"}, 404))
 
@@ -100,12 +105,12 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:
                 data = {}
             product = data.get("product")
-            city = data.get("city")
+            province = data.get("province")
             if not product:
                 self._send(*_json({"ok": False, "msg": "缺少 product"}, 400))
                 return
             # 仅麦当劳会员可投票：from_mcp=True 触发真实 query-my-account 读取
-            msg, ok, val = revival.record_vote(product, city, from_mcp=True)
+            msg, ok, val = revival.record_vote(product, province, from_mcp=True)
             self._send(*_json({"ok": ok, "msg": msg, "val": val}))
             return
         self._send(*_json({"error": "not found"}, 404))

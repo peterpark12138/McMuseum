@@ -28,7 +28,7 @@
 | 麦当劳会员投票 | 仅会员可投；1 票基础（确认身份）+ 每 100 积分 1 票（额外），无积分仅 1 票 |
 | 强身份去重 | 以会员唯一标识（会员号 / openid / 卡号 等）为去重主键，每会员每单品仅一次 |
 | 在售 vs 怀旧 | 调用 `query-meals` 拉实时在售菜单，与本地博物馆对照 |
-| 复活榜 | 本地累计 + 可选的中心化（作者侧 GitHub）聚合，支持城市维度 |
+| 复活榜 | 本地累计 + 可选的中心化（作者侧 GitHub）聚合，支持省份维度（34 个省级行政区受控枚举） |
 | 拉票卡 | 生成社媒分享文案，为作品导流 |
 
 ---
@@ -79,15 +79,15 @@ python3 scripts/revival.py museum
 # 2) 用麦当劳会员身份投票（需 MCD_MCP_TOKEN）
 #    票数 = 1（确认身份的基础票） + 积分 // 100（每 100 积分 1 票）
 python3 scripts/revival.py vote --product sakura_mcfloat --from-mcp
-#    可附带城市维度
-python3 scripts/revival.py vote --product sakura_mcfloat --from-mcp --city 上海
+#    可附带省份维度（34 个省级行政区之一，受控枚举防脏数据）
+python3 scripts/revival.py vote --product sakura_mcfloat --from-mcp --province 上海
 
 # 3) 在售 vs 怀旧 对比（真实拉取 query-meals）
 python3 scripts/revival.py meals --from-mcp
 
 # 4) 看榜
 python3 scripts/revival.py ranking --top 10
-python3 scripts/revival.py ranking --top 10 --city 上海
+python3 scripts/revival.py ranking --top 10 --province 上海   # 按省份看榜
 
 # 5) 生成拉票卡
 python3 scripts/revival.py share --product sakura_mcfloat

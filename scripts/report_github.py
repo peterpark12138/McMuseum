@@ -4,7 +4,7 @@
 麦麦复活赛 · 后台真实统计（GitHub Issue 作为零服务器后端）
 
 设计要点：
-- 每个怀旧单品对应一个 GitHub Issue；每条「有效投票」由机器人**匿名**评论一条记录（仅含票种/增量/城市/日期，不含任何用户身份）。
+- 每个怀旧单品对应一个 GitHub Issue；每条「有效投票」由机器人**匿名**评论一条记录（仅含票种/增量/省份/日期，不含任何用户身份）。
 - 真实全民榜 = 聚合所有单品 Issue 的匿名投票评论。
 - 投票资格与「强身份去重」由 revival.py 在本地完成：仅麦当劳会员账号可投票，以会员唯一标识（会员号 / openid / 卡号等）为去重主键，每会员每单品仅一次。
 - 本后端只负责把「已通过麦当劳会员校验的一票」匿名归档，做到「真实跨用户统计 + 防刷 + 零门槛（无需 GitHub 账号）」三者兼得。
@@ -77,7 +77,7 @@ def _save_map(m):
         json.dump(m, f, ensure_ascii=False, indent=2)
 
 
-def report_vote(product_id, vtype, value, city=None):
+def report_vote(product_id, vtype, value, province=None):
     """匿名上报一条有效投票到该单品对应的 GitHub Issue。返回 (ok, msg)。"""
     repo = os.environ.get("GITHUB_REPO")
     token = os.environ.get("GITHUB_TOKEN")
@@ -88,8 +88,8 @@ def report_vote(product_id, vtype, value, city=None):
     if not num:
         return False, f"单品 {product_id} 未绑定 Issue（请先运行 `python3 scripts/report_github.py setup`），跳过上报"
     url = f"{API}/repos/{repo}/issues/{num}/comments"
-    # 匿名记录：仅含 票种/增量/城市/日期，不含任何用户身份
-    body = f"vote {vtype} +{value} {city or '全国'} {datetime.date.today().isoformat()}"
+    # 匿名记录：仅含 票种/增量/省份/日期，不含任何用户身份
+    body = f"vote {vtype} +{value} {province or '全国'} {datetime.date.today().isoformat()}"
     try:
         _req(url, "POST", {"body": body}, token)
     except RuntimeError as e:

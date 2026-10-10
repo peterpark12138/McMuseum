@@ -123,6 +123,14 @@ body{
   background:#fff;color:var(--red-deep);padding:8px 16px;border-radius:999px;transition:.18s;
 }
 .ghost-btn:hover{background:var(--yellow);border-color:var(--yellow)}
+.rank-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.province-select{font-family:inherit;font-size:14px;font-weight:700;color:var(--red-deep);background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer;transition:.18s}
+.province-select:hover{border-color:var(--yellow)}
+.province-select:focus{outline:2px solid var(--yellow);outline-offset:1px}
+.modal-field{margin:14px 0 16px;text-align:left}
+.modal-field label{display:block;font-size:12px;font-weight:800;color:var(--red-deep);margin-bottom:6px}
+.modal-field .province-select{width:100%;border-radius:14px}
+.state.notice{background:var(--yellow-soft);border:none;color:var(--red-deep);font-weight:700;text-align:center}
 .rank-list{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
 .rank-row{
   display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;

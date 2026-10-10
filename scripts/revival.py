@@ -11,13 +11,13 @@
     · 仅读取积分，绝不扣减
 - 强身份去重：以麦当劳会员唯一标识（会员号 / openid / 卡号 等）为去重主键，每会员每单品仅可投一次
 - 在售 vs 怀旧对比：调用 query-meals（--from-mcp）与本地博物馆对照
-- 复活榜聚合（支持城市维度）
+- 复活榜聚合（支持省份维度，省份为受控枚举，防脏数据）
 - 拉票分享卡生成
 
 用法示例：
   python3 scripts/revival.py museum
   python3 scripts/revival.py vote --product sakura_mcfloat --from-mcp                # 麦当劳会员投票（需 MCD_MCP_TOKEN）
-  python3 scripts/revival.py vote --product sakura_mcfloat --from-mcp --city 上海
+  python3 scripts/revival.py vote --product sakura_mcfloat --from-mcp --province 上海
   python3 scripts/revival.py meals --from-mcp                                      # 在售 vs 怀旧对比
   python3 scripts/revival.py ranking --top 10
   python3 scripts/revival.py share --product sakura_mcfloat
@@ -32,6 +32,17 @@ BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(BASE, "data", "nostalgic_products.json")
 VOTES = os.path.join(BASE, "data", "votes.json")
 POINTS_RATE = 100  # 每 100 积分 = 1 票（额外票）
+
+# 34 个省级行政区（含直辖市 / 自治区 / 特别行政区）。
+# 投票地域维度用受控枚举，避免自由文本城市名造成的脏数据 / 榜被拆散。
+PROVINCES = [
+    "北京", "天津", "上海", "重庆",
+    "河北", "山西", "辽宁", "吉林", "黑龙江", "江苏", "浙江", "安徽", "福建", "江西",
+    "山东", "河南", "湖北", "湖南", "广东", "海南", "四川", "贵州", "云南", "陕西",
+    "甘肃", "青海", "台湾",
+    "内蒙古", "广西", "西藏", "宁夏", "新疆",
+    "香港", "澳门",
+]
 
 
 def load_json(path, default):
@@ -224,16 +235,22 @@ def show_meals_vs_museum():
     print("👉 对比可见：你怀念的老麦，回来了吗？")
 
 
-def record_vote(product, city=None, from_mcp=False):
+def record_vote(product, province=None, from_mcp=False):
     """记录一票。仅麦当劳会员账号可投票（已取消降级）。
 
     返回 (msg, ok, val)。
     票数 = 1（确认会员身份的基础票） + 积分票（积分 // POINTS_RATE）。
     去重主键 = 麦当劳会员唯一标识（强身份），每会员每单品仅一次。
+    province 为可选地域维度，必须是 PROVINCES 受控枚举之一，否则拒绝（防脏数据）。
     """
-    votes = load_json(VOTES, {"totals": {}, "city_totals": {}, "member_voted": {}})
+    votes = load_json(VOTES, {"totals": {}, "province_totals": {}, "member_voted": {}})
     pid = product
     name = next((p["name"] for p in get_products() if p["id"] == pid), pid)
+
+    # 省份维度：受控枚举校验，避免脏数据
+    if province and province not in PROVINCES:
+        return (f"⚠️ 省份「{province}」不在可选范围内（应为 34 个省级行政区之一，如 上海 / 广东 / 四川）。"
+                f"如无需分省统计，请勿传 --province。"), False, 0
 
     # 已取消降级：非麦当劳账号一律拒绝
     if not from_mcp:
@@ -262,9 +279,9 @@ def record_vote(product, city=None, from_mcp=False):
     votes["member_voted"][key].append(pid)
     votes["totals"][pid] = votes["totals"].get(pid, 0) + total
     val = total
-    if city:
-        votes["city_totals"].setdefault(city, {})
-        votes["city_totals"][city][pid] = votes["city_totals"][city].get(pid, 0) + val
+    if province:
+        votes["province_totals"].setdefault(province, {})
+        votes["province_totals"][province][pid] = votes["province_totals"][province].get(pid, 0) + val
     save_json(VOTES, votes)
     return (f"✅ 麦当劳会员投票成功！《{name}》\n"
             f"   基础票 1（登录确认）+ 积分票 {extra}（{points} 积分 ÷ {POINTS_RATE}） = 共 {total} 票。\n"
@@ -295,12 +312,12 @@ def show_github_ranking(top=10):
         print(f"{i}. {name.get(pid, pid)} — {cnt} 票")
 
 
-def ranking(top=10, city=None):
-    votes = load_json(VOTES, {"totals": {}, "city_totals": {}, "member_voted": {}})
+def ranking(top=10, province=None):
+    votes = load_json(VOTES, {"totals": {}, "province_totals": {}, "member_voted": {}})
     name = {p["id"]: p["name"] for p in get_products()}
-    if city and city in votes.get("city_totals", {}):
-        totals = votes["city_totals"][city]
-        title = f"🏆 {city} · 复活榜 Top {top}"
+    if province and province in votes.get("province_totals", {}):
+        totals = votes["province_totals"][province]
+        title = f"🏆 {province} · 复活榜 Top {top}"
     else:
         totals = votes.get("totals", {})
         title = f"🏆 复活榜 Top {top}"
@@ -338,13 +355,15 @@ def main():
 
     p_v = sub.add_parser("vote")
     p_v.add_argument("--product", required=True)
-    p_v.add_argument("--city", default=None)
+    p_v.add_argument("--province", default=None,
+                    help="可选省份维度（34 个省级行政区之一，如 上海/广东/四川），受控枚举防脏数据")
     p_v.add_argument("--from-mcp", action="store_true",
                      help="仅麦当劳会员可投票：真实读取 query-my-account 积分换算（需 MCD_MCP_TOKEN）")
 
     p_r = sub.add_parser("ranking")
     p_r.add_argument("--top", type=int, default=10)
-    p_r.add_argument("--city", default=None)
+    p_r.add_argument("--province", default=None,
+                     help="按省份查看复活榜（需与投票时传入的省份一致）")
     p_r.add_argument("--from-github", action="store_true", help="从 GitHub Issue 聚合真实复活榜（跨用户）")
 
     p_s = sub.add_parser("share")
@@ -356,13 +375,13 @@ def main():
     elif args.cmd == "meals":
         show_meals_vs_museum()
     elif args.cmd == "vote":
-        msg, ok, val = record_vote(args.product, args.city, args.from_mcp)
+        msg, ok, val = record_vote(args.product, args.province, args.from_mcp)
         print(msg)
         if ok:
             try:
                 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
                 from report_github import report_vote as rpt
-                ok2, m2 = rpt(args.product, "mcp", val, args.city)
+                ok2, m2 = rpt(args.product, "mcp", val, args.province)
                 if ok2:
                     print(f"[后台统计] {m2}")
             except Exception:  # noqa: BLE001
@@ -371,7 +390,7 @@ def main():
         if args.from_github:
             show_github_ranking(args.top)
         else:
-            ranking(args.top, args.city)
+            ranking(args.top, args.province)
     elif args.cmd == "share":
         print(share_card(args.product))
     else:

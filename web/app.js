@@ -5,6 +5,7 @@ const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const ICONS = ["🍔","🍟","🥤","🍦","🍗","🌭","🥟","🥞","🍩","🍱","🧇","🍪"];
 
 let PRODUCTS = [];
+let PROVINCES = [];
 
 function iconFor(p, i) {
   if (/甜品|麦旋风|派|奶昔|圣代|冰淇淋|雪/.test(p.category || "")) return "🍦";
@@ -24,6 +25,19 @@ $$(".tab").forEach(t => t.addEventListener("click", () => {
   $("#view-rank").classList.toggle("hidden", v !== "rank");
   if (v === "rank") loadRank();
 }));
+
+// ---- 加载省份枚举（受控，防脏数据）----
+async function loadProvinces() {
+  try {
+    PROVINCES = await (await fetch("/api/provinces")).json();
+  } catch (e) {
+    PROVINCES = [];
+  }
+  const sel = $("#province-filter");
+  if (sel) {
+    PROVINCES.forEach(p => sel.add(new Option(p, p)));
+  }
+}
 
 // ---- 加载单品 ----
 async function loadProducts() {
@@ -66,7 +80,10 @@ async function loadRank() {
   const list = $("#rank-list");
   list.innerHTML = "<div class='state'>加载中…</div>";
   try {
-    const res = await fetch("/api/leaderboard");
+    const sel = $("#province-filter");
+    const province = sel ? sel.value : "";
+    const url = province ? `/api/leaderboard?province=${encodeURIComponent(province)}` : "/api/leaderboard";
+    const res = await fetch(url);
     const data = await res.json();
     const items = data.items || [];
     if (!items.length) {
@@ -76,7 +93,10 @@ async function loadRank() {
     }
     $("#rank-empty").classList.add("hidden");
     const max = items[0].votes || 1;
-    list.innerHTML = items.map((it, i) => `
+    const notice = (data.fallback && province)
+      ? `<div class="state notice">${escapeHtml(province)} 还没有人投票，先看看全国榜 👇</div>`
+      : "";
+    list.innerHTML = notice + items.map((it, i) => `
       <div class="rank-row ${i < 3 ? "top" + (i + 1) : ""}">
         <div class="rank-no">${i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}</div>
         <div class="rank-main">
@@ -92,14 +112,23 @@ async function loadRank() {
   }
 }
 $("#refresh-rank").addEventListener("click", loadRank);
+$("#province-filter").addEventListener("change", loadRank);
 
 // ---- 投票弹窗 ----
 let current = null;
 function openVote(p) {
   current = p;
+  const opts = PROVINCES.map(x => `<option value="${x}">${x}</option>`).join("");
   $("#modal-body").innerHTML = `
     <h3>给《${p.name}》打 call？</h3>
     <p>将以你的 <b>麦当劳会员身份</b> 投票：<br/>1 票基础身份票 + 每 100 积分再加 1 票。</p>
+    <div class="modal-field">
+      <label for="vote-province">省份（可选 · 分省看榜）</label>
+      <select id="vote-province" class="province-select">
+        <option value="">全国（不分省）</option>
+        ${opts}
+      </select>
+    </div>
     <button class="confirm-btn" id="do-vote">确认投票</button>
     <button class="cancel-btn" id="cancel-vote">再想想</button>`;
   $("#modal").classList.remove("hidden");
@@ -114,11 +143,13 @@ async function doVote() {
   if (!current) return;
   const btn = $("#do-vote");
   btn.disabled = true; btn.textContent = "投票中…";
+  const provinceEl = $("#vote-province");
+  const province = provinceEl ? provinceEl.value : "";
   try {
     const res = await fetch("/api/vote", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ product: current.id })
+      body: JSON.stringify({ product: current.id, province })
     });
     const data = await res.json();
     if (data.ok) {
@@ -166,4 +197,5 @@ function toast(msg, kind) {
   toastTimer = setTimeout(() => t.classList.add("hidden"), 2600);
 }
 
+loadProvinces();
 loadProducts();

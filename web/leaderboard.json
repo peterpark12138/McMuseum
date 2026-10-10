@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-11T00:18:37",
+  "updated": "2026-10-11T00:46:09",
   "mode": "local",
   "national": [
     {
@@ -666,5 +666,5 @@
       "votes": 0
     }
   ],
-  "cities": {}
+  "provinces": {}
 }

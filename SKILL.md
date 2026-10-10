@@ -18,13 +18,13 @@ description: 当用户想参加「麦麦复活赛」、为怀念的麦当劳下�
 1. **逛博物馆**：调用 `query-meals` 拉取当前在售菜单，与本地博物馆（`data/nostalgic_products.json`）做「在售 vs 怀旧」对比，点出「它们回来了吗」。（可选）用 `list-nutrition-foods` 给怀旧单品做趣味营养科普。
 2. **选选手**：用户选定要支持的老产品（输入 id 或名称，可用 `revival.py museum` 列出）。
 3. **麦当劳会员投票**（统一调用 `scripts/revival.py` 记录；要求用户已配置 `MCD_MCP_TOKEN`）：
-   - 命令：`python3 scripts/revival.py vote --product <id> --from-mcp [--city <城市>]`
+   - 命令：`python3 scripts/revival.py vote --product <id> --from-mcp [--province <省份>]`
    - 票数构成：**确认麦当劳会员身份 = 1 基础票** + **每 100 积分额外 1 票**（`积分 // 100`，向下取整）；**无积分 = 仅 1 票**。
    - 脚本经 `scripts/mcp_client.py` 完成 MCP 握手并调用 `query-my-account` 读取积分与会员标识。**仅读取余额换算，未真实扣减**。
    - **强身份去重**：去重主键 = 麦当劳会员唯一标识（会员号 / openid / 卡号 等，从 `query-my-account` 返回稳健解析），每会员每单品仅可投 1 次——同一人换 WorkBuddy 账号但只要连同一会员号仍只计一次，根治「多账号刷票」。
    - **无降级**：若 `MCD_MCP_TOKEN` 缺失或无法解析会员标识，投票被拒绝并提示先连接麦当劳账号（不回退到其他账号）。
    - 在售 vs 怀旧对比：`python3 scripts/revival.py meals --from-mcp` 真实拉取 `query-meals` 与博物馆对照。
-4. **看榜**：`python3 scripts/revival.py ranking --top 10` 展示本地复活榜；可叠加城市维度（投票时传 `--city`）。
+4. **看榜**：`python3 scripts/revival.py ranking --top 10` 展示本地复活榜；可叠加省份维度（投票时传 `--province`，看榜时同样传 `--province`）。省份为 **34 个省级行政区的受控枚举**，非法值会被拒绝，避免自由文本城市名造成脏数据 / 榜被拆散。
 5. **分享卡**：`python3 scripts/revival.py share --product <id>` 生成拉票文案，引导社媒扩散（也为 GitHub Star 导流）。
 
 ## 三、MCP 调用清单（业务价值映射）
@@ -40,7 +40,7 @@ description: 当用户想参加「麦麦复活赛」、为怀念的麦当劳下�
 - MCP 401（Token 无效/过期）：提示用户检查 `MCD_MCP_TOKEN` 环境变量。
 - MCP 429（超 600 次/分钟）：降低频率、缓存菜单/积分结果，控制调用间隔。
 - 怀旧单品真实性：`verified=true` 的作为主推；`verified=false` 赛前须用官方历史菜单核实，核实前标注「待核实」不主推。
-- 用户未选单品/未选城市：给默认值并提示，不阻断流程。
+- 用户未选单品/未选省份：给默认值并提示，不阻断流程。
 - 用户未连接麦当劳账号（无 `MCD_MCP_TOKEN` 或解析不到会员标识）：明确告知「仅麦当劳会员可投票，请先连接账号」，**不降级到其他投票方式**。
 
 ## 五、反作弊

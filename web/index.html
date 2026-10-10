@@ -38,7 +38,12 @@
   <main id="view-rank" class="view hidden">
     <div class="rank-head">
       <h2>🏆 复活榜 Top</h2>
-      <button id="refresh-rank" class="ghost-btn">刷新</button>
+      <div class="rank-tools">
+        <select id="province-filter" class="province-select">
+          <option value="">全国</option>
+        </select>
+        <button id="refresh-rank" class="ghost-btn">刷新</button>
+      </div>
     </div>
     <div id="rank-list" class="rank-list"></div>
     <div id="rank-empty" class="state empty hidden">还没有人投票，快来当第一个！</div>

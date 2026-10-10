@@ -33,7 +33,7 @@ def get_products():
 
 def build(from_github=False):
     products = get_products()
-    city_totals = {}
+    province_totals = {}
     if from_github:
         try:
             sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -45,9 +45,9 @@ def build(from_github=False):
             mode = f"github(失败:{e})"
         totals = {p["id"]: agg.get(p["id"], 0) for p in products}
     else:
-        v = load_json(VOTES, {"totals": {}, "city_totals": {}})
+        v = load_json(VOTES, {"totals": {}, "province_totals": {}})
         totals = v.get("totals", {})
-        city_totals = v.get("city_totals", {})
+        province_totals = v.get("province_totals", {})
         mode = "local"
 
     national = [
@@ -64,8 +64,8 @@ def build(from_github=False):
     ]
     national.sort(key=lambda x: (-x["votes"], x["name"]))
 
-    cities = {}
-    for city, d in city_totals.items():
+    provinces = {}
+    for province, d in province_totals.items():
         cl = [
             {"id": p["id"], "name": p["name"], "votes": d.get(p["id"], 0)}
             for p in products
@@ -73,18 +73,18 @@ def build(from_github=False):
         cl = [c for c in cl if c["votes"] > 0]
         cl.sort(key=lambda x: (-x["votes"], x["name"]))
         if cl:
-            cities[city] = cl
+            provinces[province] = cl
 
     out = {
         "updated": datetime.datetime.now().isoformat(timespec="seconds"),
         "mode": mode,
         "national": national,
-        "cities": cities,
+        "provinces": provinces,
     }
     os.makedirs(WEB, exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
-    print(f"已生成 {OUT}（mode={mode}, 单品 {len(national)}, 有票城市 {len(cities)}）")
+    print(f"已生成 {OUT}（mode={mode}, 单品 {len(national)}, 有票省份 {len(provinces)}）")
 
 
 def main():
