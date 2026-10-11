@@ -18,6 +18,7 @@
 import os
 import sys
 import json
+import time
 import urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -48,10 +49,24 @@ def _use_github():
     return os.environ.get("LEADERBOARD_SOURCE", "").strip().lower() == "github"
 
 
+_GH_CACHE = {"ts": 0.0, "data": None}
+_GH_TTL = 60  # 秒：GitHub 聚合的进程内缓存，保护 API 限流（未认证 60 次/小时）
+
+
 def _github_totals():
-    """从 GitHub 聚合真实共享榜，返回 (totals, province_totals) 或 (None, None)。"""
+    """从 GitHub 聚合真实共享榜，返回 (totals, province_totals) 或 (None, None)。
+
+    带 60s 进程内 TTL 缓存：聚合本身已是仓库级单接口（个位数调用），
+    叠加缓存后公开站点不会触及 GitHub 未认证限流。
+    """
+    now = time.time()
+    if _GH_CACHE["data"] is not None and now - _GH_CACHE["ts"] < _GH_TTL:
+        d = _GH_CACHE["data"]
+        return d.get("totals", {}), d.get("province_totals", {})
     try:
         agg = report_github.aggregate()
+        _GH_CACHE["ts"] = now
+        _GH_CACHE["data"] = agg
         return agg.get("totals", {}), agg.get("province_totals", {})
     except Exception:  # noqa: BLE001
         return None, None

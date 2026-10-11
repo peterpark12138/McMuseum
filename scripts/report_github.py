@@ -19,6 +19,7 @@
 import os
 import re
 import json
+import uuid
 import datetime
 import argparse
 import urllib.request
@@ -201,11 +202,98 @@ def _tally_comments(comments, bot_login):
     return total, pt
 
 
+def _fetch_all_comments(url_base, token=None, max_pages=50):
+    """拉取一个 Issue 的全部评论（自动翻页，每页 100，防止超 100 条评论丢票）。
+
+    GET URL 附带随机 uuid 参数（cache-buster），避免中间代理缓存旧响应导致
+    「刚发的评论读不到」进而破坏 backfill 幂等性。
+    """
+    out = []
+    page = 1
+    while page <= max_pages:
+        sep = "&" if "?" in url_base else "?"
+        url = f"{url_base}{sep}per_page=100&page={page}&_={uuid.uuid4().hex}"
+        comments = _req(url, "GET", token=token)
+        if not isinstance(comments, list) or not comments:
+            break
+        out.extend(comments)
+        if len(comments) < 100:
+            break
+        page += 1
+    return out
+
+
+def _plan_backfill(local_votes, gh):
+    """纯函数：计算「本地已计票但尚未回流 GitHub」的差额，返回待补报评论计划。
+
+    返回 [(product_id, delta, province)]，province 为省份名或「全国」。
+    幂等：补报后 GitHub 聚合值上升，再次计算差额为 0，不会重复补报。
+    """
+    lt = (local_votes or {}).get("totals", {}) or {}
+    lpt = (local_votes or {}).get("province_totals", {}) or {}
+    gt = (gh or {}).get("totals", {}) or {}
+    gpt = (gh or {}).get("province_totals", {}) or {}
+    plan = []
+    for pid, n in lt.items():
+        delta = n - gt.get(pid, 0)
+        if delta <= 0:
+            continue
+        prov_sum = 0
+        for prov, pv in lpt.items():
+            d = (pv or {}).get(pid, 0) - ((gpt.get(prov) or {}).get(pid, 0))
+            if d > 0:
+                plan.append((pid, d, prov))
+                prov_sum += d
+        rest = delta - prov_sum
+        if rest > 0:
+            plan.append((pid, rest, "全国"))
+    return plan
+
+
+def backfill():
+    """把本地 votes.json 中尚未回流 GitHub 的票，匿名补报到对应 Issue（幂等，可重复执行）。"""
+    repo = os.environ.get("GITHUB_REPO")
+    token = os.environ.get("GITHUB_TOKEN")
+    if not repo or not token:
+        print("需要 GITHUB_REPO/GITHUB_TOKEN 才能补报。")
+        return
+    votes_path = os.path.join(BASE, "data", "votes.json")
+    local = {}
+    if os.path.exists(votes_path):
+        with open(votes_path, encoding="utf-8") as f:
+            local = json.load(f)
+    gh = aggregate()
+    plan = _plan_backfill(local, gh)
+    if not plan:
+        print("✅ 本地与 GitHub 共享榜已一致，无需补报。")
+        return
+    m = _load_map()
+    today = datetime.date.today().isoformat()
+    done = 0
+    for pid, delta, prov in plan:
+        num = m.get(pid)
+        if not num:
+            print(f"  ⚠️ {pid} 未绑定 Issue，跳过")
+            continue
+        body = f"vote backfill +{delta} {prov} {today}"
+        try:
+            _req(f"{API}/repos/{repo}/issues/{num}/comments", "POST", {"body": body}, token)
+            done += 1
+            print(f"  ✅ 已补报 {pid} +{delta}（{prov}）-> Issue #{num}")
+        except RuntimeError as e:
+            print(f"  ⚠️ 补报 {pid} 失败: {e}")
+    print(f"补报完成：{done}/{len(plan)} 条。")
+
+
 def aggregate():
     """聚合所有单品 Issue 的匿名投票评论，返回真实可信的跨用户复活榜。
 
     信任模型：只统计机器人自身发布的投票评论（见 _bot_login / _tally_comments），
     他人无法伪造刷票。
+
+    性能与限流：使用仓库级列表接口（GET /repos/{repo}/issues/comments）一次拉取
+    全部 Issue 评论，按 issue_url 归属到单品——整个聚合仅需个位数 API 调用
+    （每 100 条评论一页），远优于逐 Issue 请求的 51 次调用（会撞未认证 60 次/小时限流）。
 
     返回：
         {
@@ -221,12 +309,25 @@ def aggregate():
     token = os.environ.get("GITHUB_TOKEN")
     bot = _bot_login(token)
     result = {"totals": {}, "province_totals": {}}
-    for pid, num in m.items():
-        url = f"{API}/repos/{repo}/issues/{num}/comments?per_page=100"
-        try:
-            comments = _req(url, "GET", token=token)
-        except RuntimeError:
-            comments = []
+    # 初始化所有单品为 0，保证榜完整
+    for pid in m:
+        result["totals"][pid] = 0
+    # 仓库级评论列表 -> 按 issue 编号分组
+    num2pid = {num: pid for pid, num in m.items()}
+    try:
+        all_comments = _fetch_all_comments(f"{API}/repos/{repo}/issues/comments", token)
+    except RuntimeError:
+        return result
+    by_issue = {}
+    for c in all_comments:
+        issue_url = c.get("issue_url") or ""
+        mm = re.search(r"/issues/(\d+)$", issue_url)
+        if not mm:
+            continue
+        pid = num2pid.get(int(mm.group(1)))
+        if pid:
+            by_issue.setdefault(pid, []).append(c)
+    for pid, comments in by_issue.items():
         total, pt = _tally_comments(comments, bot)
         result["totals"][pid] = total
         for prov, v in pt.items():
@@ -242,11 +343,14 @@ def main():
     p_s = sub.add_parser("setup", help="为每个怀旧单品建 Issue 并写 issue_map.json（仅作者执行一次）")
     p_s.add_argument("--repo", default=None)
     sub.add_parser("aggregate", help="输出 GitHub 真实聚合榜（JSON）")
+    sub.add_parser("backfill", help="把本地已计票但未回流 GitHub 的票匿名补报（幂等）")
     args = ap.parse_args()
     if args.action == "setup":
         setup(args.repo)
     elif args.action == "aggregate":
         print(json.dumps(aggregate(), ensure_ascii=False, indent=2))
+    elif args.action == "backfill":
+        backfill()
     else:
         ap.print_help()
 

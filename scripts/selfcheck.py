@@ -316,6 +316,44 @@ try:
 except Exception as _e:
     add("MCP 只读红线(safe_call 拦截写工具)", False, f"检查失败: {_e}")
 
+# 9.11 共享榜补报与分页：_plan_backfill 差额计算 + _fetch_all_comments 翻页
+try:
+    import report_github as _rg
+    # (a) _plan_backfill 纯函数：本地多出 3 票（2 在省 + 1 全国）→ 计划补 2 条；GitHub 领先时不补
+    _local = {"totals": {"a": 3, "b": 2}, "province_totals": {"吉林": {"a": 2}}}
+    _gh = {"totals": {"a": 0, "b": 5}, "province_totals": {}}
+    _plan = _rg._plan_backfill(_local, _gh)
+    _plan_ok = sorted(_plan) == [("a", 1, "全国"), ("a", 2, "吉林")]
+    # 幂等：补报后（gh 追平）计划应为空
+    _gh2 = {"totals": {"a": 3, "b": 5}, "province_totals": {"吉林": {"a": 2}}}
+    _plan_ok = _plan_ok and _rg._plan_backfill(_local, _gh2) == []
+    add("共享榜补报差额计算(_plan_backfill)", _plan_ok,
+        "本地超 3 票 -> 计划 2 条；追平后计划为空(幂等)" if _plan_ok else f"实际计划: {_plan}")
+
+    # (b) _fetch_all_comments 自动翻页：两页各 100 条 + 第三页空 → 共 200 条
+    class _Orig:
+        pass
+    _orig_req = _rg._req
+    _page_re = _re.compile(r"[?&]page=(\d+)(&|$)")
+    def _fake_req(url, method="GET", data=None, token=None):
+        mm = _page_re.search(url)
+        pg = mm.group(1) if mm else "0"
+        if pg == "1":
+            return [{"id": i} for i in range(100)]
+        if pg == "2":
+            return [{"id": i} for i in range(100, 200)]
+        return []
+    _rg._req = _fake_req
+    try:
+        _got = _rg._fetch_all_comments("https://api.github.com/repos/x/y/issues/1")
+    finally:
+        _rg._req = _orig_req
+    _page_ok = len(_got) == 200
+    add("聚合评论自动翻页(防超100条丢票)", _page_ok,
+        "2 页 x 100 条全部取回" if _page_ok else f"实际取回 {len(_got)} 条")
+except Exception as _e:
+    add("共享榜补报与分页", False, f"检查失败: {_e}")
+
 # 10. 真实依赖配置状态
 mcp_tok = os.environ.get("MCD_MCP_TOKEN")
 gh_repo = os.environ.get("GITHUB_REPO")

@@ -339,8 +339,12 @@ def _get_address_and_stores():
         sobj = _extract_json_object(_text(safe_call(c, "delivery-query-stores",
                                                    {"addressId": address_id, "beType": "2"})))
         sd = (sobj or {}).get("data")
-        stores = sd if isinstance(sd, list) else (
-            sd.get("stores") or sd.get("list") or [] if isinstance(sd, dict) else [])
+        if isinstance(sd, list):
+            stores = sd
+        elif isinstance(sd, dict):
+            stores = sd.get("stores") or sd.get("list") or []
+        else:
+            stores = []
         return province, address_id, [s for s in stores if isinstance(s, dict)]
     except Exception:
         return "", "", []

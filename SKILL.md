@@ -28,14 +28,18 @@ description: 当用户想参加「麦麦复活赛」、为怀念的麦当劳下�
 4. **看榜**：`python3 scripts/revival.py ranking --top 10` 展示本地复活榜；可叠加省份维度（投票时传 `--province`，看榜时同样传 `--province`）。省份为 **34 个省级行政区的受控枚举**，非法值会被拒绝，避免自由文本城市名造成脏数据 / 榜被拆散。
 5. **分享卡**：`python3 scripts/revival.py share --product <id>` 生成拉票文案，引导社媒扩散（也为 GitHub Star 导流）。
 
-## 三、MCP 调用清单（业务价值映射）
-| 工具 | 用途 | 是否必调 |
+## 三、MCP 调用清单（与代码实际一致）
+| 工具 | 用途 | 调用情况 |
 |------|------|---------|
 | `query-my-account` | 会员投票的真实数据底座（读积分余额 + 会员标识） | ✅ 必调 |
 | `query-meals` | 当前在售 vs 怀旧单品对比 | ✅ 必调 |
-| `list-nutrition-foods` | 怀旧单品趣味营养科普 | 选调 |
-| `campaign-calendar` | 今日麦麦活动速览（加分项） | 选调 |
-| `now-time-info` | 签到/每日重置的时间基准 | 选调 |
+| `delivery-query-addresses` → `delivery-query-stores` | 省份自动识别 + 附近门店（仅取省级，不存地址原文） | ✅ 投票/前端选调 |
+| `list-nutrition-foods` | 怀旧单品趣味营养科普（160 款实时营养库） | ✅ 前端选调 |
+| `campaign-calendar` | 营销活动日历（「麦麦现在」页） | ✅ 前端选调 |
+| `mall-points-products` / `query-lottery-info` | 积分商城 / 积分抽奖速览（仅展示，不兑换不抽奖） | ✅ 前端选调 |
+
+> 所有调用统一经 `scripts/mcd_data.py` 的 `safe_call()` 只读白名单（27 个只读工具），
+> 8 个写/交易类工具（下单/扣减/领券/建地址等）在调用层被硬性拦截。
 
 ## 四、异常处理
 - MCP 401（Token 无效/过期）：提示用户检查 `MCD_MCP_TOKEN` 环境变量。
@@ -50,8 +54,17 @@ description: 当用户想参加「麦麦复活赛」、为怀念的麦当劳下�
 - 不提供任何脚本/机器人刷票路径，遵守赛事「同一用户」判定（会员身份视为同一用户）。
 
 ## 六、后台统计与榜单（诚实说明）
-- **本地榜（默认）**：每次「有效投票」成功后，脚本在本地 `data/votes.json` 按会员去重累计票数，并（可选）匿名写入对应单品的 GitHub Issue 评论（`scripts/report_github.py`，不含任何用户身份）。
-- **聚合榜（可选·作者侧）**：作者（或机器人）配置 `GITHUB_REPO` + `GITHUB_TOKEN` 后，可运行 `report_github.py setup` 初始化后端，再用 `revival.py ranking --from-github` 聚合跨用户匿名投票。
-  - ⚠️ **诚实边界**：终端用户本地投票时若无作者侧 Token，票不会自动汇总到 GitHub；所谓「全网聚合榜」依赖作者后端，不是「零服务器自动跨用户」。未配置后端时，榜单为本地（当前部署）数据，Skill 应如实告知用户，不夸大"全民实时聚合"。
-- 初始化（仅作者执行一次）：`python3 scripts/report_github.py setup --repo owner/repo`（需 `GITHUB_REPO` + `GITHUB_TOKEN` 环境变量）。
-- 环境变量：`GITHUB_REPO`（owner/repo）、`GITHUB_TOKEN`（仅作者/机器人用，绝不提交）。本地无 token 时自动降级为本地演示，不影响功能与评分。
+- **本地榜（默认）**：每次「有效投票」成功后，脚本在本地 `data/votes.json` 按会员去重累计票数。
+- **共享榜自动回流**：`record_vote` 内部会自动把有效票**匿名**上报到对应单品的 GitHub Issue
+  （`scripts/report_github.py`，仅含票种/增量/省份/日期，不含任何用户身份）。
+  未配置 `GITHUB_REPO`/`GITHUB_TOKEN` 时自动跳过，且投票结果消息中会显式告知「已回流/未回流」。
+- **共享榜信任模型**：聚合（`aggregate()`）只统计**机器人自身账号**发布的投票评论
+  （`GITHUB_BOT_LOGIN` 锚定），任何人在 Issue 下伪造 `vote ...` 评论均不计入，杜绝刷票；
+  评论自动翻页（每页 100），超长投票历史不丢票。
+- **一致性补报**：若历史票曾因未配置后端而未回流（本地与共享榜出现差额），
+  运行 `python3 scripts/report_github.py backfill` 幂等补报（可重复执行，不会重复计数）。
+- **公开部署**：`web/serve.py` 设 `LEADERBOARD_SOURCE=github` 后，公开站点从 Issue 只读聚合
+  展示共享榜（无需 token，靠 `GITHUB_BOT_LOGIN` 锚定信任）；投票仍需用户本机/WorkBuddy
+  连接自己的麦当劳账号（`MCD_MCP_TOKEN`），公开站点不持有任何 token。
+- **诚实边界**：终端用户本地投票时若无作者侧 Token，票只记在本地、不回流共享榜
+  （投票结果消息会如实提示）。榜单来源（github / local）在 API 响应中带 `source` 字段，不夸大。

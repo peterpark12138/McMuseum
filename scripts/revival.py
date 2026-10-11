@@ -365,14 +365,17 @@ def record_vote(product, province=None, from_mcp=False, auto_province=True):
 
     # 后台上报到 GitHub 共享榜（匿名、仅作者 token 可写；未配置自动跳过）。
     # 放在 record_vote 内，确保命令行与前端 /api/vote 都能回流到共享榜。
+    # 上报结果显式告知（诚实原则）：本地票若未回流共享榜，用户应知情。
+    report_note = ""
     try:
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         import mcp_client as _mc
         _mc._load_env_file()  # 确保 .env 中的 GITHUB_REPO/GITHUB_TOKEN 被加载
         from report_github import report_vote as _rpt
-        _rpt(pid, "mcp", val, province)
-    except Exception:  # noqa: BLE001
-        pass
+        ok_r, m_r = _rpt(pid, "mcp", val, province)
+        report_note = f"\n   共享榜：{'已匿名回流 GitHub ✅' if ok_r else f'未回流（{m_r}）'}"
+    except Exception as e:  # noqa: BLE001
+        report_note = f"\n   共享榜：未回流（{e}）"
 
     region_line = ""
     if province:
@@ -380,7 +383,7 @@ def record_vote(product, province=None, from_mcp=False, auto_province=True):
         region_line = f"\n   地域：{province}（{tag}，仅统计到省级，不存储地址）"
     return (f"✅ 麦当劳会员投票成功！《{name}》\n"
             f"   基础票 1（登录确认）+ 积分票 {extra}（{points} 积分 ÷ {POINTS_RATE}） = 共 {total} 票。\n"
-            f"   （仅读取积分，未扣减；按会员号强身份去重）{region_line}"), True, val
+            f"   （仅读取积分，未扣减；按会员号强身份去重）{region_line}{report_note}"), True, val
 
 
 def show_github_ranking(top=10):
