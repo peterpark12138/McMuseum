@@ -150,26 +150,88 @@ def setup(repo=None):
     print("data/issue_map.json 已更新。")
 
 
+def _bot_login(token=None):
+    """信任锚点：确定「哪些评论可信」。
+
+    投票评论由机器人（持有 GITHUB_TOKEN 的账号）以自身身份发布，因此只统计
+    机器人自身发布的评论，可彻底杜绝他人在 Issue 下伪造 `vote ...` 刷票。
+
+    优先级：
+      1. 显式 GITHUB_BOT_LOGIN（公开部署可无 token，仅配此值即可）；
+      2. 由 GITHUB_REPO 的 owner 推断（公开只读部署默认）；
+      3. 有 token 时调用 /user 获取。
+    都没有则返回 None（此时不信任任何作者，等价于只聚合空）。
+    """
+    env = os.environ.get("GITHUB_BOT_LOGIN")
+    if env:
+        return env
+    repo = os.environ.get("GITHUB_REPO") or ""
+    owner = repo.split("/")[0].strip() if "/" in repo else ""
+    if token and not owner:
+        try:
+            u = _req(f"{API}/user", "GET", token=token)
+            return u.get("login")
+        except RuntimeError:
+            return None
+    return owner or None
+
+
+def _tally_comments(comments, bot_login):
+    """纯函数：从一个 Issue 的评论列表中，仅统计【机器人自身】发布的投票评论。
+
+    返回 (total, {province: votes})。不触网，便于自检与单测。
+    评论正文格式：vote <票种> +<增量> <省份|全国> <日期>
+    """
+    total = 0
+    pt = {}
+    pat = re.compile(r"^vote (\w+) \+(\d+)(?:\s+(\S+))?")
+    for c in comments:
+        # 信任锚点：仅机器人自身评论计入
+        if bot_login and (c.get("user") or {}).get("login") != bot_login:
+            continue
+        body = (c.get("body") or "").strip()
+        mm = pat.match(body)
+        if not mm:
+            continue
+        val = int(mm.group(2))
+        prov = mm.group(3) or "全国"
+        total += val
+        if prov != "全国":
+            pt[prov] = pt.get(prov, 0) + val
+    return total, pt
+
+
 def aggregate():
-    """聚合所有单品 Issue 的匿名投票评论，返回 {product_id: total}；未配置则返回 {}。"""
+    """聚合所有单品 Issue 的匿名投票评论，返回真实可信的跨用户复活榜。
+
+    信任模型：只统计机器人自身发布的投票评论（见 _bot_login / _tally_comments），
+    他人无法伪造刷票。
+
+    返回：
+        {
+          "totals": {product_id: 总票数},
+          "province_totals": {省份: {product_id: 票数}},
+        }
+    未配置 GITHUB_REPO 时返回全空结构（不影响本地/前端运行）。
+    """
     repo = os.environ.get("GITHUB_REPO")
     if not repo:
-        return {}
+        return {"totals": {}, "province_totals": {}}
     m = _load_map()
     token = os.environ.get("GITHUB_TOKEN")
-    result = {}
+    bot = _bot_login(token)
+    result = {"totals": {}, "province_totals": {}}
     for pid, num in m.items():
         url = f"{API}/repos/{repo}/issues/{num}/comments?per_page=100"
         try:
             comments = _req(url, "GET", token=token)
         except RuntimeError:
             comments = []
-        total = 0
-        for c in comments:
-            mm = re.search(r"^vote (\w+) \+(\d+)", (c.get("body") or ""))
-            if mm:
-                total += int(mm.group(2))
-        result[pid] = total
+        total, pt = _tally_comments(comments, bot)
+        result["totals"][pid] = total
+        for prov, v in pt.items():
+            result["province_totals"].setdefault(prov, {})
+            result["province_totals"][prov][pid] = result["province_totals"][prov].get(pid, 0) + v
     return result
 
 

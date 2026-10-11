@@ -63,13 +63,18 @@ add_state("Python 版本", "✅" if (pyv.major, pyv.minor) >= (3, 8) else "❌",
           f"{pyv.major}.{pyv.minor}.{pyv.micro}（要求 3.8+）")
 
 # 2. 脚本语法编译
-for fn in ["revival.py", "mcp_client.py", "report_github.py", "build_leaderboard.py"]:
+for fn in ["revival.py", "mcp_client.py", "report_github.py", "build_leaderboard.py", "mcd_data.py"]:
     fp = os.path.join(SCRIPTS, fn)
     rc, _, err = run([sys.executable, "-m", "py_compile", fp])
     if rc != 0:
         add(f"语法编译 {fn}", False, err.strip()[:200])
     else:
         add(f"语法编译 {fn}", True, "通过")
+
+# serve.py 位于 web/ 目录（前端服务），单独编译
+_serve_fp = os.path.join(WEB, "serve.py")
+_rc, _, _err = run([sys.executable, "-m", "py_compile", _serve_fp])
+add("语法编译 serve.py", _rc == 0, "通过" if _rc == 0 else _err.strip()[:200])
 
 # 3. 数据文件存在且合法
 if os.path.exists(DATA):
@@ -217,6 +222,99 @@ try:
     add("省份文本解析正确", _p == "吉林", f"地址文本 -> {_p or '(未识别)'}")
 except Exception as _e:
     add("省份自动探测仅调用只读工具", False, f"检查失败: {_e}")
+
+# 9.9 共享榜聚合只信任机器人自身评论（防伪造刷票）
+try:
+    import report_github as _rg
+    _bot = "mcrevival-bot"
+    _comments = [
+        {"user": {"login": _bot}, "body": "vote mcp +3 上海 2026-10-11"},
+        {"user": {"login": "attacker"}, "body": "vote base +999 全国 2026-10-11"},  # 伪造刷票
+        {"user": {"login": _bot}, "body": "vote mcp +1 全国 2026-10-11"},
+        {"user": {"login": "someone"}, "body": "vote mcp +50 广东 2026-10-11"},   # 伪造刷票
+        {"user": {"login": _bot}, "body": "这是一条无关评论"},
+    ]
+    _total, _pt = _rg._tally_comments(_comments, _bot)
+    # 仅 bot 的两条计票：上海 3 + 全国 1 = 4；伪造的 999 / 50 不应计入
+    _spoof_ok = (_total == 4) and (_pt.get("上海") == 3) and ("全国" not in _pt)
+    add("共享榜仅信任机器人评论(防伪造)", _spoof_ok,
+        f"拒绝伪造刷票：bot 计 {_total} 票；上海={_pt.get('上海')}" if _spoof_ok
+        else f"聚合异常：total={_total}, pt={_pt}（伪造评论可能被计入！）")
+    # 结构校验：无 GITHUB_REPO 时返回新结构 {"totals":{}, "province_totals":{}}
+    _old_repo = os.environ.pop("GITHUB_REPO", None)
+    try:
+        _agg = _rg.aggregate()
+        _struct_ok = isinstance(_agg, dict) and "totals" in _agg and "province_totals" in _agg
+    finally:
+        if _old_repo is not None:
+            os.environ["GITHUB_REPO"] = _old_repo
+    add("aggregate 返回新结构(totals/province_totals)", _struct_ok,
+        "结构正确" if _struct_ok else "结构缺失键")
+except Exception as _e:
+    add("共享榜仅信任机器人评论(防伪造)", False, f"检查失败: {_e}")
+
+# 9.10 麦当劳 MCP 只读红线：safe_call 拦截写工具 + get_* 无 token 优雅降级
+try:
+    import mcd_data as _md
+    # (a) 8 个写/交易类工具必须被 safe_call 拒绝
+    class _FakeClient:
+        def __init__(self):
+            self.called = []
+        def call_tool(self, name, arguments=None):
+            self.called.append(name)
+            return {"result": {"content": []}}
+    def _raises(client, name):
+        try:
+            _md.safe_call(client, name, {})
+            return False
+        except ValueError:
+            return True
+        except Exception:
+            return False
+    _fc = _FakeClient()
+    _writes = ["draw-lottery", "delivery-create-address", "create-order",
+               "auto-bind-coupons", "calculate-price", "party-order-create",
+               "mall-create-order", "cancel-order"]
+    _rejected = all(_raises(_fc, n) for n in _writes)
+    # (b) 只读工具必须被放行（会真正调用，验证白名单含它们）
+    _fc2 = _FakeClient()
+    try:
+        _md.safe_call(_fc2, "query-meals", {"beType": 1, "orderType": 1})
+        _allowed = (_fc2.called == ["query-meals"])
+    except Exception:
+        _allowed = False
+    add("MCP 只读红线(safe_call 拦截写工具)", _rejected and _allowed,
+        f"8 个写工具全部被拒，只读工具正常放行" if (_rejected and _allowed)
+        else f"拦截异常：rejected={_rejected}, read_passed={_allowed}")
+
+    # (c) 无 token 时各 get_* 优雅降级（离线、不触网），均返回空容器
+    _saved = os.environ.get("MCD_MCP_TOKEN")
+    try:
+        os.environ["MCD_MCP_TOKEN"] = ""   # 强制视为无 token（_load_env_file 不会覆盖已存在的空值）
+        _nut = _md.get_nutrition()
+        _cmp = _md.get_campaigns()
+        _lot = _md.get_lottery_info()
+        _mall = _md.get_points_mall()
+        _meals = _md.get_current_meals()
+        _near = _md.get_nearby_stores()
+        _degrade_ok = (isinstance(_nut, list) and isinstance(_cmp, list)
+                       and isinstance(_lot, dict) and isinstance(_mall, list)
+                       and isinstance(_meals, list) and isinstance(_near, dict))
+    finally:
+        if _saved is not None:
+            os.environ["MCD_MCP_TOKEN"] = _saved
+    add("只读增强无 token 优雅降级", _degrade_ok,
+        "各 get_* 无 token 时返回空容器，公开部署不崩" if _degrade_ok else "降级路径异常")
+
+    # (d) serve.py 已暴露 6 个只读接口
+    _serve_src = read_text(os.path.join(WEB, "serve.py"))
+    _paths = ["/api/nutrition", "/api/campaigns", "/api/lottery",
+              "/api/points-mall", "/api/on-sale", "/api/nearby"]
+    _all_paths = all(p in _serve_src for p in _paths)
+    add("serve.py 暴露 6 个只读接口", _all_paths,
+        f"已接入: {', '.join(_paths)}" if _all_paths else "缺少部分接口")
+except Exception as _e:
+    add("MCP 只读红线(safe_call 拦截写工具)", False, f"检查失败: {_e}")
 
 # 10. 真实依赖配置状态
 mcp_tok = os.environ.get("MCD_MCP_TOKEN")

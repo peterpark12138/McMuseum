@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-麦麦复活赛 · 本地前端服务（展示 + 投票交互 + 看榜）
+麦麦复活赛 · 本地/云端前端服务（展示 + 投票交互 + 看榜）
 
 - 包裹 scripts/revival.py，把投票/榜单能力以 JSON API 暴露给网页
-- 投票走真实麦当劳 MCP（需 MCD_MCP_TOKEN / .env）
-- 纯本地运行，不依赖任何第三方框架（仅标准库）
+- 投票走真实麦当劳 MCP（需 MCD_MCP_TOKEN / .env），仅会员可投
+- 榜单支持两种数据源：
+    * 本地（默认）：读 data/votes.json，单机演示
+    * GitHub 共享榜：设 LEADERBOARD_SOURCE=github 后，从 Issue 评论聚合
+      跨用户真实榜（仅读取，公开部署可无 token，靠 GITHUB_BOT_LOGIN 锚定信任）
+- 纯标准库，无第三方依赖；绑定 0.0.0.0 + $PORT 便于云端部署
 
 运行：
     python web/serve.py
@@ -30,11 +34,27 @@ except Exception:
     pass
 
 import revival  # noqa: E402
+import report_github  # noqa: E402
+import mcd_data  # noqa: E402
 
 
 def _json(data, status=200):
     body = json.dumps(data, ensure_ascii=False).encode("utf-8")
     return status, {"Content-Type": "application/json; charset=utf-8"}, body
+
+
+def _use_github():
+    """是否使用 GitHub 共享榜作为数据源（跨用户真实榜）。"""
+    return os.environ.get("LEADERBOARD_SOURCE", "").strip().lower() == "github"
+
+
+def _github_totals():
+    """从 GitHub 聚合真实共享榜，返回 (totals, province_totals) 或 (None, None)。"""
+    try:
+        agg = report_github.aggregate()
+        return agg.get("totals", {}), agg.get("province_totals", {})
+    except Exception:  # noqa: BLE001
+        return None, None
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -67,7 +87,12 @@ class Handler(BaseHTTPRequestHandler):
             self._serve_file(os.path.join(HERE, "app.js"), "application/javascript")
             return
         if path == "/api/products":
-            totals = revival.load_json(revival.VOTES, {"totals": {}}).get("totals", {})
+            # 投票大厅单品列表：票数取自当前数据源（本地或 GitHub 共享榜）
+            if _use_github():
+                gt, _ = _github_totals()
+                totals = gt if gt is not None else revival.load_json(revival.VOTES, {"totals": {}}).get("totals", {})
+            else:
+                totals = revival.load_json(revival.VOTES, {"totals": {}}).get("totals", {})
             out = []
             for p in revival.get_products():
                 d = dict(p)
@@ -89,17 +114,65 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/leaderboard":
             qs = urllib.parse.parse_qs(parsed.query)
             province = qs.get("province", [None])[0]
-            votes = revival.load_json(revival.VOTES, {"totals": {}, "province_totals": {}})
+            if _use_github():
+                gt, gpt = _github_totals()
+                if gt is not None:
+                    totals = gt
+                    province_totals = gpt or {}
+                    source = "github"
+                else:
+                    votes = revival.load_json(revival.VOTES, {"totals": {}, "province_totals": {}})
+                    totals = votes.get("totals", {})
+                    province_totals = votes.get("province_totals", {})
+                    source = "local(fallback)"
+            else:
+                votes = revival.load_json(revival.VOTES, {"totals": {}, "province_totals": {}})
+                totals = votes.get("totals", {})
+                province_totals = votes.get("province_totals", {})
+                source = "local"
             name = {p["id"]: p["name"] for p in revival.get_products()}
-            if province and province in votes.get("province_totals", {}):
-                totals = votes["province_totals"][province]
+            if province and province in province_totals:
+                totals = province_totals[province]
                 used_fallback = False
             else:
-                totals = votes.get("totals", {})
                 used_fallback = bool(province)  # 该省暂无投票 -> 回退全国榜（前端会提示）
             items = sorted(totals.items(), key=lambda x: -x[1])
             out = [{"id": i, "name": name.get(i, i), "votes": v} for i, v in items]
-            self._send(*_json({"province": province, "items": out, "fallback": used_fallback}))
+            self._send(*_json({"province": province, "items": out,
+                               "fallback": used_fallback, "source": source}))
+            return
+
+        # ---- 麦当劳实时只读增强（无 token 优雅降级，公开部署不影响可用性）----
+        if path == "/api/nutrition":
+            qs = urllib.parse.parse_qs(parsed.query)
+            name = (qs.get("name", [None])[0] or "").strip()
+            items = mcd_data.get_nutrition()
+            if name:
+                items = [x for x in items if name in (x.get("productName") or "")]
+            self._send(*_json({"fallback": not mcd_data.token_available(),
+                               "items": items[:200]}))
+            return
+        if path == "/api/campaigns":
+            self._send(*_json({"fallback": not mcd_data.token_available(),
+                               "items": mcd_data.get_campaigns()}))
+            return
+        if path == "/api/lottery":
+            self._send(*_json({"fallback": not mcd_data.token_available(),
+                               "info": mcd_data.get_lottery_info()}))
+            return
+        if path == "/api/points-mall":
+            self._send(*_json({"fallback": not mcd_data.token_available(),
+                               "items": mcd_data.get_points_mall()}))
+            return
+        if path == "/api/on-sale":
+            products = revival.get_products()
+            self._send(*_json({"fallback": not mcd_data.token_available(),
+                               "meals": [m["name"] for m in mcd_data.get_current_meals()],
+                               "comparison": mcd_data.compare_on_sale(products)}))
+            return
+        if path == "/api/nearby":
+            near = mcd_data.get_nearby_stores()
+            self._send(*_json({"fallback": not mcd_data.token_available(), **near}))
             return
         self._send(*_json({"error": "not found"}, 404))
 
@@ -117,7 +190,8 @@ class Handler(BaseHTTPRequestHandler):
             if not product:
                 self._send(*_json({"ok": False, "msg": "缺少 product"}, 400))
                 return
-            # 仅麦当劳会员可投票：from_mcp=True 触发真实 query-my-account 读取
+            # 仅麦当劳会员可投票：from_mcp=True 触发真实 query-my-account 读取。
+            # record_vote 内部会自动把有效票回流到 GitHub 共享榜（匿名、仅作者可写）。
             msg, ok, val = revival.record_vote(product, province, from_mcp=True)
             self._send(*_json({"ok": ok, "msg": msg, "val": val}))
             return
@@ -129,8 +203,10 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     port = int(os.environ.get("PORT", "8000"))
-    srv = ThreadingHTTPServer(("127.0.0.1", port), Handler)
-    print(f"🍟 麦麦复活赛前端已启动: http://127.0.0.1:{port}")
+    host = os.environ.get("HOST", "0.0.0.0")
+    srv = ThreadingHTTPServer((host, port), Handler)
+    src = "GitHub 共享榜" if _use_github() else "本地"
+    print(f"🍟 麦麦复活赛前端已启动: http://127.0.0.1:{port}  (bind {host}, 数据源={src})")
     print("   投票需已配置 MCD_MCP_TOKEN（或 .env）；Ctrl+C 退出。")
     srv.serve_forever()
 

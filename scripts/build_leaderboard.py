@@ -35,15 +35,17 @@ def build(from_github=False):
     products = get_products()
     province_totals = {}
     if from_github:
+        totals = {}
+        province_totals = {}
         try:
             sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
             from report_github import aggregate
-            agg = aggregate() or {}
+            agg = aggregate() or {"totals": {}, "province_totals": {}}
+            totals = agg.get("totals", {})
+            province_totals = agg.get("province_totals", {})
             mode = "github"
         except Exception as e:  # noqa: BLE001
-            agg = {}
             mode = f"github(失败:{e})"
-        totals = {p["id"]: agg.get(p["id"], 0) for p in products}
     else:
         v = load_json(VOTES, {"totals": {}, "province_totals": {}})
         totals = v.get("totals", {})

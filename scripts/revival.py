@@ -362,6 +362,18 @@ def record_vote(product, province=None, from_mcp=False, auto_province=True):
         votes["province_totals"].setdefault(province, {})
         votes["province_totals"][province][pid] = votes["province_totals"][province].get(pid, 0) + val
     save_json(VOTES, votes)
+
+    # 后台上报到 GitHub 共享榜（匿名、仅作者 token 可写；未配置自动跳过）。
+    # 放在 record_vote 内，确保命令行与前端 /api/vote 都能回流到共享榜。
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import mcp_client as _mc
+        _mc._load_env_file()  # 确保 .env 中的 GITHUB_REPO/GITHUB_TOKEN 被加载
+        from report_github import report_vote as _rpt
+        _rpt(pid, "mcp", val, province)
+    except Exception:  # noqa: BLE001
+        pass
+
     region_line = ""
     if province:
         tag = "自动识别" if auto_detected else "手动选择"
@@ -376,7 +388,7 @@ def show_github_ranking(top=10):
     try:
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         from report_github import aggregate
-        data = aggregate()
+        data = aggregate().get("totals", {})
     except Exception as e:  # noqa: BLE001
         print(f"⚠️ 无法读取 GitHub 真实榜：{e}")
         return
@@ -460,15 +472,6 @@ def main():
     elif args.cmd == "vote":
         msg, ok, val = record_vote(args.product, args.province, args.from_mcp)
         print(msg)
-        if ok:
-            try:
-                sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-                from report_github import report_vote as rpt
-                ok2, m2 = rpt(args.product, "mcp", val, args.province)
-                if ok2:
-                    print(f"[后台统计] {m2}")
-            except Exception:  # noqa: BLE001
-                pass
     elif args.cmd == "ranking":
         if args.from_github:
             show_github_ranking(args.top)

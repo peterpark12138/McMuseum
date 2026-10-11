@@ -11,7 +11,7 @@
 
 核心特点：
 
-- **真实使用麦当劳 MCP**：通过官方 `mcp.mcd.cn` 的 Streamable HTTP 接口，真实调用 `query-my-account`（读取会员积分）与 `query-meals`（拉取在售菜单），用于积分换算与"在售 vs 怀旧"对比。**仅读取，绝不扣减。**
+- **真实使用麦当劳 MCP**：通过官方 `mcp.mcd.cn` 的 Streamable HTTP 接口，真实调用多个**只读**工具（`query-my-account` 读积分、`query-meals` 拉在售、`list-nutrition-foods` 营养库、`campaign-calendar` 活动日历、`mall-points-products` 积分商城、`query-lottery-info` 抽奖信息、`delivery-query-stores` 附近门店等）。所有调用统一收口到 `scripts/mcd_data.py` 的 `safe_call` 白名单——**8 个写/交易类工具（下单、领券、抽奖、建地址…）一律被硬拦截**，从调用层守住"仅读取、绝不扣减"的红线。
 - **强身份投票**：投票严格绑定麦当劳会员账号，按会员唯一标识去重，从机制上杜绝"多账号刷票"。
 - **透明可核**：所有怀旧单品均经联网核实（麦当劳中国官网及公开报道），标注下架/限定状态，不杜撰事实。
 - **本地前端页面**：`web/` 下提供麦当劳红黄风格的「投票大厅 + 复活榜」交互页，纯前端 + 一个零依赖本地服务（`web/serve.py`，仅标准库）即可运行。
@@ -28,7 +28,9 @@
 | 麦当劳会员投票 | 仅会员可投；1 票基础（确认身份）+ 每 100 积分 1 票（额外），无积分仅 1 票 |
 | 强身份去重 | 以会员唯一标识（会员号 / openid / 卡号 等）为去重主键，每会员每单品仅一次 |
 | 在售 vs 怀旧 | 调用 `query-meals` 拉实时在售菜单，与本地博物馆对照 |
-| 复活榜 | 本地累计 + 可选的中心化（作者侧 GitHub）聚合，支持省份维度（34 个省级行政区受控枚举） |
+| 复活榜 | 跨用户真实聚合（GitHub Issue 后端，仅计机器人自身评论、防伪造刷票）+ 本地兜底，支持省份维度（34 个省级行政区受控枚举） |
+| 麦麦现在（实时只读增强） | 「麦当劳现在」页：营销活动日历 / 积分商城可兑换 / 积分抽奖信息 / 在售对比 / 附近门店，全部来自麦当劳 MCP 只读接口，实时更新 |
+| 只读红线 | 所有 MCP 调用经 `mcd_data.safe_call` 白名单，8 个写/交易工具（`create-order` / `draw-lottery` / `auto-bind-coupons` / `delivery-create-address` / `calculate-price` / `party-order-create` / `mall-create-order` / `cancel-order`）一律拒绝 |
 | 拉票卡 | 生成社媒分享文案，为作品导流 |
 
 ---
@@ -56,9 +58,15 @@ cp mcp-config.example.json mcp-config.json
 # 编辑 mcp-config.json，确保 token 字段为 ${MCD_MCP_TOKEN} 之类的环境变量占位符
 ```
 
-### 3.3 可选：中心化复活榜（作者侧）
+### 3.3 跨用户真实复活榜（GitHub Issue 后端，零服务器）
 
-如需跨用户聚合的"全网榜"，由作者（或机器人）配置 GitHub 后端：
+所有有效投票会**匿名**回流到对应单品的 GitHub Issue 评论（仅含票种/增量/省份/日期，不含任何用户身份）。
+公开站点读取这些评论聚合成"全民复活榜"。
+
+**信任模型（防伪造刷票）**：聚合时**只统计机器人自身账号**发布的投票评论（以 `GITHUB_BOT_LOGIN` 为信任锚点），
+他人无法在 Issue 下伪造 `vote ...` 灌票。这是本作品"透明可核"的硬保障。
+
+作者/机器人一次性建 Issue：
 
 ```bash
 export GITHUB_REPO="owner/repo"
@@ -66,7 +74,7 @@ export GITHUB_TOKEN="你的GitHubToken"   # 仅作者/机器人持有，绝不�
 python3 scripts/report_github.py setup --repo owner/repo
 ```
 
-> 未配置时，投票与榜单在本地（当前部署）照常运行，不影响功能与评分；只是"全民聚合榜"暂为本地数据。
+> 未配置 GitHub 后端时，投票与榜单在本地照常运行；只是"全民聚合榜"为空。
 
 ---
 
@@ -119,6 +127,24 @@ python3 web/serve.py
 - **复活榜**：实时展示各单品累计票数（带进度条与 🥇🥈🥉）。
 
 > 前端页与 Skill 共用同一套 `revival.py` 逻辑，投票数据直接写入 `data/votes.json`，与命令行完全一致。
+
+#### 4.x.1 部署上线（公开站点 + 实时共享榜）
+
+公开站点只负责"展示博物馆 + 实时共享榜"，**不持有任何 Token**；投票由用户在本机 / WorkBuddy 用
+**自己的麦当劳会员账号**完成，结果自动匿名回流到 GitHub Issue，任何人打开站点即可看到真实榜单。
+
+用 `sites` 技能把 `web/` 作为「静态页 + 标准库服务」部署（入口 `web/serve.py`，零第三方依赖），并配置环境变量：
+
+```bash
+LEADERBOARD_SOURCE=github         # 榜单走 GitHub 真实聚合（跨用户、防伪造）
+GITHUB_BOT_LOGIN=你的GitHub用户名  # 信任锚点；公开部署无需 GITHUB_TOKEN，只读公开 Issue 即可
+# ⚠️ 切勿在公开站点配置 MCD_MCP_TOKEN / GITHUB_TOKEN（投票走用户本地，不在服务端）
+```
+
+本地预览仍用 `python3 web/serve.py`（默认本地数据源；设 `LEADERBOARD_SOURCE=github` 可本地预览共享榜）。
+
+> 数据闭环：用户本地 / WorkBuddy 投票（自身麦当劳账号）→ 匿名回流 GitHub Issue → 公开站点聚合展示。
+> 不依赖任何自建服务器，零运维成本；共享榜默认只读公开数据，无需在服务端存放任何密钥。
 
 ---
 

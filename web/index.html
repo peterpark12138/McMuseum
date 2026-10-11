@@ -20,6 +20,7 @@
     <nav class="tabs">
       <button class="tab active" data-view="hall">投票大厅</button>
       <button class="tab" data-view="rank">复活榜</button>
+      <button class="tab" data-view="now">麦麦现在</button>
     </nav>
   </div>
 
@@ -56,6 +57,51 @@
       <div id="modal-body"></div>
     </div>
   </div>
+
+  <!-- 麦麦现在（麦当劳实时只读增强） -->
+  <main id="view-now" class="view hidden">
+    <div id="now-empty" class="state empty hidden">实时数据加载中…</div>
+
+    <section class="now-sec" id="sec-onsale">
+      <h2 class="now-h">🍔 在售对比 · 它还在卖吗？</h2>
+      <p class="now-sub">把怀旧单品与麦当劳<strong>当前在售菜单</strong>实时比对，看看你怀念的那口是「仍在售」还是「已绝版」。</p>
+      <div id="onsale-list" class="onsale-list"></div>
+    </section>
+
+    <section class="now-sec" id="sec-campaigns">
+      <h2 class="now-h">📣 麦当劳最近在搞什么</h2>
+      <p class="now-sub">来自麦当劳官方营销活动日历（实时）。</p>
+      <div id="campaigns-list" class="camp-list"></div>
+    </section>
+
+    <section class="now-sec" id="sec-mall">
+      <h2 class="now-h">🎁 积分还能换这些</h2>
+      <p class="now-sub">麦麦积分商城可兑换（实时）。你为复活赛投出的「积分票」，正是来自这里的真实积分。</p>
+      <div id="mall-list" class="mall-list"></div>
+    </section>
+
+    <section class="now-sec" id="sec-lottery">
+      <h2 class="now-h">🎰 积分抽奖</h2>
+      <p class="now-sub">当前积分抽奖活动信息（仅读取，不抽奖）。</p>
+      <div id="lottery-box" class="lottery-box"></div>
+    </section>
+
+    <section class="now-sec" id="sec-nutrition">
+      <h2 class="now-h">🥗 麦当劳营养库</h2>
+      <p class="now-sub">来自 <code>list-nutrition-foods</code> 的 160 款餐品营养数据（热量 / 蛋白质 / 脂肪）。搜一下你关心的那口。</p>
+      <div class="nut-search">
+        <input id="nut-input" type="text" placeholder="输入餐品名，如 麦满分 / 薯条 / 麦旋风" />
+        <button id="nut-btn" class="ghost-btn">搜索</button>
+      </div>
+      <div id="nut-list" class="nut-list"></div>
+    </section>
+
+    <section class="now-sec" id="sec-nearby">
+      <h2 class="now-h">📍 附近重温</h2>
+      <p class="now-sub">只读你的配送地址省份，查询该地址可配送的门店（不保存任何地址原文）。</p>
+      <div id="nearby-box" class="nearby-box"></div>
+    </section>
+  </main>
 
   <div id="toast" class="toast hidden"></div>
 

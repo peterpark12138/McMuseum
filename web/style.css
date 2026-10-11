@@ -193,3 +193,63 @@ body{
   .grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
   .brand-sub{display:none}
 }
+
+/* 麦麦现在 */
+.now-sec{max-width:1080px;margin:0 auto 26px;padding:0 4px}
+.now-h{font-family:"ZCOOL KuaiLe",sans-serif;font-size:24px;color:var(--ink);margin-bottom:6px}
+.now-sub{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6}
+.now-sub strong{color:var(--red-deep)}
+.now-fallback{
+  background:#fff;border:1px dashed var(--line);border-radius:16px;
+  padding:18px 16px;text-align:center;color:var(--muted);font-size:13px;
+}
+.onsale-list{display:flex;flex-direction:column;gap:10px}
+.os-row{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:#fff;border-radius:14px;padding:12px 16px;box-shadow:var(--shadow);
+}
+.os-name{font-weight:800;font-size:15px;color:var(--ink)}
+.os-era{font-size:11px;color:var(--muted);font-weight:600;margin-left:6px}
+.os-tag{font-size:12px;font-weight:800;padding:5px 12px;border-radius:999px;white-space:nowrap}
+.os-tag.on{background:#e8f7ee;color:#1a8a4a;border:1px solid #b9e6c8}
+.os-tag.off{background:#fff0f2;color:var(--red-deep);border:1px solid #ffd5dc}
+.os-foot{font-size:12px;color:var(--muted);margin-top:10px;text-align:right}
+.os-foot b{color:var(--red-deep)}
+
+.camp-list{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.camp-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.camp-card img{width:100%;height:130px;object-fit:cover;background:var(--yellow-soft)}
+.camp-body{padding:12px 14px}
+.camp-title{font-weight:800;font-size:14px;color:var(--ink);line-height:1.4}
+.camp-date{font-size:11px;color:var(--muted);margin-top:6px}
+
+.mall-list{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.mall-card{background:#fff;border-radius:16px;padding:14px;box-shadow:var(--shadow);border:1px solid #fff}
+.mall-name{font-weight:800;font-size:14px;color:var(--ink);line-height:1.4}
+.mall-point{margin-top:8px;display:inline-block;font-weight:800;color:var(--red-deep);background:var(--yellow-soft);border-radius:999px;padding:4px 12px;font-size:13px}
+.mall-sell{margin-top:8px;font-size:12px;color:var(--muted);line-height:1.5}
+
+.lottery-box{}
+.lottery-card{background:#fff;border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);max-width:520px}
+.lottery-status{font-family:"ZCOOL KuaiLe",sans-serif;font-size:18px;color:var(--red-deep)}
+.lottery-cost{margin-top:8px;font-size:13px;color:var(--ink);font-weight:700}
+.lottery-prizes{margin-top:8px;font-size:13px;color:var(--muted);line-height:1.5}
+.lottery-note{margin-top:10px;font-size:11px;color:var(--muted)}
+
+.nearby-box{display:flex;flex-direction:column;gap:10px}
+.nearby-prov{font-size:13px;color:var(--muted);margin-bottom:4px}
+.nearby-row{background:#fff;border-radius:14px;padding:12px 16px;box-shadow:var(--shadow)}
+.nearby-name{font-weight:800;font-size:14px;color:var(--ink)}
+.nearby-addr{font-size:12px;color:var(--muted);margin-top:4px}
+
+.nut-search{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.nut-search input{
+  flex:1;min-width:200px;font-family:inherit;font-size:14px;color:var(--ink);
+  border:1.5px solid var(--line);border-radius:999px;padding:10px 16px;transition:.18s;
+}
+.nut-search input:focus{outline:2px solid var(--yellow);outline-offset:1px;border-color:var(--yellow)}
+.nut-list{display:flex;flex-direction:column;gap:8px}
+.nut-row{background:#fff;border-radius:12px;padding:10px 14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px}
+.nut-name{font-weight:800;font-size:14px;color:var(--ink)}
+.nut-metrics{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--red-deep);font-weight:700}
+.nut-metrics span{background:var(--yellow-soft);border-radius:999px;padding:3px 10px}

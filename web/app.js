@@ -25,6 +25,7 @@ $$(".tab").forEach(t => t.addEventListener("click", () => {
   $("#view-hall").classList.toggle("hidden", v !== "hall");
   $("#view-rank").classList.toggle("hidden", v !== "rank");
   if (v === "rank") loadRank();
+  if (v === "now") loadNow();
 }));
 
 // ---- 加载省份枚举（受控，防脏数据）----
@@ -125,6 +126,17 @@ async function loadRank() {
 $("#refresh-rank").addEventListener("click", loadRank);
 $("#province-filter").addEventListener("change", loadRank);
 
+// 营养库搜索
+function bindNutrition() {
+  const input = $("#nut-input");
+  const btn = $("#nut-btn");
+  if (!input || !btn) return;
+  const go = () => loadNutrition(input.value.trim());
+  btn.addEventListener("click", go);
+  input.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+}
+bindNutrition();
+
 // ---- 投票弹窗 ----
 let current = null;
 function openVote(p) {
@@ -198,6 +210,157 @@ async function doVote() {
   } finally {
     btn.disabled = false; btn.textContent = "确认投票";
   }
+}
+
+// ---- 麦麦现在（麦当劳实时只读增强）----
+async function loadNow() {
+  await Promise.allSettled([loadOnSale(), loadCampaigns(), loadMall(), loadLottery(), loadNutrition(), loadNearby()]);
+}
+
+async function loadOnSale() {
+  const box = $("#onsale-list");
+  box.innerHTML = "<div class='state'>加载中…</div>";
+  try {
+    const d = await (await fetch("/api/on-sale")).json();
+    if (d.fallback) {
+      box.innerHTML = nowFallback("🍔 在售对比需要连接你的麦当劳账号（配置 MCD_MCP_TOKEN）后实时比对。");
+      return;
+    }
+    const cmp = d.comparison || {};
+    const rows = (PRODUCTS.length ? PRODUCTS : await (await fetch("/api/products")).json())
+      .map(p => ({ p, c: cmp[p.id] || { available: false, matched: null } }));
+    if (!rows.length) { box.innerHTML = ""; return; }
+    box.innerHTML = rows.map(({ p, c }) => {
+      const tag = c.available
+        ? `<span class="os-tag on">仍在售 · ${escapeHtml(c.matched || "")}</span>`
+        : `<span class="os-tag off">已绝版</span>`;
+      return `<div class="os-row">
+        <div class="os-name">${escapeHtml(p.name)} <span class="os-era">${escapeHtml(p.era || "")}</span></div>
+        ${tag}
+      </div>`;
+    }).join("") + `<p class="os-foot">当前在售餐品共 <b>${(d.meals || []).length}</b> 款 · 数据来自 query-meals 实时接口</p>`;
+  } catch (e) {
+    box.innerHTML = nowFallback("在售对比加载失败，请确认服务运行中。");
+  }
+}
+
+async function loadCampaigns() {
+  const box = $("#campaigns-list");
+  box.innerHTML = "<div class='state'>加载中…</div>";
+  try {
+    const d = await (await fetch("/api/campaigns")).json();
+    if (d.fallback || !d.items || !d.items.length) {
+      box.innerHTML = nowFallback("📣 营销活动日历需要连接麦当劳账号后实时展示。");
+      return;
+    }
+    box.innerHTML = d.items.map(it => `
+      <div class="camp-card">
+        ${it.image ? `<img src="${it.image}" alt="" loading="lazy"/>` : ""}
+        <div class="camp-body">
+          <div class="camp-title">${escapeHtml(it.title)}</div>
+          ${it.date ? `<div class="camp-date">${escapeHtml(it.date)}</div>` : ""}
+        </div>
+      </div>`).join("");
+  } catch (e) {
+    box.innerHTML = nowFallback("活动加载失败，请确认服务运行中。");
+  }
+}
+
+async function loadMall() {
+  const box = $("#mall-list");
+  box.innerHTML = "<div class='state'>加载中…</div>";
+  try {
+    const d = await (await fetch("/api/points-mall")).json();
+    if (d.fallback || !d.items || !d.items.length) {
+      box.innerHTML = nowFallback("🎁 积分商城需要连接麦当劳账号后实时展示。");
+      return;
+    }
+    box.innerHTML = d.items.map(it => `
+      <div class="mall-card">
+        <div class="mall-name">${escapeHtml(it.spuName)}</div>
+        <div class="mall-point">${escapeHtml(String(it.point))} 积分</div>
+        ${it.selling ? `<div class="mall-sell">${escapeHtml(it.selling)}</div>` : ""}
+      </div>`).join("");
+  } catch (e) {
+    box.innerHTML = nowFallback("积分商城加载失败，请确认服务运行中。");
+  }
+}
+
+async function loadLottery() {
+  const box = $("#lottery-box");
+  box.innerHTML = "<div class='state'>加载中…</div>";
+  try {
+    const d = await (await fetch("/api/lottery")).json();
+    if (d.fallback || !d.info || !Object.keys(d.info).length) {
+      box.innerHTML = nowFallback("🎰 抽奖信息需要连接麦当劳账号后实时展示。");
+      return;
+    }
+    const info = d.info;
+    const prizes = (info.prizes || []).filter(Boolean);
+    box.innerHTML = `
+      <div class="lottery-card">
+        <div class="lottery-status">${escapeHtml(info.activityStatusText || info.statusText || "活动中")}</div>
+        ${info.cost ? `<div class="lottery-cost">单次消耗：${escapeHtml(String(info.cost))}</div>` : ""}
+        ${prizes.length ? `<div class="lottery-prizes"><b>奖品含：</b>${prizes.map(escapeHtml).join("、")}</div>` : ""}
+        <p class="lottery-note">本作品仅读取活动信息，绝不代你抽奖 / 扣积分。</p>
+      </div>`;
+  } catch (e) {
+    box.innerHTML = nowFallback("抽奖信息加载失败，请确认服务运行中。");
+  }
+}
+
+async function loadNutrition(name) {
+  const box = $("#nut-list");
+  box.innerHTML = "<div class='state'>加载中…</div>";
+  try {
+    const url = name ? `/api/nutrition?name=${encodeURIComponent(name)}` : "/api/nutrition";
+    const d = await (await fetch(url)).json();
+    if (d.fallback || !d.items || !d.items.length) {
+      box.innerHTML = nowFallback(name ? "未找到匹配营养数据。" : "🥗 营养库需要连接麦当劳账号后实时展示。");
+      return;
+    }
+    box.innerHTML = d.items.slice(0, 40).map(it => `
+      <div class="nut-row">
+        <div class="nut-name">${escapeHtml(it.productName)}</div>
+        <div class="nut-metrics">
+          <span>🔥 ${escapeHtml(it.energyKcal)} kcal</span>
+          <span>💪 蛋白 ${escapeHtml(it.protein)}g</span>
+          <span>🧈 脂肪 ${escapeHtml(it.fat)}g</span>
+          <span>🍞 碳水 ${escapeHtml(it.carbohydrate)}g</span>
+        </div>
+      </div>`).join("") + (d.items.length > 40 ? `<p class="os-foot">仅显示前 40 条，可缩小关键词。</p>` : "");
+  } catch (e) {
+    box.innerHTML = nowFallback("营养库加载失败，请确认服务运行中。");
+  }
+}
+
+async function loadNearby() {
+  const box = $("#nearby-box");
+  box.innerHTML = "<div class='state'>加载中…</div>";
+  try {
+    const d = await (await fetch("/api/nearby")).json();
+    if (d.fallback) {
+      box.innerHTML = nowFallback("📍 附近门店需要连接麦当劳账号（用于只读配送地址省份）后展示。");
+      return;
+    }
+    const stores = d.stores || [];
+    const head = d.province ? `<p class="nearby-prov">已识别省份：<b>${escapeHtml(d.province)}</b>（仅省级，未保存地址）</p>` : "";
+    if (!stores.length) {
+      box.innerHTML = head + nowFallback("该地址暂无可配送门店数据。");
+      return;
+    }
+    box.innerHTML = head + stores.map(s => `
+      <div class="nearby-row">
+        <div class="nearby-name">🏠 ${escapeHtml(s.name)}</div>
+        ${s.address ? `<div class="nearby-addr">${escapeHtml(s.address)}</div>` : ""}
+      </div>`).join("");
+  } catch (e) {
+    box.innerHTML = nowFallback("附近门店加载失败，请确认服务运行中。");
+  }
+}
+
+function nowFallback(msg) {
+  return `<div class="now-fallback">${escapeHtml(msg)}</div>`;
 }
 
 function escapeHtml(s) {
