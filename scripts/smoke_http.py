@@ -110,6 +110,28 @@ def main():
     finally:
         p.kill()
 
+    # 场景 D：公开演示模式（模式 A）—— 无 Token、显眼标注"演示数据"、投票不可用
+    p, port = start_server({"MCMUSEUM_DEMO": "1", "MCD_MCP_TOKEN": ""})
+    try:
+        st, d = call(port, "/api/products")
+        demo_items = len(d) if isinstance(d, list) else 0
+        check("演示模式可浏览（无 Token）", st == 200 and demo_items > 0,
+              f"HTTP {st}, {demo_items} 款，条目带 demo 标记="
+              f"{all(x.get('demo') for x in d) if isinstance(d, list) else False}")
+        st, d = call(port, "/api/leaderboard")
+        check("演示模式榜单标注 demo 数据源", st == 200 and d.get("source") == "demo"
+              and bool(d.get("demo_note")),
+              f"HTTP {st}, source={d.get('source')}, 带演示数据说明={bool(d.get('demo_note'))}")
+        st, d = call(port, "/api/vote-capabilities")
+        check("演示模式投票不可用", st == 200 and d.get("voting_available") is False
+              and d.get("mode") == "demo-browse-only" and d.get("demo") is True,
+              f"HTTP {st}, mode={d.get('mode')}, demo={d.get('demo')}")
+        st, d = call(port, "/api/vote", "POST", {"product": "sakura_mcfloat"})
+        check("演示模式 POST /api/vote 返回 501", st == 501 and d.get("ok") is False,
+              f"HTTP {st}, code={d.get('code')}（演示票不可能进入正式榜）")
+    finally:
+        p.kill()
+
     print("-" * 60)
     bad = [r for r in results if not r[0]]
     print(f"结论：通过 {len(results) - len(bad)} 项 | ❌失败 {len(bad)} 项")

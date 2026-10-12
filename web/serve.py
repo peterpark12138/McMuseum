@@ -69,8 +69,46 @@ def server_vote_enabled():
     return os.environ.get("MCMUSEUM_ENABLE_SERVER_VOTE", "").strip().lower() in ("1", "true", "yes", "on")
 
 
+# ---- 公开演示模式（模式 A）：与真实投票数据完全隔离 ----
+DEMO_VOTES = os.path.join(ROOT, "data", "demo_votes.json")
+DEMO_NOTE = ("演示数据：以下票数为示例值，仅用于展示榜单外观，"
+             "不代表任何真实投票结果，也不会提交到 GitHub 正式共享榜。")
+
+
+def demo_mode():
+    """是否以「公开演示模式」启动（MCMUSEUM_DEMO=1）。
+
+    演示模式：无需任何 Token；只展示 data/demo_votes.json 里的示例票数；
+    在线投票一律不可用，因此演示票不存在流入正式榜的路径。
+    """
+    return os.environ.get("MCMUSEUM_DEMO", "").strip().lower() in ("1", "true", "yes", "on")
+
+
+def demo_totals():
+    """读取演示票数（只读）。返回 (totals, province_totals)；文件缺失时返回空结构。"""
+    try:
+        with open(DEMO_VOTES, encoding="utf-8") as f:
+            d = json.load(f)
+        if not d.get("_demo"):
+            return {}, {}      # 不是演示文件就当没有，绝不拿真实数据充数
+        return d.get("totals", {}) or {}, d.get("province_totals", {}) or {}
+    except Exception:  # noqa: BLE001
+        return {}, {}
+
+
 def vote_capability():
     """当前实例能否在此完成"真实麦当劳会员投票"。返回结构化能力描述（永远不撒谎）。"""
+    if demo_mode():
+        return {
+            "voting_available": False,
+            "mode": "demo-browse-only",
+            "code": "demo_mode_vote_disabled",
+            "http_status": 501,
+            "demo": True,
+            "msg": ("当前为「公开演示模式」：展示的票数是示例数据，不提供在线投票。"
+                    "真实投票请用本机 CLI / WorkBuddy Skill 完成（需麦当劳会员认证）。"),
+            "how_to_vote": LOCAL_CLI_HINT,
+        }
     if not server_vote_enabled():
         return {
             "voting_available": False,
@@ -224,13 +262,46 @@ class Handler(BaseHTTPRequestHandler):
             ctype = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg"}.get(ext, "application/octet-stream")
             self._serve_file(os.path.join(HERE, "assets", rel), ctype)
             return
+        if path == "/api/product":
+            # 单品详情（只读）：GET /api/product?id=<单品id>
+            qs = urllib.parse.parse_qs(parsed.query)
+            pid = (qs.get("id", [None])[0] or "").strip()
+            if not pid:
+                self._send(*_json({"error": "missing id", "msg": "缺少查询参数 id"}, 400))
+                return
+            prod = next((p for p in revival.get_products() if p["id"] == pid), None)
+            if prod is None:
+                self._send(*_json({"error": "product_not_found",
+                                   "msg": f"未找到单品「{pid}」，请用 /api/products 查看可用 id"}, 404))
+                return
+            d = dict(prod)
+            if demo_mode():
+                dt, _ = demo_totals()
+                d["votes"] = dt.get(pid, 0)
+                d["demo"] = True
+            else:
+                d["votes"] = revival.load_votes().get("totals", {}).get(pid, 0)
+            self._send(*_json(d))
+            return
         if path == "/api/products":
-            # 投票大厅单品列表：票数取自当前数据源（本地或 GitHub 共享榜）
+            # 投票大厅单品列表：票数取自当前数据源（演示 / 本地 / GitHub 共享榜）
+            if demo_mode():
+                # 保持与正式模式一致的数组结构（前端不用改解析逻辑），
+                # 演示标记放在每个条目 + /api/vote-capabilities 里。
+                totals, _ = demo_totals()
+                out = []
+                for p in revival.get_products():
+                    d = dict(p)
+                    d["votes"] = totals.get(p["id"], 0)
+                    d["demo"] = True
+                    out.append(d)
+                self._send(*_json(out))
+                return
             if _use_github():
                 gt, _ = _github_totals()
-                totals = gt if gt is not None else revival.load_json(revival.VOTES, {"totals": {}}).get("totals", {})
+                totals = gt if gt is not None else revival.load_votes().get("totals", {})
             else:
-                totals = revival.load_json(revival.VOTES, {"totals": {}}).get("totals", {})
+                totals = revival.load_votes().get("totals", {})
             out = []
             for p in revival.get_products():
                 d = dict(p)
@@ -243,6 +314,10 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path == "/api/detect-province":
             # 自动识别省份（仅取省级，不返回/不存储任何地址原文）；识别不到返回 ""
+            # 演示模式不触碰 MCP（无 Token，也不该发请求）
+            if demo_mode():
+                self._send(*_json({"province": "", "demo": True}))
+                return
             try:
                 p = revival.auto_detect_province()
             except Exception:
@@ -252,19 +327,22 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/leaderboard":
             qs = urllib.parse.parse_qs(parsed.query)
             province = qs.get("province", [None])[0]
-            if _use_github():
+            if demo_mode():
+                totals, province_totals = demo_totals()
+                source = "demo"
+            elif _use_github():
                 gt, gpt = _github_totals()
                 if gt is not None:
                     totals = gt
                     province_totals = gpt or {}
                     source = "github"
                 else:
-                    votes = revival.load_json(revival.VOTES, {"totals": {}, "province_totals": {}})
+                    votes = revival.load_votes()
                     totals = votes.get("totals", {})
                     province_totals = votes.get("province_totals", {})
                     source = "local(fallback)"
             else:
-                votes = revival.load_json(revival.VOTES, {"totals": {}, "province_totals": {}})
+                votes = revival.load_votes()
                 totals = votes.get("totals", {})
                 province_totals = votes.get("province_totals", {})
                 source = "local"
@@ -277,14 +355,20 @@ class Handler(BaseHTTPRequestHandler):
             items = sorted(totals.items(), key=lambda x: -x[1])
             out = [{"id": i, "name": name.get(i, i), "votes": v} for i, v in items]
             self._send(*_json({"province": province, "items": out,
-                               "fallback": used_fallback, "source": source}))
+                               "fallback": used_fallback, "source": source,
+                               "demo": demo_mode(),
+                               "demo_note": DEMO_NOTE if demo_mode() else ""}))
             return
 
         # ---- 麦当劳实时只读增强（公开营销类数据支持缓存快照，无 token 也可展示；
         #      用户专属数据（抽奖/附近门店）无 token 时优雅降级，公开部署不影响可用性）----
         if path == "/api/vote-capabilities":
             # 前端据此决定「投一票」按钮可用 / 置灰，并给出本地投票引导（不伪造能力）
-            self._send(*_json(vote_capability()))
+            caps = dict(vote_capability())
+            caps["demo"] = demo_mode()
+            if demo_mode():
+                caps["demo_note"] = DEMO_NOTE
+            self._send(*_json(caps))
             return
         if path == "/api/account":
             # 会员连接状态 + 可用积分（只读 query-my-account；绝不返回会员标识，300s 缓存）
@@ -388,9 +472,11 @@ def main():
     port = int(os.environ.get("PORT", "8000"))
     host = os.environ.get("HOST", "0.0.0.0")
     srv = ThreadingHTTPServer((host, port), Handler)
-    src = "GitHub 共享榜" if _use_github() else "本地"
+    src = "演示数据(DEMO)" if demo_mode() else ("GitHub 共享榜" if _use_github() else "本地")
     caps = vote_capability()
     print(f"🍟 麦麦复活赛前端已启动: http://127.0.0.1:{port}  (bind {host}, 数据源={src})")
+    if demo_mode():
+        print("   🧪 公开演示模式：票数为示例数据（页面已标注「演示数据」），不提供在线投票，也不会回流正式共享榜。")
     if caps["voting_available"]:
         print("   在线投票：✅ 已开启（可信本机环境 MCMUSEUM_ENABLE_SERVER_VOTE=1 + 会员 Token 已配置）")
     else:

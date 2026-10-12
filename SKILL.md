@@ -25,7 +25,10 @@ description: 当用户想参加「麦麦复活赛」、为怀念的麦当劳下�
    - **强身份去重**：去重主键 = 麦当劳会员唯一标识（会员号 / openid / 卡号 等，从 `query-my-account` 返回稳健解析），每会员每单品仅可投 1 次——同一人换 WorkBuddy 账号但只要连同一会员号仍只计一次，根治「多账号刷票」。
    - **无降级**：若 `MCD_MCP_TOKEN` 缺失或无法解析会员标识，投票被拒绝并提示先连接麦当劳账号（不回退到其他账号）。
    - 在售 vs 怀旧对比：`python3 scripts/revival.py meals --from-mcp` 真实拉取 `query-meals` 与博物馆对照。
-4. **看榜**：`python3 scripts/revival.py ranking --top 10` 展示本地复活榜；可叠加省份维度（投票时传 `--province`，看榜时同样传 `--province`）。省份为 **34 个省级行政区的受控枚举**，非法值会被拒绝，避免自由文本城市名造成脏数据 / 榜被拆散。
+4. **看榜**：`python3 scripts/revival.py ranking --top 10` 展示本地复活榜（读 `data/votes.json`）；
+   `python3 scripts/revival.py ranking --from-github --top 10` 展示 **GitHub 真实共享榜**（只读公开 Issue）。
+   可叠加省份维度（投票时传 `--province`，看榜时同样传 `--province`）。省份为 **34 个省级行政区的受控枚举**，非法值会被拒绝，避免自由文本城市名造成脏数据 / 榜被拆散。
+   **测试时想不污染正式共享榜**：加 `MCMUSEUM_SHARED_BOARD=0`，本地照常计票但不写 GitHub（回执会写明"已跳过共享榜提交"）。
 5. **分享卡**：`python3 scripts/revival.py share --product <id>` 生成拉票文案，引导社媒扩散（也为 GitHub Star 导流）。
 
 ## 三、MCP 调用清单（与代码实际一致）
@@ -69,6 +72,15 @@ description: 当用户想参加「麦麦复活赛」、为怀念的麦当劳下�
 - **诚实边界**：终端用户本地投票时若无作者侧 Token，票只记在本地、不回流共享榜
   （投票结果消息会如实提示）。榜单来源（github / local）在 API 响应中带 `source` 字段，不夸大。
 
+## 六·补、两种模式（用户问"能不能在网页上投"时先分清）
+- **模式 A · 公开演示**：`MCMUSEUM_DEMO=1 python3 web/serve.py`，**无需任何 Token**。
+  页面顶部有黄色「演示数据」横幅，榜单标注"示例票数，非真实投票结果"，投票按钮为灰色
+  「🔒 演示模式」，`POST /api/vote` 返回 501。**演示票永远不会进入正式共享榜**，
+  不要把它说成真实票数，也不要引导用户去"刷"演示榜。
+- **模式 B · 真实投票**：只能用本机的 CLI / 本 Skill（见第二节流程）。
+  回执里"共享榜：已匿名回流 ✅"与"共享榜：未回流（…）"含义不同，转述时要原样传达，
+  **不要把"本地成功"说成"共享榜已更新"**。
+
 ## 七、网页投票的能力边界（不要误导用户）
 - **公开站点默认没有在线投票**。`POST /api/vote` 返回 **501** `vote_not_supported_here`；
   显式开了 `MCMUSEUM_ENABLE_SERVER_VOTE=1` 但没配 Token 则返回 **503** `member_auth_unavailable`。
@@ -80,3 +92,15 @@ description: 当用户想参加「麦麦复活赛」、为怀念的麦当劳下�
   `openid` / `token` 等字段一律被拒（400 `client_identity_not_accepted`）。
 - 未实现的边界要如实说明：**跨用户全局去重做不到**（共享榜匿名聚合，不含会员标识），
   去重作用域是「单个 `revival.py` 实例内的 `votes.json`」。
+
+## 八、核验与演示（用户问"怎么证明是真的"时用）
+- `python3 scripts/test_scenarios.py`：15 个场景测试，每个用例标注 **[MOCK]**（离线可复现，
+  临时账本 + mock 外部依赖）或 **[REAL]**（真实集成，默认跳过并显示 ⏭️，**跳过不算通过**）。
+  加 `--real` 才执行真实集成（只读：认证一次 + 读一次共享榜，不会投票/发评论）。
+- `python3 scripts/smoke_http.py`：真起 4 种部署形态的服务做 HTTP 断言（501/503/400/demo）。
+- `python3 scripts/selfcheck.py`：全项目自检。
+- 评审复现流程：`docs/DEMO_GUIDE.md`；60–90 秒演示脚本：`docs/DEMO_SCRIPT.md`。
+- 现有 `docs/demo.gif` 约 22 秒、只覆盖浏览，**不能**当作完整演示提交（未覆盖投票、
+  重复投票拦截与共享榜区分），需按 `docs/DEMO_SCRIPT.md` 补录。
+- 演示数据只在 `data/demo_votes.json`（`_demo: true`），与真实账本 `data/votes.json` 隔离；
+  演示模式只读它、从不写它。

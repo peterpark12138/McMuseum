@@ -16,5 +16,8 @@ data/votes.json
 web/leaderboard.json
 data/cache/
 
+# 账本并发锁（运行时生成）
+data/.votes.lock
+
 # 图片搜集中间产物与验证截图
 data/_*

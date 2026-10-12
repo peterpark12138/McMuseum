@@ -214,6 +214,19 @@ button,.nav a,.tag,.card-badge,.cd-cell,.stat-box,.hero-tag,.banner-tag,.votes-p
   color:#8A6A1F;font-size:13px;line-height:1.7;border-radius:12px;padding:10px 14px;margin-bottom:18px}
 .vote-tip.hidden{display:none}
 .vote-tip b{color:#6B4E00}
+/* 演示模式置顶横幅：斜纹警示底 + 醒目标签，绝不让演示数据被误认为真实票 */
+.demo-banner{
+  position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:10px;
+  padding:10px clamp(16px,5vw,60px);font-size:13px;line-height:1.6;color:#5A3E00;
+  background:repeating-linear-gradient(135deg,#FFF3C4 0 12px,#FFE79A 12px 24px);
+  border-bottom:2px solid #E8B400;
+}
+.demo-banner.hidden{display:none}
+.demo-banner .tag{
+  flex:none;background:#5A3E00;color:#FFE79A;border-radius:999px;
+  padding:3px 10px;font-size:12px;font-weight:900;letter-spacing:.5px;
+}
+.demo-banner b{color:#4A3200}
 
 /* ================= 页脚 ================= */
 .footer{background:var(--dark);padding:56px clamp(20px,7vw,120px);display:flex;flex-direction:column;gap:28px}
@@ -525,6 +538,12 @@ button,.nav a,.tag,.card-badge,.cd-cell,.stat-box,.hero-tag,.banner-tag,.votes-p
 </style>
 </head>
 <body>
+
+<!-- 演示模式横幅：仅 MCMUSEUM_DEMO=1 时显示，任何人一眼可见"这是演示数据" -->
+<div class="demo-banner hidden" id="demoBanner" role="status" aria-live="polite">
+  <span class="tag">演示数据</span>
+  <div id="demoBannerText"></div>
+</div>
 
 <!-- ============================================================
      页面 1 · 投票大厅

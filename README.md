@@ -80,6 +80,25 @@ python3 scripts/report_github.py setup --repo owner/repo
 
 ---
 
+## 三·补、两种运行模式（先选一个再看命令）
+
+| | **模式 A · 公开演示** | **模式 B · 真实投票** |
+|---|---|---|
+| 启动 | `MCMUSEUM_DEMO=1 python3 web/serve.py` | CLI / WorkBuddy Skill（在你本机） |
+| 需要 Token | **不需要任何 Token** | 需要你自己的 `MCD_MCP_TOKEN` |
+| 能做什么 | 浏览 81 款单品、单品详情、看演示榜单 | 用真实麦当劳会员身份投票 |
+| 页面标识 | 顶部常驻黄色「**演示数据**」横幅 + 榜单标注「⚠️ 演示数据 · 示例票数」 | 无横幅；榜单标注真实来源 |
+| 投票入口 | 灰色「🔒 演示模式」，`POST /api/vote` = **501** | CLI 真实投票；回执区分"本地成功 / 共享榜同步失败" |
+| 会进正式 GitHub 榜吗 | **永远不会**（该模式没有写票入口） | 会（除非加 `MCMUSEUM_SHARED_BOARD=0` 沙箱开关） |
+
+演示数据来自仓库内置的 `data/demo_votes.json`（带 `_demo: true` 标记），与真实账本
+`data/votes.json` 完全隔离；演示模式只**读**它，从不写它。
+
+只想快速试玩或做评审演示 → 用模式 A，一条命令、零凭证。
+完整复现流程（含"投票前后看榜""验证重复投票被拦截""清理测试数据"）见 **[docs/DEMO_GUIDE.md](docs/DEMO_GUIDE.md)**。
+
+---
+
 ## 四、使用示例
 
 ```bash
@@ -189,20 +208,35 @@ GITHUB_BOT_LOGIN=你的GitHub用户名  # 信任锚点；公开部署无需 GITH
 - **仅读取**：积分仅用于换算票数，绝不调用任何扣减 / 下单接口，不触碰用户资金。
 - **遵守反刷榜**：不提供任何机器人 / 脚本批量刷票路径。
 
-### 5.1 自己验证这些边界（两条命令）
+### 5.1 自己验证这些边界（三条命令）
 
 ```bash
-python3 scripts/selfcheck.py     # 逻辑层：能力声明 / 身份字段拒绝 / 状态码 / 脱敏 / 无效身份不产票 / 回执诚实
-python3 scripts/smoke_http.py    # 端到端：真起服务，验证 501 / 503 / 400 与"无 Token 仍可浏览"
+python3 scripts/test_scenarios.py   # 15 个场景：产品读取 / 无 Token / 并发双投 / GitHub 故障 / 演示隔离 …
+python3 scripts/smoke_http.py       # 端到端：真起 4 种部署形态的服务做 HTTP 断言
+python3 scripts/selfcheck.py        # 全项目自检：内容充分性 + MCP 只读红线 + 能力边界 + 账本健壮性
 ```
 
-`smoke_http.py` 会依次拉起三种部署形态的服务并断言：
+`smoke_http.py` 会依次拉起四种部署形态的服务并断言：
 
 | 场景 | 断言 |
 |---|---|
 | 公开站点 | 浏览 200、`/api/vote-capabilities` 返回不可用、`POST /api/vote` = **501** 且 `ok=false, val=0` |
 | 开启投票但无 Token | `POST /api/vote` = **503**、浏览仍 200 |
 | 可信本机 + 伪造会员标识 | `POST /api/vote` = **400** `client_identity_not_accepted`（不会走到真实投票） |
+| 公开演示模式 | 无 Token 可浏览、`source=demo`、`POST /api/vote` = **501** `demo_mode_vote_disabled` |
+
+`test_scenarios.py` 的每个用例都标注性质：**[MOCK]** 用 mock 隔离麦当劳 MCP 与 GitHub，
+在临时目录操作副本账本（**不写真实账本、不碰 GitHub**），离线可复现；
+**[REAL]** 真实集成默认**跳过**并显示 ⏭️（需加 `--real` 才执行），**跳过不算通过**。
+`--real` 只做只读验证（认证一次 + 读一次共享榜），不会投票、不会发评论。
+
+本机实测：`test_scenarios.py` ✅15 / ❌0 / ⏭️2，加 `--real` 后 ✅17 / ❌0 / ⏭️0，
+`smoke_http.py` ✅13 / ❌0，`selfcheck.py` ✅61 / ❌0。
+
+**演示相关**：评审一键复现流程见 [docs/DEMO_GUIDE.md](docs/DEMO_GUIDE.md)，
+60–90 秒演示脚本见 [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)。
+现有 `docs/demo.gif` 是 960×540 / 146 帧 / **约 22 秒**的浏览片段，
+**不能**单独代表完整演示（未覆盖投票、去重与共享榜区分），需按脚本补录。
 
 ---
 
@@ -229,8 +263,14 @@ McMuseum/
 │   ├── mcp_client.py        # 麦当劳 MCP 真实调用客户端（只读）
 │   ├── report_github.py      # 可选：GitHub 后端匿名聚合
 │   ├── build_leaderboard.py  # 生成可视化榜单数据
-│   ├── selfcheck.py         # 一键自检（含内容充分性 + 投票能力边界检查）
-│   └── smoke_http.py        # HTTP 端到端冒烟：起真实服务验证投票能力边界
+│   ├── selfcheck.py         # 一键自检（内容充分性 + 只读红线 + 能力边界 + 账本健壮性）
+│   ├── smoke_http.py        # HTTP 端到端冒烟：真起 4 种部署形态验证能力边界
+│   └── test_scenarios.py    # 15 个场景测试（[MOCK] 离线可复现 / [REAL] 默认跳过）
+├── docs/
+│   ├── DEMO_GUIDE.md        # 评审可复现流程（模式 A/B、看榜、去重验证、清理测试数据）
+│   ├── DEMO_SCRIPT.md       # 60–90 秒演示脚本 + 现有 demo.gif 的评估
+│   ├── demo.gif             # 现有演示片段（约 22 秒，仅覆盖浏览）
+│   └── promotion.md         # 宣传渠道整理
 ├── data/
 │   ├── nostalgic_products.json  # 怀旧单品名录（已核实）
 │   └── votes.json               # 本地投票累计（运行时生成）

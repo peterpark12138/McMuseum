@@ -27,6 +27,8 @@ import os
 import sys
 import argparse
 import re
+import threading
+import contextlib
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(BASE, "data", "nostalgic_products.json")
@@ -56,6 +58,94 @@ def save_json(path, data):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+VOTES_SCHEMA = {"totals": {}, "province_totals": {}, "member_voted": {}}
+
+
+def load_votes(path=None):
+    """读取投票账本，并补齐缺失的顶层键。
+
+    早期版本写出的 votes.json 只有 totals / city_totals，缺 province_totals，
+    直接 setdefault 会 KeyError 导致投票直接崩（500 / traceback）。这里统一归一化。
+    """
+    path = path or VOTES
+    # 注意：默认值必须每次新建嵌套字典。用 dict(VOTES_SCHEMA) 只是浅拷贝，
+    # 三个空字典会与模块级 VOTES_SCHEMA 共享同一对象，写入时互相污染
+    # （表现为"换了个账本文件，却提示已投过票"）。
+    v = load_json(path, {k: {} for k in VOTES_SCHEMA})
+    if not isinstance(v, dict):
+        v = {}
+    for k in VOTES_SCHEMA:
+        if not isinstance(v.get(k), dict):
+            v[k] = {}
+    return v
+
+
+# ---- 投票账本并发锁（防"两个并发请求双投计两次"）----
+# 优先级：POSIX fcntl.flock（跨进程）> Windows msvcrt.locking（跨进程）> 进程内 threading.Lock（保底）。
+# 保底锁也能覆盖 ThreadingHTTPServer 的并发请求场景。
+_LOCK_FILE = os.path.join(BASE, "data", ".votes.lock")
+_thread_lock = threading.Lock()
+try:
+    import fcntl as _fcntl
+except Exception:  # noqa: BLE001
+    _fcntl = None
+try:
+    import msvcrt as _msvcrt
+except Exception:  # noqa: BLE001
+    _msvcrt = None
+
+
+@contextlib.contextmanager
+def votes_lock():
+    """保护 votes.json 的读-改-写临界区。"""
+    f = None
+    if _fcntl is not None:
+        try:
+            os.makedirs(os.path.dirname(_LOCK_FILE), exist_ok=True)
+            f = open(_LOCK_FILE, "a+")
+            _fcntl.flock(f.fileno(), _fcntl.LOCK_EX)
+        except Exception:  # noqa: BLE001
+            f = None
+    if f is None and _msvcrt is not None:
+        try:
+            os.makedirs(os.path.dirname(_LOCK_FILE), exist_ok=True)
+            f = open(_LOCK_FILE, "a+")
+            f.seek(0)
+            _msvcrt.locking(f.fileno(), _msvcrt.LK_LOCK, 1)
+        except Exception:  # noqa: BLE001
+            try:
+                f.close()
+            except Exception:  # noqa: BLE001
+                pass
+            f = None
+    try:
+        with _thread_lock:
+            yield
+    finally:
+        if f is not None:
+            try:
+                if _fcntl is not None:
+                    _fcntl.flock(f.fileno(), _fcntl.LOCK_UN)
+                elif _msvcrt is not None:
+                    f.seek(0)
+                    _msvcrt.locking(f.fileno(), _msvcrt.LK_UNLCK, 1)
+            except Exception:  # noqa: BLE001
+                pass
+            try:
+                f.close()
+            except Exception:  # noqa: BLE001
+                pass
+
+
+def shared_board_enabled():
+    """是否允许向 GitHub 共享榜提交。
+
+    置 MCMUSEUM_SHARED_BOARD=0 即可把本机当作测试沙箱：本地照常计票，
+    但绝不向正式共享榜写任何评论（避免测试票污染正式榜单）。
+    """
+    return os.environ.get("MCMUSEUM_SHARED_BOARD", "1").strip().lower() not in ("0", "false", "no", "off")
 
 
 def get_products():
@@ -329,11 +419,11 @@ def record_vote(product, province=None, from_mcp=False, auto_province=True):
     province 为可选地域维度，必须是 PROVINCES 受控枚举之一，否则拒绝（防脏数据）。
     province 为 None 且 auto_province=True 时，自动从麦当劳 MCP 地址解析（仅取省份，不存地址）。
     """
-    votes = load_json(VOTES, {"totals": {}, "province_totals": {}, "member_voted": {}})
     pid = product
     name = next((p["name"] for p in get_products() if p["id"] == pid), pid)
     LAST_VOTE_RESULT.update({"product": pid, "ok": False, "val": 0, "province": province,
-                             "github_reported": False, "github_msg": ""})
+                             "github_reported": False, "github_msg": "",
+                             "shared_board_skipped": False, "saved": False})
 
     # 省份维度：未提供时自动探测（仅麦当劳会员路径，因需 MCP 连接）
     auto_detected = False
@@ -366,17 +456,27 @@ def record_vote(product, province=None, from_mcp=False, auto_province=True):
     total = base + extra
 
     key = "m:" + member_id
-    voted = votes["member_voted"].setdefault(key, [])
-    if pid in voted:
-        return f"该麦当劳会员已为《{name}》投过票（每会员每单品仅一次），不能重复刷票。", False, 0
+    # ---- 临界区：读-改-写必须整体加锁，否则两个并发请求会各自通过去重检查 -> 重复计票 ----
+    with votes_lock():
+        votes = load_votes()
+        voted = votes["member_voted"].setdefault(key, [])
+        if pid in voted:
+            return (f"该麦当劳会员已为《{name}》投过票（每会员每单品仅一次），不能重复刷票。"), False, 0
 
-    votes["member_voted"][key].append(pid)
-    votes["totals"][pid] = votes["totals"].get(pid, 0) + total
-    val = total
-    if province:
-        votes["province_totals"].setdefault(province, {})
-        votes["province_totals"][province][pid] = votes["province_totals"][province].get(pid, 0) + val
-    save_json(VOTES, votes)
+        voted.append(pid)
+        votes["totals"][pid] = votes["totals"].get(pid, 0) + total
+        val = total
+        if province:
+            votes["province_totals"].setdefault(province, {})
+            votes["province_totals"][province][pid] = votes["province_totals"][province].get(pid, 0) + val
+        # 持久化失败必须如实报错：绝不能在没落盘的情况下宣称"投票成功"
+        try:
+            save_json(VOTES, votes)
+        except Exception as e:  # noqa: BLE001
+            LAST_VOTE_RESULT.update({"ok": False, "val": 0, "saved": False})
+            return (f"⚠️ 投票未能保存：本地账本写入失败（{e}）。"
+                    f"本次投票**未**计入任何榜单，请检查 data/ 目录权限或磁盘空间后重试。"), False, 0
+    LAST_VOTE_RESULT["saved"] = True
 
     # 后台上报到 GitHub 共享榜（匿名、仅作者 token 可写；未配置自动跳过）。
     # 放在 record_vote 内，确保命令行与前端 /api/vote 都能回流到共享榜。
@@ -384,20 +484,28 @@ def record_vote(product, province=None, from_mcp=False, auto_province=True):
     # 注意：票已写入本地 votes.json 才算成功；GitHub 回流失败**不**回滚本地票，
     # 但必须如实写进回执（github_reported=False + 原因），绝不能让上层宣称"共享榜已更新"。
     report_note = ""
-    try:
-        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-        import mcp_client as _mc
-        _mc._load_env_file()  # 确保 .env 中的 GITHUB_REPO/GITHUB_TOKEN 被加载
-        from report_github import report_vote as _rpt
-        ok_r, m_r = _rpt(pid, "mcp", val, province)
-        report_note = f"\n   共享榜：{'已匿名回流 GitHub ✅' if ok_r else f'未回流（{m_r}）'}"
-    except Exception as e:  # noqa: BLE001
-        ok_r, m_r = False, str(e)
-        report_note = f"\n   共享榜：未回流（{e}）"
+    skipped = False
+    if not shared_board_enabled():
+        # 测试沙箱开关：本地照常计票，但不向正式共享榜写任何东西
+        ok_r, m_r = False, "已按 MCMUSEUM_SHARED_BOARD=0 跳过共享榜提交（本机测试模式，不污染正式榜）"
+        skipped = True
+        report_note = f"\n   共享榜：{m_r}"
+    else:
+        try:
+            sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+            import mcp_client as _mc
+            _mc._load_env_file()  # 确保 .env 中的 GITHUB_REPO/GITHUB_TOKEN 被加载
+            from report_github import report_vote as _rpt
+            ok_r, m_r = _rpt(pid, "mcp", val, province)
+            report_note = f"\n   共享榜：{'已匿名回流 GitHub ✅' if ok_r else f'未回流（{m_r}）'}"
+        except Exception as e:  # noqa: BLE001
+            ok_r, m_r = False, str(e)
+            report_note = f"\n   共享榜：未回流（{e}）"
 
     LAST_VOTE_RESULT.update({
         "product": pid, "ok": True, "val": val, "province": province,
         "github_reported": bool(ok_r), "github_msg": (m_r or "") if ok_r else (m_r or "未回流"),
+        "shared_board_skipped": skipped,
     })
 
     region_line = ""
@@ -413,6 +521,8 @@ def show_github_ranking(top=10):
     """从 GitHub Issue 聚合真实复活榜（跨用户、真实可信，需作者侧 GITHUB_TOKEN）。"""
     try:
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import mcp_client as _mc2
+        _mc2._load_env_file()   # 与 record_vote 一致：先加载 .env，否则明明配了却报"未配置"
         from report_github import aggregate
         data = aggregate().get("totals", {})
     except Exception as e:  # noqa: BLE001
@@ -434,7 +544,7 @@ def show_github_ranking(top=10):
 
 
 def ranking(top=10, province=None):
-    votes = load_json(VOTES, {"totals": {}, "province_totals": {}, "member_voted": {}})
+    votes = load_votes()
     name = {p["id"]: p["name"] for p in get_products()}
     if province and province in votes.get("province_totals", {}):
         totals = votes["province_totals"][province]

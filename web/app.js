@@ -54,21 +54,43 @@ let rankLoaded = false, nowLoaded = false;
 
 /* 在线投票能力（由 /api/vote-capabilities 如实下发）；
    公开部署默认 voting_available=false —— 按钮置灰并引导本机投票，绝不假成功。 */
-let VOTE_CAPS = { voting_available: false, mode: "unknown", code: "", msg: "", how_to_vote: "" };
+let VOTE_CAPS = { voting_available: false, mode: "unknown", code: "", msg: "", how_to_vote: "", demo: false };
 
 async function loadVoteCapabilities() {
   try {
     VOTE_CAPS = await (await fetch("/api/vote-capabilities")).json();
   } catch (e) {
     VOTE_CAPS = { voting_available: false, mode: "unknown",
-                  msg: "无法获取投票能力状态，按不可用处理。", how_to_vote: "" };
+                  msg: "无法获取投票能力状态，按不可用处理。", how_to_vote: "", demo: false };
   }
   renderVoteTip();
+  renderDemoBanner();
+}
+
+/* 演示模式横幅：全站置顶，任何人一眼能看到"这是演示数据" */
+function renderDemoBanner() {
+  const bar = $("#demoBanner");
+  if (!bar) return;
+  if (!VOTE_CAPS.demo) { bar.classList.add("hidden"); return; }
+  bar.classList.remove("hidden");
+  const txt = $("#demoBannerText");
+  if (txt) {
+    txt.innerHTML = `<b>演示模式 · 演示数据</b>　页面上的票数是示例值，<b>不是</b>真实投票结果，
+      也不会提交到 GitHub 正式共享榜。真实投票需在你本机用麦当劳会员身份完成。`;
+  }
 }
 
 function renderVoteTip() {
   const tip = $("#voteTip"), txt = $("#voteTipText");
   if (!tip || !txt) return;
+  if (VOTE_CAPS.demo) {
+    txt.innerHTML = `<b>演示模式：在线投票不可用</b>　这里的票数是示例数据。
+      想投出真实的一票，请在本机执行
+      <code>python scripts/revival.py vote --product &lt;单品id&gt; --from-mcp</code>，
+      或让 WorkBuddy「麦麦复活赛」Skill 代你投票。`;
+    tip.classList.remove("hidden");
+    return;
+  }
   if (VOTE_CAPS.voting_available) { tip.classList.add("hidden"); return; }
   txt.innerHTML = `<b>本站点未开启在线投票</b>：公开服务无法安全验证麦当劳会员身份，也不会代替访客持有会员凭证。
     你可以照常浏览与看榜；真实投票请在本机执行
@@ -79,7 +101,7 @@ function renderVoteTip() {
 /* 按钮文案/样式：不可用时显示为不可用态，点击后引导本机流程 */
 function voteBtnHtml(pid, isVoted, cls) {
   const can = !!VOTE_CAPS.voting_available;
-  const label = isVoted ? "已投" : (can ? "投一票" : "🔒 本机投票");
+  const label = isVoted ? "已投" : (can ? "投一票" : (VOTE_CAPS.demo ? "🔒 演示模式" : "🔒 本机投票"));
   const state = isVoted ? "voted" : (can ? "" : "unavailable");
   const title = isVoted ? "" : (can ? "" : "在线投票不可用，点此查看本机投票方式");
   return `<button class="${cls} ${state}" data-pid="${escapeHtml(pid)}" title="${escapeHtml(title)}" onclick="startVote('${escapeHtml(pid)}')">${label}</button>`;
@@ -248,10 +270,13 @@ function showVoteUnavailable(pid) {
   const p = PRODUCTS.find(x => x.id === pid) || { name: pid };
   const why = escapeHtml(VOTE_CAPS.msg || "本站点未开启在线投票。");
   const how = escapeHtml(VOTE_CAPS.how_to_vote || "");
+  const isDemo = !!VOTE_CAPS.demo;
   $("#modalBody").innerHTML = `
     <div class="vote-result">
-      <div class="big">🔒</div>
-      <h3>本站不提供在线投票</h3>
+      <div class="big">${isDemo ? "🧪" : "🔒"}</div>
+      <h3>${isDemo ? "演示模式：这里投不了票" : "本站不提供在线投票"}</h3>
+      ${isDemo ? `<p style="text-align:left;color:#B4470F;font-size:13px">
+        你正在看的是<b>演示数据</b>：示例票数，不是真实投票结果，也不会进入 GitHub 正式共享榜。</p>` : ""}
       <p style="text-align:left">
         浏览怀旧单品与复活榜照常可用；但<b>真实会员投票需要验证「你自己的」麦当劳会员身份</b>，
         公开站点拿不到、也不该保存任何人的会员凭证，所以这里不会假装投票成功。<br/><br/>
@@ -375,7 +400,9 @@ async function loadRank() {
   $("#rankUpdated").textContent = "数据更新于 " + new Date().toTimeString().slice(0, 5);
   $("#rankSource").textContent = d.source === "github"
     ? "（GitHub 共享榜 · 匿名票数聚合）"
-    : "（本地榜 · " + (d.source || "local") + "）";
+    : (d.source === "demo"
+        ? "（⚠️ 演示数据 · 示例票数，非真实投票结果）"
+        : "（本地榜 · " + (d.source || "local") + "）");
   const note = $("#rankNote");
   if (d.fallback && province) {
     note.textContent = `「${province}」暂无投票记录，已为你回退展示全国榜。`;

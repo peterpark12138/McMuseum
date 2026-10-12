@@ -571,6 +571,145 @@ try:
 except Exception as _e:
     add("共享榜信任锚点检查", False, f"检查失败: {_e}")
 
+# 9.16 演示模式（模式 A）与真实数据隔离
+try:
+    _demo_path = os.path.join(BASE, "data", "demo_votes.json")
+    _demo_ok = os.path.exists(_demo_path)
+    if _demo_ok:
+        with open(_demo_path, encoding="utf-8") as f:
+            _demo = json.load(f)
+        _demo_ok = _demo.get("_demo") is True and bool(_demo.get("_note"))
+    add("演示数据文件存在且自带演示标记", _demo_ok,
+        "data/demo_votes.json 带 _demo=true 与说明文字" if _demo_ok
+        else "缺失 data/demo_votes.json 或缺少 _demo 标记")
+
+    _r5 = None
+    try:
+        import serve as _sv2  # noqa: E402
+        _old = os.environ.get("MCMUSEUM_DEMO")
+        os.environ["MCMUSEUM_DEMO"] = "1"
+        try:
+            _c = _sv2.vote_capability()
+            _dt, _ = _sv2.demo_totals()
+        finally:
+            os.environ.pop("MCMUSEUM_DEMO", None)
+            if _old is not None:
+                os.environ["MCMUSEUM_DEMO"] = _old
+        _iso = (_c.get("voting_available") is False
+                and _c.get("mode") == "demo-browse-only" and len(_dt) > 0)
+        add("演示模式下投票不可用(演示票无入口进正式榜)", _iso,
+            f"mode={_c.get('mode')}；演示票 {len(_dt)} 款可读" if _iso else f"隔离异常：{_c}")
+    except Exception as _e:
+        add("演示模式下投票不可用(演示票无入口进正式榜)", False, f"检查失败: {_e}")
+except Exception as _e:
+    add("演示模式检查", False, f"检查失败: {_e}")
+
+# 9.17 投票账本健壮性：并发锁 / 旧账本缺键归一化 / 持久化失败不报成功
+try:
+    import tempfile as _tf2
+    import shutil as _sh2
+    import threading as _th
+    import revival as _rv4
+    _d4 = _tf2.mkdtemp(prefix="mcmuseum-sc-")
+    _p4 = os.path.join(_d4, "votes.json")
+    _old_v4 = _rv4.VOTES
+    _rv4.VOTES = _p4
+    try:
+        # (a) 旧账本缺 province_totals 时不能崩（早期版本写出的只有 city_totals）
+        with open(_p4, "w", encoding="utf-8") as f:
+            json.dump({"totals": {"x": 1}, "city_totals": {}}, f)
+        _v4 = _rv4.load_votes()
+        _norm_ok = isinstance(_v4.get("province_totals"), dict) and isinstance(_v4.get("member_voted"), dict)
+        add("旧版账本缺键自动归一化", _norm_ok,
+            "缺 province_totals 的旧 votes.json 也能正常读写" if _norm_ok else "归一化失败，带省份投票会 KeyError")
+
+        # (b) 默认值不共享引用（否则换账本也提示"已投过票"）
+        _a = _rv4.load_votes()
+        _a["member_voted"]["m:zz"] = ["x"]
+        _b = _rv4.load_votes()
+        _noalias = "m:zz" not in _b.get("member_voted", {})
+        add("账本默认值不跨调用共享引用", _noalias,
+            "两次 load_votes 互不污染" if _noalias else "默认值被共享，会串账")
+
+        # (c) 并发双投只计一次
+        os.path.exists(_p4) and os.remove(_p4)
+        _old_rai4 = _rv4.real_account_info
+        _rv4.real_account_info = lambda: (0, "sc-member-0001")
+        _out = {}
+        _bar = _th.Barrier(2)
+
+        def _w(i):
+            _bar.wait()
+            _out[i] = _rv4.record_vote("sakura_mcfloat", None, from_mcp=True)[1]
+        try:
+            _ts = [_th.Thread(target=_w, args=(i,)) for i in range(2)]
+            for t in _ts:
+                t.start()
+            for t in _ts:
+                t.join(timeout=30)
+            _book = json.load(open(_p4, encoding="utf-8"))
+        finally:
+            _rv4.real_account_info = _old_rai4
+        _conc_ok = sum(1 for v in _out.values() if v) == 1 and _book["totals"]["sakura_mcfloat"] == 1
+        add("并发同会员同单品只计一票(有锁)", _conc_ok,
+            f"成功数={sum(1 for v in _out.values() if v)}，账本={_book['totals']['sakura_mcfloat']}"
+            if _conc_ok else f"重复计票：{_book['totals']}")
+
+        # (d) 持久化失败不报成功
+        _old_save4 = _rv4.save_json
+        _rv4.save_json = lambda path, data: (_ for _ in ()).throw(OSError("模拟磁盘不可写"))
+        _rv4.real_account_info = lambda: (0, "sc-member-0002")
+        try:
+            _m5, _ok5, _v5 = _rv4.record_vote("taro_pie", None, from_mcp=True)
+        finally:
+            _rv4.save_json = _old_save4
+            _rv4.real_account_info = _old_rai4
+        _pf_ok = (_ok5 is False and _v5 == 0 and "未能保存" in _m5)
+        add("持久化失败不报告投票成功", _pf_ok,
+            "写盘失败 -> ok=False 且明确提示未计入" if _pf_ok else f"异常：ok={_ok5}, msg={_m5[:40]}")
+    finally:
+        _rv4.VOTES = _old_v4
+        _sh2.rmtree(_d4, ignore_errors=True)
+except Exception as _e:
+    add("投票账本健壮性检查", False, f"检查失败: {_e}")
+
+# 9.18 沙箱开关：MCMUSEUM_SHARED_BOARD=0 时不向正式共享榜写任何东西
+try:
+    import report_github as _rg5
+    import revival as _rv5
+    import tempfile as _tf3
+    import shutil as _sh3
+    _calls = []
+    _old_rv5 = _rg5.report_vote
+    _rg5.report_vote = lambda *a, **k: (_calls.append(a), (True, "ok"))[1]
+    _old_sb = os.environ.get("MCMUSEUM_SHARED_BOARD")
+    os.environ["MCMUSEUM_SHARED_BOARD"] = "0"
+    _d5 = _tf3.mkdtemp(prefix="mcmuseum-sb-")
+    try:
+        _p5 = os.path.join(_d5, "votes.json")
+        _old_v5 = _rv5.VOTES
+        _rv5.VOTES = _p5
+        _old_rai5 = _rv5.real_account_info
+        _rv5.real_account_info = lambda: (100, "sc-member-0003")
+        try:
+            _m6, _ok6, _v6 = _rv5.record_vote("shake_fries", None, from_mcp=True)
+            _rec6 = dict(_rv5.LAST_VOTE_RESULT)
+        finally:
+            _rv5.real_account_info = _old_rai5
+            _rv5.VOTES = _old_v5
+            os.environ.pop("MCMUSEUM_SHARED_BOARD", None)
+            if _old_sb is not None:
+                os.environ["MCMUSEUM_SHARED_BOARD"] = _old_sb
+            _rg5.report_vote = _old_rv5
+    finally:
+        _sh3.rmtree(_d5, ignore_errors=True)
+    _sb_ok = (len(_calls) == 0 and _ok6 is True and _rec6.get("shared_board_skipped") is True)
+    add("沙箱开关下不写正式共享榜", _sb_ok,
+        f"GitHub 调用次数={len(_calls)}（预期 0），本地仍计 {_v6} 票" if _sb_ok
+        else f"未生效：calls={len(_calls)}, ok={_ok6}")
+except Exception as _e:
+    add("沙箱开关检查", False, f"检查失败: {_e}")
+
 # 10. 真实依赖配置状态
 mcp_tok = os.environ.get("MCD_MCP_TOKEN")
 gh_repo = os.environ.get("GITHUB_REPO")
@@ -594,5 +733,15 @@ if fails:
     sys.exit(1)
 else:
     print("✅ 核心功能（本地全流程 + 内容充分性）已可跑通。")
-    print("   ⚠️ 真实 MCP / 真实 GitHub 后端需在 WorkBuddy 配置对应 Token 后联调验证。")
+    # 尾提示必须反映真实配置状态：已配置的后端不能再宣称"待联调"
+    need = []
+    if not mcp_tok:
+        need.append("真实 MCP 会员认证（未配置 MCD_MCP_TOKEN，模式 B 真实投票不可用）")
+    if not (gh_repo and gh_tok):
+        need.append("真实 GitHub 共享榜（未配置 GITHUB_REPO/GITHUB_TOKEN，仅走本地榜）")
+    if need:
+        print("   ⚠️ 以下真实后端尚未配置，对应能力不可用：" + "；".join(need))
+    else:
+        print("   ℹ️ 真实 MCP 与 GitHub 后端均已配置；端到端真实链路请用 "
+              "`python3 scripts/test_scenarios.py --real` 单独验证（默认跳过，跳过不算通过）。")
     sys.exit(0)
