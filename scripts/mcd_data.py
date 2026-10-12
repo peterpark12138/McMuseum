@@ -305,6 +305,7 @@ def get_points_mall(force=False):
                         "point": it.get("point", ""),
                         "selling": it.get("selling", ""),
                         "upTime": it.get("upTime", ""),
+                        "image": it.get("spuImage", ""),
                     })
         _cache_set("mall", items)
         return items

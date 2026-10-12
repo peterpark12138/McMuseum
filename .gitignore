@@ -15,3 +15,6 @@ Thumbs.db
 data/votes.json
 web/leaderboard.json
 data/cache/
+
+# 图片搜集中间产物与验证截图
+data/_*

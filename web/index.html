@@ -44,7 +44,7 @@ img{display:block}
 
 /* ================= 顶部公告条 ================= */
 .notice{
-  height:40px;background:var(--dark);padding:0 120px;
+  height:40px;background:var(--dark);padding:0 clamp(20px,7vw,120px);
   display:flex;align-items:center;justify-content:space-between;
   font-size:13px;
 }
@@ -56,7 +56,7 @@ img{display:block}
 
 /* ================= 页头 ================= */
 .header{
-  height:92px;background:#fff;padding:0 120px;
+  height:92px;background:#fff;padding:0 clamp(20px,7vw,120px);
   display:flex;align-items:center;justify-content:space-between;
 }
 .brand{display:flex;align-items:center;gap:14px}
@@ -84,7 +84,7 @@ img{display:block}
 
 /* ================= 屏幕A：Hero ================= */
 .hero{
-  min-height:544px;background:var(--red);padding:40px 120px;
+  min-height:544px;background:var(--red);padding:40px clamp(20px,7vw,120px);
   display:flex;align-items:center;gap:56px;
 }
 .hero-copy{flex:1;display:flex;flex-direction:column;gap:22px}
@@ -118,9 +118,9 @@ img{display:block}
 .cd-cell .num{font-size:22px;font-weight:900;color:var(--yellow);font-variant-numeric:tabular-nums}
 .cd-cell .unit{font-size:12px;font-weight:500;color:#FFD5CE}
 .hero-stat{font-size:14px;color:var(--hero-mut);line-height:20px}
-.hero-showcase{position:relative;width:564px;height:420px;flex:none}
-.hero-showcase .circle{position:absolute;left:102px;top:24px;width:360px;height:360px;border-radius:50%;background:var(--yellow)}
-.hero-showcase img{position:absolute;left:0;top:24px;width:564px;height:376px}
+.hero-showcase{position:relative;width:min(564px,46%);flex:none;aspect-ratio:1426/857}
+.hero-showcase .circle{position:absolute;left:18%;top:5%;width:64%;aspect-ratio:1;border-radius:50%;background:var(--yellow)}
+.hero-showcase img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain}
 
 /* ================= 波浪条 ================= */
 .wave{height:48px;position:relative;overflow:hidden}
@@ -137,7 +137,7 @@ img{display:block}
 .gap44{height:44px;background:var(--cream)}
 
 /* ================= 屏幕A：内容区 ================= */
-.content{padding:72px 120px;display:flex;flex-direction:column;gap:36px;background:var(--cream)}
+.content{padding:56px clamp(20px,7vw,120px);display:flex;flex-direction:column;gap:36px;background:var(--cream)}
 .content-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .content-head .titles{display:flex;flex-direction:column;gap:10px}
 .content-head h2{font-size:40px;font-weight:900;line-height:50px;color:var(--dark)}
@@ -168,38 +168,37 @@ img{display:block}
 .refresh-btn svg{transition:transform .5s}
 .refresh-btn.spin svg{transform:rotate(360deg)}
 
-.grid{display:grid;grid-template-columns:repeat(3,384px);gap:24px;justify-content:center}
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:20px}
 .card{
-  background:#fff;border-radius:24px;border:1.5px solid var(--border);
-  padding:20px;display:flex;flex-direction:column;gap:16px;
-  box-shadow:var(--card-shadow);
+  background:#fff;border-radius:20px;border:1.5px solid var(--border);
+  padding:14px;display:flex;flex-direction:column;gap:12px;
+  box-shadow:var(--card-shadow);min-width:0;
 }
-.card-img{width:100%;height:230px;border-radius:16px;overflow:hidden;background:#fff}
-.card-img img{width:100%;height:100%;object-fit:cover}
-.card-img.emoji{display:flex;align-items:center;justify-content:center;font-size:96px;background:radial-gradient(circle at 40% 30%,#FFF6E5,#FFE9B8)}
-.card-name-row{display:grid;grid-template-columns:72px 1fr auto;align-items:center;gap:2px;min-height:28px}
-.card-name-row .pad{width:72px;height:26px}
-.card-name{font-size:22px;font-weight:900;color:var(--dark);line-height:28px;text-align:center}
+.card-img{width:100%;aspect-ratio:1;height:auto;border-radius:14px;overflow:hidden;background:#fff;border:1px solid var(--divider)}
+.card-img img{width:100%;height:100%;object-fit:contain}
+.card-img.emoji{display:flex;align-items:center;justify-content:center;font-size:64px;background:radial-gradient(circle at 40% 30%,#FFF6E5,#FFE9B8);border:none}
+.card-name-row{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:26px}
+.card-name{font-size:17px;font-weight:900;color:var(--dark);line-height:24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card-badge{
-  display:flex;align-items:center;height:26px;padding:0 12px;border-radius:13px;
-  background:var(--red);font-size:12px;font-weight:500;color:#fff;white-space:nowrap;
+  display:flex;align-items:center;height:22px;padding:0 9px;border-radius:11px;flex:none;
+  background:var(--red);font-size:11px;font-weight:500;color:#fff;white-space:nowrap;
 }
-.card-desc{font-size:14px;color:var(--gray);line-height:22px;min-height:44px}
-.card-votes{display:flex;flex-direction:column;gap:8px}
+.card-desc{font-size:12.5px;color:var(--gray);line-height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:default}
+.card-votes{display:flex;flex-direction:column;gap:8px;margin-top:auto}
 .card-votes .row{display:flex;align-items:center;justify-content:space-between}
-.card-votes .num{font-size:17px;font-weight:900;color:var(--red);line-height:22px}
-.card-votes .pct{font-size:14px;font-weight:500;color:var(--gray)}
+.card-votes .num{font-size:15px;font-weight:900;color:var(--red);line-height:22px}
+.card-votes .pct{font-size:12.5px;font-weight:500;color:var(--gray)}
 .progress{height:10px;border-radius:5px;background:var(--bar-bg);overflow:hidden}
 .progress i{display:block;height:10px;border-radius:5px;background:var(--yellow)}
 .vote-btn{
-  height:54px;border-radius:27px;background:var(--yellow);
-  font-size:17px;font-weight:900;color:var(--dark);transition:.15s;
+  height:44px;border-radius:22px;background:var(--yellow);
+  font-size:15px;font-weight:900;color:var(--dark);transition:.15s;
 }
 .vote-btn:hover{filter:brightness(1.05)}
 .vote-btn.voted{background:var(--dark);color:var(--yellow);cursor:default}
 
 /* ================= 页脚 ================= */
-.footer{background:var(--dark);padding:56px 120px;display:flex;flex-direction:column;gap:28px}
+.footer{background:var(--dark);padding:56px clamp(20px,7vw,120px);display:flex;flex-direction:column;gap:28px}
 .footer-top{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap}
 .footer-brand{width:440px;display:flex;flex-direction:column;gap:14px}
 .footer-brand .row{display:flex;align-items:center;gap:12px}
@@ -215,7 +214,7 @@ img{display:block}
 
 /* ================= 屏幕B ================= */
 .banner{
-  background:var(--red);padding:60px 120px;display:flex;flex-direction:column;gap:24px;
+  background:var(--red);padding:60px clamp(20px,7vw,120px);display:flex;flex-direction:column;gap:24px;
 }
 .banner-tag{
   align-self:flex-start;display:flex;align-items:center;height:36px;padding:8px 16px;
@@ -233,7 +232,7 @@ img{display:block}
 .stat-box .lab{font-size:13px;font-weight:500;color:rgba(255,255,255,.82)}
 
 /* TOP3 */
-.top3-sec{padding:56px 120px 24px;display:flex;flex-direction:column;gap:32px;background:var(--cream)}
+.top3-sec{padding:56px clamp(20px,7vw,120px) 24px;display:flex;flex-direction:column;gap:32px;background:var(--cream)}
 .sec-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .sec-head .titles{display:flex;flex-direction:column;gap:4px}
 .sec-head h2{font-size:32px;font-weight:900;line-height:42px}
@@ -242,7 +241,7 @@ img{display:block}
 .top3-card{
   position:relative;background:#fff;border-radius:24px;border:1.5px solid var(--border);
   padding:20px;display:flex;flex-direction:column;gap:16px;align-items:center;
-  box-shadow:var(--card-shadow);
+  box-shadow:var(--card-shadow);min-width:0;
 }
 .top3-card.first{width:432px}
 .top3-card.other{width:360px}
@@ -260,14 +259,14 @@ img{display:block}
 .medal img{width:100%;display:block}
 
 /* 完整榜单 */
-.rank-sec{padding:24px 120px 56px;display:flex;flex-direction:column;gap:24px;background:var(--cream)}
+.rank-sec{padding:24px clamp(20px,7vw,120px) 56px;display:flex;flex-direction:column;gap:24px;background:var(--cream)}
 .rank-sec h2{font-size:28px;font-weight:900;line-height:36px}
 .rank-sec h2 .src{font-size:13px;font-weight:500;color:var(--gray);margin-left:10px}
 .rank-note{font-size:13px;font-weight:500;color:var(--rank-num);background:var(--pill-y);border-radius:10px;padding:10px 14px;align-self:flex-start}
 .rank-list{display:flex;flex-direction:column;gap:14px}
 .rank-row{
   display:flex;align-items:center;gap:20px;background:#fff;border-radius:16px;
-  border:1.5px solid var(--border);padding:18px 20px;box-shadow:var(--card-shadow);
+  border:1.5px solid var(--border);padding:18px 20px;box-shadow:var(--card-shadow);min-width:0;
 }
 .rank-no{
   width:44px;height:44px;border-radius:22px;background:var(--bar-bg);
@@ -287,7 +286,7 @@ img{display:block}
 .rank-vote.voted{background:var(--dark);color:var(--yellow)}
 
 /* 屏B页脚 */
-.footer-b{background:var(--dark);padding:56px 120px 40px;display:flex;flex-direction:column;gap:32px}
+.footer-b{background:var(--dark);padding:56px clamp(20px,7vw,120px) 40px;display:flex;flex-direction:column;gap:32px}
 .footer-b-top{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap}
 .footer-b-brand{display:flex;align-items:center;gap:14px}
 .footer-b-brand img{width:52px;height:39px;object-fit:cover}
@@ -301,51 +300,66 @@ img{display:block}
 .footer-b-bottom{font-size:13px;color:rgba(255,255,255,.5)}
 
 /* ================= 屏幕C ================= */
-.now-body{background:var(--cream);padding:56px 120px;display:flex;flex-direction:column;gap:48px}
+.now-body{background:var(--cream);padding:56px clamp(20px,7vw,120px);display:flex;flex-direction:column;gap:48px}
 .now-sec{display:flex;flex-direction:column;gap:14px}
 .now-sec h2{font-size:26px;font-weight:900;color:var(--dark);line-height:34px}
 .now-sec .sub{font-size:14px;font-weight:500;color:var(--gray);line-height:20px}
-.avail-list{display:flex;flex-direction:column;gap:10px}
-.avail-row{
-  display:flex;align-items:center;justify-content:space-between;background:#fff;
-  border-radius:14px;padding:12px 18px;box-shadow:var(--card-shadow);gap:12px;
+.avail-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+.avail-card{
+  background:#fff;border-radius:14px;border:1.5px solid var(--border);padding:12px;
+  display:flex;flex-direction:column;gap:8px;box-shadow:var(--card-shadow);min-width:0;
 }
-.avail-row .l{display:flex;align-items:center;gap:12px;min-width:0}
-.avail-row .name{font-size:15px;font-weight:700}
-.avail-row .era{font-size:11px;font-weight:500;color:var(--gray)}
+.avail-card .img{
+  width:100%;aspect-ratio:1;border-radius:10px;overflow:hidden;background:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:42px;
+}
+.avail-card .img img{width:100%;height:100%;object-fit:contain}
+.avail-card .name{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.avail-card .era{font-size:11px;font-weight:500;color:var(--gray);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tag{
-  display:flex;align-items:center;padding:5px 12px;border-radius:999px;
-  font-size:12px;font-weight:700;white-space:nowrap;
+  display:flex;align-items:center;justify-content:center;padding:5px 10px;border-radius:999px;
+  font-size:11.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .tag.green{background:var(--green-bg);border:1px solid var(--green-bd);color:var(--green-tx)}
 .tag.red{background:var(--red-bg);border:1px solid var(--red-bd);color:var(--red-tag)}
+.avail-more{
+  align-self:center;display:flex;align-items:center;gap:6px;height:40px;padding:0 22px;
+  border-radius:20px;background:#fff;border:1.5px solid var(--divider);
+  font-size:13.5px;font-weight:700;color:var(--dark);transition:.15s;
+}
+.avail-more:hover{border-color:var(--yellow);background:var(--navbg)}
 .avail-foot{font-size:12px;font-weight:500;color:var(--gray);text-align:right}
-.campaign-grid{display:flex;gap:20px;flex-wrap:wrap}
+.campaign-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}
 .campaign-card{
-  flex:1;min-width:220px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--card-shadow);
+  background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--card-shadow);min-width:0;
 }
 .campaign-card .cover{
-  height:130px;display:flex;align-items:center;justify-content:center;
-  font-size:20px;font-weight:900;color:#C8102E;overflow:hidden;
+  height:110px;display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:900;color:#C8102E;overflow:hidden;text-align:center;padding:0 8px;
 }
 .campaign-card .cover img{width:100%;height:100%;object-fit:cover}
 .campaign-card .body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px}
-.campaign-card .t{font-size:14px;font-weight:700}
+.campaign-card .t{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .campaign-card .d{font-size:11px;font-weight:500;color:var(--gray)}
-.mall-grid{display:flex;gap:20px;flex-wrap:wrap}
+.mall-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .mall-card{
-  flex:1;min-width:200px;background:#fff;border-radius:16px;padding:14px 16px;
-  display:flex;flex-direction:column;gap:8px;box-shadow:var(--card-shadow);
+  background:#fff;border-radius:16px;padding:14px 16px;
+  display:flex;flex-direction:column;gap:8px;box-shadow:var(--card-shadow);min-width:0;
 }
-.mall-card .t{font-size:14px;font-weight:700}
+.mall-card .img{
+  width:100%;aspect-ratio:1;border-radius:12px;overflow:hidden;background:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:46px;
+}
+.mall-card .img img{width:100%;height:100%;object-fit:contain}
+.mall-card .t{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mall-card .pill{
-  align-self:flex-start;display:flex;align-items:center;padding:4px 12px;border-radius:999px;
+  align-self:flex-start;display:flex;align-items:center;padding:4px 12px;border-radius:999px;margin-top:auto;
   background:var(--pill-y);font-size:13px;font-weight:700;color:#C8102E;
 }
-.mall-card .s{font-size:12px;font-weight:500;color:var(--gray)}
+.mall-card .s{font-size:12px;font-weight:500;color:var(--gray);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lottery-card{
   width:520px;max-width:100%;background:#fff;border-radius:16px;padding:16px 18px;
-  display:flex;flex-direction:column;gap:8px;box-shadow:var(--card-shadow);
+  display:flex;flex-direction:column;gap:8px;box-shadow:var(--card-shadow);min-width:0;
 }
 .lottery-card .t{font-size:18px;font-weight:900;color:#C8102E}
 .lottery-card .c{font-size:13px;font-weight:700;color:var(--dark)}
@@ -365,14 +379,31 @@ img{display:block}
   height:46px;padding:0 20px;border-radius:23px;background:var(--red);
   font-size:15px;font-weight:700;color:#fff;
 }
-.nut-list{display:flex;flex-direction:column;gap:8px}
-.nut-row{
-  background:#fff;border-radius:12px;padding:10px 14px;
-  display:flex;flex-direction:column;gap:6px;box-shadow:var(--card-shadow);
+.nut-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.nut-card{
+  background:#fff;border:2px solid var(--dark);border-radius:12px;overflow:hidden;
+  box-shadow:var(--card-shadow);display:flex;flex-direction:column;
 }
-.nut-row .t{font-size:14px;font-weight:700}
-.nut-row .m{display:flex;gap:12px;flex-wrap:wrap}
-.nut-row .m span{font-size:12px;font-weight:700;color:#C8102E;padding:3px 0}
+.nut-card .hd{
+  display:flex;align-items:center;gap:8px;padding:9px 12px;
+  border-bottom:2px solid var(--dark);
+}
+.nut-card .hd .ico{font-size:20px;flex:none}
+.nut-card .hd .t{font-size:13.5px;font-weight:900;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nut-card .kcal{
+  display:flex;align-items:baseline;justify-content:space-between;
+  padding:6px 12px;border-bottom:1.5px solid var(--dark);
+}
+.nut-card .kcal .lab{font-size:11.5px;font-weight:700;color:var(--gray)}
+.nut-card .kcal .v{font-size:19px;font-weight:900;color:var(--red);font-variant-numeric:tabular-nums}
+.nut-card .kcal .u{font-size:11px;font-weight:500;color:var(--gray)}
+.nut-card .nr{
+  display:flex;justify-content:space-between;padding:5px 12px;
+  font-size:12px;border-bottom:1px solid var(--divider);
+}
+.nut-card .nr:last-child{border-bottom:none}
+.nut-card .nr .k{color:var(--gray);font-weight:500}
+.nut-card .nr .val{font-weight:700;font-variant-numeric:tabular-nums}
 .store-prov{font-size:13px;font-weight:500;color:var(--gray)}
 .store-list{display:flex;flex-direction:column;gap:10px}
 .store-row{
@@ -382,7 +413,7 @@ img{display:block}
 .store-row .t{font-size:14px;font-weight:700}
 .store-row .a{font-size:12px;font-weight:500;color:var(--gray)}
 .footer-c{
-  background:var(--dark);padding:32px 120px;display:flex;align-items:center;justify-content:center;
+  background:var(--dark);padding:32px clamp(20px,7vw,120px);display:flex;align-items:center;justify-content:center;
   font-size:13px;font-weight:500;color:var(--pill-y);text-align:center;
 }
 
@@ -419,21 +450,43 @@ img{display:block}
   padding:26px;text-align:center;font-size:14px;color:var(--gray);
 }
 
+/* 回到顶部 */
+.to-top{
+  position:fixed;right:26px;bottom:26px;z-index:90;
+  width:52px;height:52px;border-radius:50%;background:var(--red);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 10px 26px -8px rgba(218,41,28,.55);transition:.2s;
+  opacity:0;pointer-events:none;transform:translateY(8px);
+}
+.to-top.show{opacity:1;pointer-events:auto;transform:none}
+.to-top:hover{filter:brightness(1.08)}
+
 @media (max-width:1480px){
-  .grid{grid-template-columns:repeat(3,minmax(300px,384px))}
+  .grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .avail-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .campaign-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .nut-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 @media (max-width:1240px){
-  .hero{min-height:0;padding:40px 48px;flex-wrap:wrap}
-  .hero-showcase{display:none}
-  .notice,.header,.rules,.content,.banner,.top3-sec,.rank-sec,.footer,.footer-b,.now-body,.footer-c{padding-left:48px;padding-right:48px}
+  .hero{min-height:0;padding-top:36px;padding-bottom:36px;flex-wrap:wrap}
+  .hero-showcase{width:min(460px,88%);margin:0 auto}
   .podium{flex-wrap:wrap}
   .stat-row{flex-wrap:wrap}
   .stat-box{min-width:180px}
-  .grid{grid-template-columns:repeat(2,minmax(300px,384px))}
+  .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .avail-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .campaign-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .mall-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .nut-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .header{flex-wrap:wrap;height:auto;padding-top:14px;padding-bottom:14px;gap:14px}
 }
+@media (max-width:860px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .avail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .campaign-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mall-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 @media (max-width:720px){
-  .grid{grid-template-columns:1fr}
   .hero-title .l1,.hero-title .l2{font-size:38px;line-height:52px}
   .content-head h2{font-size:30px;line-height:40px}
   .top3-card.first,.top3-card.other{width:100%}
@@ -441,6 +494,10 @@ img{display:block}
   .top3-card.first .medal{left:auto;right:8px}
   .top3-card.other .medal{left:auto;right:8px}
   .rank-row{flex-wrap:wrap}
+}
+@media (max-width:560px){
+  .grid{grid-template-columns:1fr}
+  .nut-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -452,8 +509,8 @@ img{display:block}
 <main class="page active" id="page-vote">
 
   <div class="notice">
-    <div class="left"><span class="dot"></span><span>老麦返场计划 · 仅麦当劳会员可投票 · 给你最想念的那一口</span></div>
-    <div class="right">全程 MCP 只读 · 不扣积分</div>
+    <div class="left"><span class="dot"></span><span>老麦返场计划 · 给你最想念的那一口</span></div>
+    <div class="right">2026 复活季</div>
   </div>
 
   <header class="header">
@@ -483,7 +540,7 @@ img{display:block}
     <div class="hero-copy">
       <div class="hero-tag">
         <svg fill="none" height="18" viewBox="0 0 18 18" width="18"><path d="M9 1.5l1.9 4.3 4.6.5-3.4 3.1 1 4.6L9 11.7l-4.1 2.3 1-4.6L2.5 6.3l4.6-.5L9 1.5z" fill="#DA291C"/><path d="M9 6.6v5.1" stroke="#FFC72C" stroke-linecap="round" stroke-width="1.4"/></svg>
-        老麦返场 · 会员专属投票
+        老麦返场 · 怀旧复活计划
       </div>
       <div class="hero-title">
         <div class="l1">为你怀念的那一口，</div>
@@ -512,22 +569,7 @@ img{display:block}
     </div>
   </section>
 
-  <div class="wave wave-a"><svg preserveAspectRatio="none" viewBox="0 0 1440 38"><path d="M0,0 H1440 V14 Q1384,38 1320,14 Q1264,38 1200,14 Q1144,38 1080,14 Q1024,38 960,14 Q904,38 840,14 Q784,38 720,14 Q664,38 600,14 Q544,38 480,14 Q424,38 360,14 Q304,38 240,14 Q184,38 120,14 Q64,38 0,14 Z" fill="#DA291C"/></svg></div>
-
-  <div class="rules">
-    <div class="rule">
-      <svg fill="none" height="24" viewBox="0 0 24 24" width="24"><rect fill="#DA291C" height="14" rx="3" width="20" x="2" y="5"/><circle cx="8.5" cy="11" fill="#FFC72C" r="2.2"/><path d="M4 16.5c1.5-3 3.5-4.5 5.5-4.5s3.5 1.5 4.5 4.5" fill="#FFC72C"/><rect fill="#FFC72C" height="1.6" rx=".8" width="3" x="16.5" y="10"/><rect fill="#FFC72C" height="1.6" rx=".8" width="3" x="16.5" y="13.5"/></svg>
-      仅限麦当劳会员参与 · 1 个身份 1 票
-    </div>
-    <div class="rule">
-      <svg fill="none" height="24" viewBox="0 0 24 24" width="24"><circle cx="12" cy="12" fill="#DA291C" r="9"/><circle cx="12" cy="12" fill="#FFC72C" r="5.6"/><text fill="#DA291C" font-family="inherit" font-size="8.5" font-weight="900" text-anchor="middle" x="12" y="15.6">100</text></svg>
-      每 100 积分再加 1 票
-    </div>
-    <div class="rule">
-      <svg fill="none" height="24" viewBox="0 0 24 24" width="24"><path d="M12 2.5l7.5 3v6c0 5-3.2 8.4-7.5 10-4.3-1.6-7.5-5-7.5-10v-6l7.5-3z" fill="#DA291C"/><path d="M8.6 12.2l2.3 2.4 4.6-5" fill="none" stroke="#FFC72C" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"/></svg>
-      按会员号去重，全程不刷票
-    </div>
-  </div>
+  <div class="wave wave-b"><svg preserveAspectRatio="none" viewBox="0 0 1440 38"><path d="M0,0 H1440 V14 Q1384,38 1320,14 Q1264,38 1200,14 Q1144,38 1080,14 Q1024,38 960,14 Q904,38 840,14 Q784,38 720,14 Q664,38 600,14 Q544,38 480,14 Q424,38 360,14 Q304,38 240,14 Q184,38 120,14 Q64,38 0,14 Z" fill="#DA291C"/></svg></div>
 
   <div class="gap44" id="rankAnchor"></div>
 
@@ -535,7 +577,7 @@ img{display:block}
     <div class="content-head">
       <div class="titles">
         <h2>投票大厅</h2>
-        <div class="desc">选出你最想念的那一口，把复活票投给它（候选 51 款，均为真实下架/限时单品）</div>
+        <div class="desc">选出你最想念的那一口，把复活票投给它</div>
       </div>
       <div class="tools">
         <div class="search-box">
@@ -571,7 +613,7 @@ img{display:block}
         <div class="col">
           <a href="https://github.com/peterpark12138/McMuseum" target="_blank" rel="noopener">活动规则</a>
           <a href="https://github.com/peterpark12138/McMuseum#readme" target="_blank" rel="noopener">投票说明</a>
-          <a href="https://github.com/peterpark12138/McMuseum/blob/main/MCP_INTEGRATION.md" target="_blank" rel="noopener">只读集成</a>
+          <a href="https://github.com/peterpark12138/McMuseum/blob/main/MCP_INTEGRATION.md" target="_blank" rel="noopener">技术说明</a>
         </div>
         <div class="col">
           <a href="https://github.com/peterpark12138/McMuseum/issues" target="_blank" rel="noopener">常见问题</a>
@@ -594,7 +636,7 @@ img{display:block}
 <main class="page" id="page-rank">
 
   <div class="notice">
-    <div class="left"><span class="dot"></span><span>复活榜按有效票数实时排序（共享榜约每分钟刷新）</span></div>
+    <div class="left"><span class="dot"></span><span>复活榜 · 按有效票数排序</span></div>
     <div class="right" id="rankUpdated">数据更新于 --:--</div>
   </div>
 
@@ -622,7 +664,7 @@ img{display:block}
   <div class="divider"></div>
 
   <section class="banner">
-    <div class="banner-tag">LIVE · 实时复活榜</div>
+    <div class="banner-tag">LIVE · 复活榜</div>
     <h1>谁将重返菜单，由你的一票决定</h1>
     <div class="sub">投票倒计时进行中 · 每一票都是一次召回，老味道正在复活</div>
     <div class="stat-row">
@@ -675,7 +717,7 @@ img{display:block}
         <div class="col">
           <a href="https://github.com/peterpark12138/McMuseum" target="_blank" rel="noopener">活动规则</a>
           <a href="https://github.com/peterpark12138/McMuseum#readme" target="_blank" rel="noopener">投票说明</a>
-          <a href="https://github.com/peterpark12138/McMuseum/blob/main/MCP_INTEGRATION.md" target="_blank" rel="noopener">只读集成</a>
+          <a href="https://github.com/peterpark12138/McMuseum/blob/main/MCP_INTEGRATION.md" target="_blank" rel="noopener">技术说明</a>
         </div>
         <div class="col">
           <a href="https://github.com/peterpark12138/McMuseum/issues" target="_blank" rel="noopener">常见问题</a>
@@ -695,7 +737,7 @@ img{display:block}
 <main class="page" id="page-now">
 
   <div class="notice center">
-    <div class="left"><span>麦当劳 MCP 只读增强 · 实时数据仅读取，不代操作</span></div>
+    <div class="left"><span>麦麦现在 · 看看麦当劳今天的样子</span></div>
   </div>
 
   <header class="header">
@@ -725,32 +767,33 @@ img{display:block}
 
     <section class="now-sec">
       <h2>在售对比 · 它还在卖吗？</h2>
-      <div class="sub">把怀旧单品与麦当劳当前在售菜单实时比对，看看你怀念的那口是「仍在售」还是「已绝版」。</div>
-      <div class="avail-list" id="availList"></div>
+      <div class="sub">把怀旧单品与当前在售菜单比对，看看你怀念的那口是「仍在售」还是「已绝版」。</div>
+      <div class="avail-grid" id="availList"></div>
+      <button class="avail-more hidden" id="availMore">展开更多</button>
       <div class="avail-foot" id="availFoot"></div>
     </section>
 
     <section class="now-sec">
       <h2>麦当劳最近在搞什么</h2>
-      <div class="sub">来自麦当劳官方营销活动日历（实时）。</div>
+      <div class="sub">来自麦当劳官方营销活动日历。</div>
       <div class="campaign-grid" id="campaignGrid"></div>
     </section>
 
     <section class="now-sec">
       <h2>积分还能换这些</h2>
-      <div class="sub">麦麦积分商城可兑换（实时）。你为复活赛投出的「积分票」，正是来自这里的真实积分。</div>
+      <div class="sub">麦麦积分商城当前可兑换的好物。</div>
       <div class="mall-grid" id="mallGrid"></div>
     </section>
 
     <section class="now-sec">
       <h2>积分抽奖</h2>
-      <div class="sub">当前积分抽奖活动信息（仅读取，不代抽奖）。</div>
+      <div class="sub">当前积分抽奖活动信息。</div>
       <div id="lotteryWrap"></div>
     </section>
 
     <section class="now-sec">
       <h2>麦当劳营养库</h2>
-      <div class="sub">160 款餐品营养数据（热量 / 蛋白质 / 脂肪 / 碳水）。搜一下你关心的那口。</div>
+      <div class="sub">160 款在售餐品营养数据，搜一下你关心的那口。</div>
       <div class="nut-search">
         <div class="nut-input">
           <svg fill="none" height="16" viewBox="0 0 16 16" width="16" style="margin-right:8px; flex:none"><circle cx="7" cy="7" r="5" stroke="#B5AAA0" stroke-width="1.6"/><path d="M11 11l3.2 3.2" stroke="#B5AAA0" stroke-linecap="round" stroke-width="1.6"/></svg>
@@ -758,17 +801,17 @@ img{display:block}
         </div>
         <button class="nut-btn" id="nutBtn">搜索</button>
       </div>
-      <div class="nut-list" id="nutList"></div>
+      <div class="nut-grid" id="nutList"></div>
     </section>
 
     <section class="now-sec">
       <h2>附近重温</h2>
-      <div class="sub">只读你的配送地址省份，查询该地址可配送的门店（不保存任何地址原文）。</div>
+      <div class="sub">看看你所在省份的可配送门店，去店里重温一口。</div>
       <div id="nearbyWrap"></div>
     </section>
   </div>
 
-  <footer class="footer-c">麦麦复活赛 · 老麦返场许愿池&nbsp;&nbsp;|&nbsp;&nbsp;实时数据来自麦当劳官方接口（只读）&nbsp;&nbsp;|&nbsp;&nbsp;参赛作品（概念演示），非麦当劳官方活动</footer>
+  <footer class="footer-c">麦麦复活赛 · 老麦返场许愿池&nbsp;&nbsp;|&nbsp;&nbsp;参赛作品（概念演示），非麦当劳官方活动</footer>
 </main>
 
 <!-- 投票确认弹窗 -->
@@ -780,6 +823,10 @@ img{display:block}
 </div>
 
 <div id="toast" class="toast hidden"></div>
+
+<button class="to-top" id="toTop" aria-label="回到顶部">
+  <svg fill="none" height="22" viewBox="0 0 20 20" width="22"><path d="M10 16V4M4.5 9.5L10 4l5.5 5.5" stroke="#FFC72C" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.6"/></svg>
+</button>
 
 <script src="/app.js"></script>
 </body>

@@ -7,9 +7,40 @@ const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
 
 const DEADLINE = "2026-10-25T23:59:59+08:00"; // 大赛投票截止（与报名截止同日）
 
-/* 设计稿产品插画（仅映射数据中真实存在的单品，无图用 emoji） */
+/* 产品真实图（官方菜单图 + 网络搜集实物照，均已人工核对）；无图用 emoji 兜底 */
 const HALL_IMG = {
-  taro_pie: "assets/v-taro.png",
+  // 麦当劳官方菜单图（menu-img.mcd.cn）
+  shake_fries: "assets/products/shake_fries.png",
+  purple_sweet_potato_pie: "assets/products/purple_sweet_potato_pie.gif",
+  taro_pie: "assets/products/taro_pie.gif",
+  big_chicken_steak: "assets/products/big_chicken_steak.png",
+  twisty_fries: "assets/products/twisty_fries.png",
+  apple_pie: "assets/products/apple_pie.gif",
+  shake_fries_fun: "assets/products/shake_fries_fun.png",
+  peach_pie: "assets/products/peach_pie.gif",
+  mango_pie: "assets/products/mango_pie.gif",
+  custard_pie: "assets/products/custard_pie.gif",
+  braised_spicy_burger: "assets/products/braised_spicy_burger.png",
+  grilled_chicken_burger: "assets/products/grilled_chicken_burger.png",
+  // 网络搜集实物照（已逐张核对）
+  nen_niu_wufang: "assets/products/nen_niu_wufang.jpg",
+  mexican_wrap: "assets/products/mexican_wrap.jpg",
+  sakura_mcfloat: "assets/products/sakura_mcfloat.jpg",
+  garlic_chili_sauce: "assets/products/garlic_chili_sauce.jpeg",
+  durian_flavor: "assets/products/durian_flavor.jpg",
+  five_color_burger: "assets/products/five_color_burger.jpg",
+  mc_rice_wrap: "assets/products/mc_rice_wrap.jpeg",
+  angus_burger: "assets/products/angus_burger.jpg",
+  cilantro_mcfloat: "assets/products/cilantro_mcfloat.jpg",
+  roujiamo: "assets/products/roujiamo.jpg",
+  youtiao_doujiang: "assets/products/youtiao_doujiang.jpg",
+  treasure_triangle: "assets/products/treasure_triangle.jpg",
+  strawberry_milkshake: "assets/products/strawberry_milkshake.jpg",
+  mccool: "assets/products/mccool.jpg",
+  vcut_wedges: "assets/products/vcut_wedges.jpg",
+  curry_wing: "assets/products/curry_wing.jpg",
+  maple_pancake_burger: "assets/products/maple_pancake_burger.jpg",
+  // 设计稿手绘插画（真实设计素材）
   kakazu_crispy_chicken: "assets/v-crispy.png",
   matcha_mcfloat: "assets/v-mcflurry.png",
 };
@@ -41,7 +72,7 @@ function toast(msg, type) {
 }
 
 function iconFor(p) {
-  const t = (p.category || "") + (p.name || "");
+  const t = (p.category || "") + (p.name || "") + (p.productName || "");
   if (/蘸酱|酱/.test(t)) return "🥫";
   if (/派/.test(t)) return "🥧";
   if (/麦旋风|冰淇淋|甜筒|雪糕|奶昔/.test(t)) return "🍦";
@@ -156,8 +187,8 @@ function renderHall() {
     const isVoted = voted.has(p.id);
     return `<div class="card" data-name="${escapeHtml(p.name)}">
       ${imgHtml}
-      <div class="card-name-row"><span class="pad"></span><div class="card-name">${escapeHtml(p.name)}</div><div class="card-badge">${escapeHtml(badge)}</div></div>
-      <div class="card-desc">${escapeHtml(p.story || "")}</div>
+      <div class="card-name-row"><div class="card-name">${escapeHtml(p.name)}</div><div class="card-badge">${escapeHtml(badge)}</div></div>
+      <div class="card-desc" title="${escapeHtml(p.story || "")}">${escapeHtml(p.story || "")}</div>
       <div class="card-votes">
         <div class="row"><span class="num">${fmt(p.votes)} 票</span><span class="pct">占 ${pct}%</span></div>
         <div class="progress"><i style="width:${Math.min(100, pct)}%"></i></div>
@@ -296,7 +327,7 @@ function renderPodium(items, total) {
   $("#podium").innerHTML = order.map(i => {
     const it = top3[i];
     const isFirst = i === 0;
-    const img = PODIUM_IMG[it.id];
+    const img = PODIUM_IMG[it.id] || HALL_IMG[it.id];
     const prodHtml = img
       ? `<img alt class="rays" src="assets/rays.png"><img alt="${escapeHtml(it.name)}" class="prod" src="${img}">`
       : `<img alt class="rays" src="assets/rays.png"><div class="prod emoji">${iconFor(it)}</div>`;
@@ -344,28 +375,47 @@ async function loadNow() {
 }
 
 async function loadOnSale() {
-  const box = $("#availList"), foot = $("#availFoot");
-  box.innerHTML = `<div class="state-box">在售比对加载中…</div>`;
+  const box = $("#availList"), foot = $("#availFoot"), moreBtn = $("#availMore");
+  box.innerHTML = `<div class="state-box" style="grid-column:1/-1">在售比对加载中…</div>`;
+  moreBtn.classList.add("hidden");
   try {
     const d = await (await fetch("/api/on-sale")).json();
     if (d.fallback) {
-      box.innerHTML = nowFallback("🍔 在售对比需要连接你的麦当劳账号后实时比对。");
+      box.innerHTML = `<div style="grid-column:1/-1">${nowFallback("🍔 在售对比需要连接你的麦当劳账号后实时比对。")}</div>`;
       foot.textContent = "";
       return;
     }
     const cmp = d.comparison || {};
     const rows = (PRODUCTS.length ? PRODUCTS : await (await fetch("/api/products")).json())
       .map(p => ({ p, c: cmp[p.id] || { available: false, matched: null } }));
-    box.innerHTML = rows.map(({ p, c }) => `
-      <div class="avail-row">
-        <div class="l"><span class="name">${escapeHtml(p.name)}</span><span class="era">${escapeHtml(p.era || "")}</span></div>
-        ${c.available
-          ? `<div class="tag green">仍在售 · ${escapeHtml(c.matched || "")}</div>`
-          : `<div class="tag red">已绝版</div>`}
-      </div>`).join("");
-    foot.textContent = `当前在售餐品共 ${(d.meals || []).length} 款 · 数据来自 query-meals 实时接口`;
+    const COLLAPSED = 10;
+    let expanded = false;
+    const render = () => {
+      const show = expanded ? rows : rows.slice(0, COLLAPSED);
+      box.innerHTML = show.map(({ p, c }) => {
+        const img = HALL_IMG[p.id];
+        const imgHtml = img
+          ? `<div class="img"><img alt="${escapeHtml(p.name)}" loading="lazy" src="${img}"></div>`
+          : `<div class="img" style="background:radial-gradient(circle at 40% 30%,#FFF6E5,#FFE9B8)">${iconFor(p)}</div>`;
+        return `<div class="avail-card">
+          ${imgHtml}
+          <div class="name" title="${escapeHtml(p.name)}">${escapeHtml(p.name)}</div>
+          ${p.era ? `<div class="era">${escapeHtml(p.era)}</div>` : ""}
+          ${c.available
+            ? `<div class="tag green" title="仍在售 · ${escapeHtml(c.matched || "")}">仍在售 · ${escapeHtml(c.matched || "")}</div>`
+            : `<div class="tag red">已绝版</div>`}
+        </div>`;
+      }).join("");
+      if (rows.length > COLLAPSED) {
+        moreBtn.classList.remove("hidden");
+        moreBtn.textContent = expanded ? "收起" : `展开更多（共 ${rows.length} 款）`;
+      }
+    };
+    moreBtn.onclick = () => { expanded = !expanded; render(); };
+    render();
+    foot.textContent = `当前在售餐品共 ${(d.meals || []).length} 款`;
   } catch (e) {
-    box.innerHTML = nowFallback("在售对比加载失败，请确认服务运行中。");
+    box.innerHTML = `<div style="grid-column:1/-1">${nowFallback("在售对比加载失败，请确认服务运行中。")}</div>`;
     foot.textContent = "";
   }
 }
@@ -379,7 +429,7 @@ async function loadCampaigns() {
       box.innerHTML = nowFallback("📣 营销活动日历需要连接麦当劳账号后实时展示。");
       return;
     }
-    box.innerHTML = d.items.slice(0, 6).map(it => `
+    box.innerHTML = d.items.slice(0, 10).map(it => `
       <div class="campaign-card">
         ${it.image
           ? `<div class="cover"><img alt="" loading="lazy" src="${escapeHtml(it.image)}"></div>`
@@ -405,9 +455,12 @@ async function loadMall() {
     }
     box.innerHTML = d.items.slice(0, 8).map(it => `
       <div class="mall-card">
-        <div class="t">${escapeHtml(it.spuName)}</div>
+        ${it.image
+          ? `<div class="img"><img alt="${escapeHtml(it.spuName)}" loading="lazy" src="${escapeHtml(it.image)}"></div>`
+          : `<div class="img" style="background:radial-gradient(circle at 40% 30%,#FFF6E5,#FFE9B8)">🎁</div>`}
+        <div class="t" title="${escapeHtml(it.spuName)}">${escapeHtml(it.spuName)}</div>
+        ${it.selling ? `<div class="s" title="${escapeHtml(it.selling)}">${escapeHtml(it.selling)}</div>` : ""}
         <div class="pill">${escapeHtml(String(it.point))} 积分</div>
-        ${it.selling ? `<div class="s">${escapeHtml(it.selling)}</div>` : ""}
       </div>`).join("");
   } catch (e) {
     box.innerHTML = nowFallback("积分商城加载失败，请确认服务运行中。");
@@ -430,7 +483,6 @@ async function loadLottery() {
         <div class="t">${escapeHtml(info.activityStatusText || "抽奖活动")}</div>
         ${info.cost ? `<div class="c">单次消耗：${escapeHtml(String(info.cost))} 积分</div>` : ""}
         ${prizes.length ? `<div class="p">奖品含：${prizes.map(escapeHtml).join("、")}</div>` : ""}
-        <div class="n">本作品仅读取活动信息，绝不代你抽奖 / 扣积分。</div>
       </div>`;
   } catch (e) {
     box.innerHTML = nowFallback("抽奖信息加载失败，请确认服务运行中。");
@@ -448,14 +500,12 @@ async function loadNutrition(name) {
       return;
     }
     box.innerHTML = d.items.slice(0, 40).map(it => `
-      <div class="nut-row" data-name="${escapeHtml(it.productName)}">
-        <div class="t">${escapeHtml(it.productName)}</div>
-        <div class="m">
-          <span>${escapeHtml(it.energyKcal)} kcal</span>
-          <span>蛋白 ${escapeHtml(it.protein)}g</span>
-          <span>脂肪 ${escapeHtml(it.fat)}g</span>
-          <span>碳水 ${escapeHtml(it.carbohydrate)}g</span>
-        </div>
+      <div class="nut-card" data-name="${escapeHtml(it.productName)}">
+        <div class="hd"><span class="ico">${iconFor(it)}</span><div class="t" title="${escapeHtml(it.productName)}">${escapeHtml(it.productName)}</div></div>
+        <div class="kcal"><span class="lab">能量</span><span><span class="v">${escapeHtml(it.energyKcal)}</span> <span class="u">kcal</span></span></div>
+        <div class="nr"><span class="k">蛋白质</span><span class="val">${escapeHtml(it.protein)} g</span></div>
+        <div class="nr"><span class="k">脂肪</span><span class="val">${escapeHtml(it.fat)} g</span></div>
+        <div class="nr"><span class="k">碳水化合物</span><span class="val">${escapeHtml(it.carbohydrate)} g</span></div>
       </div>`).join("");
   } catch (e) {
     box.innerHTML = nowFallback("营养库加载失败，请确认服务运行中。");
@@ -520,3 +570,10 @@ async function loadProvinces() {
 (async function init() {
   await Promise.allSettled([loadAccount(), loadProvinces(), loadProducts()]);
 })();
+
+/* ---------------- 回到顶部 ---------------- */
+const toTopBtn = $("#toTop");
+window.addEventListener("scroll", () => {
+  toTopBtn.classList.toggle("show", window.scrollY > 400);
+}, { passive: true });
+toTopBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
