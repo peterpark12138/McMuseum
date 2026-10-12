@@ -134,14 +134,19 @@ else:
     miss = [k for k, v in (("介绍", has_intro), ("安装", has_install), ("示例", has_example), ("目标用户", has_target)) if not v]
     add("README 内容充分(介绍/安装/示例/目标用户)", False, f"缺少: {', '.join(miss)}")
 
-# 9.2 CONTEST_DECLARATION 关键声明
+# 9.2 CONTEST_DECLARATION 官方原文逐字比对（官方要求：文件名与内容均不可改动）
+import hashlib as _hl
 cd_txt = read_text(os.path.join(BASE, "CONTEST_DECLARATION.md"))
+cd_sha = _hl.sha256(cd_txt.encode("utf-8")).hexdigest()
+# 官方原文（首次提交中的原样内容）SHA256
+OFFICIAL_CD_SHA = "8cc4b682463e366299bc3d20810efaf50aa3adf5e197e2937d3a56b6ee3e1000"
 if len(cd_txt) < 50:
-    add("CONTEST_DECLARATION 完整性", False, "内容过短，疑似被改/缺失")
-elif all(k in cd_txt for k in ("声明", "原创")):
-    add("CONTEST_DECLARATION 完整性", True, "含「声明/原创」等关键表述")
+    add("CONTEST_DECLARATION 完整性", False, "内容过短，疑似缺失")
+elif cd_sha == OFFICIAL_CD_SHA:
+    add("CONTEST_DECLARATION 完整性", True, "与官方原文逐字一致(SHA256 校验通过)")
 else:
-    add("CONTEST_DECLARATION 完整性", False, "缺少「声明/原创」等关键表述，可能已被改动")
+    add("CONTEST_DECLARATION 完整性", False,
+        "⚠️ 与官方原文不一致——赛事要求该文件内容不可改动，请恢复官方原文件")
 
 # 9.3 mcp-config 仅占位符
 cfg_path = os.path.join(BASE, "mcp-config.example.json")
@@ -353,6 +358,31 @@ try:
         "2 页 x 100 条全部取回" if _page_ok else f"实际取回 {len(_got)} 条")
 except Exception as _e:
     add("共享榜补报与分页", False, f"检查失败: {_e}")
+
+# 9.11b 客户端层只读红线：call_tool 是唯一出口，CLI/任意代码路径均无法绕过
+try:
+    import mcp_client as _mc2
+    _client2 = _mc2.McDonaldMCPClient()  # 需 token（本机已配置）；call_tool 校验先于任何网络请求
+    _post_calls = []
+    _orig_post = _client2._post
+    _client2._post = lambda payload, notify=False: (_post_calls.append(payload), {"result": {}})[1]
+    # (a) 8 个写工具经客户端 call_tool 必须被拒绝，且绝不发出网络请求
+    _cli_blocked = 0
+    for _w in ["create-order", "draw-lottery", "delivery-create-address", "auto-bind-coupons",
+               "calculate-price", "party-order-create", "mall-create-order", "cancel-order"]:
+        try:
+            _client2.call_tool(_w, {})
+        except ValueError:
+            _cli_blocked += 1
+    # (b) CLI main 使用的也是同一 call_tool（源码断言：无独立请求路径）
+    _cli_src_ok = "call_tool(args.tool" in read_text(os.path.join(SCRIPTS, "mcp_client.py"))
+    # (c) 只读工具放行且走到 _post
+    _rd_ok = _client2.call_tool("query-my-account", {}) == {"result": {}} and len(_post_calls) == 1
+    _client2._post = _orig_post
+    add("客户端层只读白名单(含 CLI 无绕过)", _cli_blocked == 8 and _cli_src_ok and _rd_ok,
+        f"8 写工具全拦截且零网络调用={_cli_blocked == 8}; CLI 走 call_tool={_cli_src_ok}; 只读放行={_rd_ok}")
+except Exception as _e:
+    add("客户端层只读白名单(含 CLI 无绕过)", False, f"检查失败: {_e}")
 
 # 10. 真实依赖配置状态
 mcp_tok = os.environ.get("MCD_MCP_TOKEN")

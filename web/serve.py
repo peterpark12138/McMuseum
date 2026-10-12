@@ -65,6 +65,9 @@ def _github_totals():
         return d.get("totals", {}), d.get("province_totals", {})
     try:
         agg = report_github.aggregate()
+        if not agg.get("_github_ok", True):
+            # GitHub 网络失败：不缓存全 0 结果，降级本地榜，待下次请求重试
+            return None, None
         _GH_CACHE["ts"] = now
         _GH_CACHE["data"] = agg
         return agg.get("totals", {}), agg.get("province_totals", {})
@@ -157,32 +160,34 @@ class Handler(BaseHTTPRequestHandler):
                                "fallback": used_fallback, "source": source}))
             return
 
-        # ---- 麦当劳实时只读增强（无 token 优雅降级，公开部署不影响可用性）----
+        # ---- 麦当劳实时只读增强（公开营销类数据支持缓存快照，无 token 也可展示；
+        #      用户专属数据（抽奖/附近门店）无 token 时优雅降级，公开部署不影响可用性）----
         if path == "/api/nutrition":
             qs = urllib.parse.parse_qs(parsed.query)
             name = (qs.get("name", [None])[0] or "").strip()
             items = mcd_data.get_nutrition()
             if name:
                 items = [x for x in items if name in (x.get("productName") or "")]
-            self._send(*_json({"fallback": not mcd_data.token_available(),
+            self._send(*_json({"fallback": not items,
                                "items": items[:200]}))
             return
         if path == "/api/campaigns":
-            self._send(*_json({"fallback": not mcd_data.token_available(),
-                               "items": mcd_data.get_campaigns()}))
+            items = mcd_data.get_campaigns()
+            self._send(*_json({"fallback": not items, "items": items}))
             return
         if path == "/api/lottery":
             self._send(*_json({"fallback": not mcd_data.token_available(),
                                "info": mcd_data.get_lottery_info()}))
             return
         if path == "/api/points-mall":
-            self._send(*_json({"fallback": not mcd_data.token_available(),
-                               "items": mcd_data.get_points_mall()}))
+            items = mcd_data.get_points_mall()
+            self._send(*_json({"fallback": not items, "items": items}))
             return
         if path == "/api/on-sale":
             products = revival.get_products()
-            self._send(*_json({"fallback": not mcd_data.token_available(),
-                               "meals": [m["name"] for m in mcd_data.get_current_meals()],
+            meals = mcd_data.get_current_meals()
+            self._send(*_json({"fallback": not meals,
+                               "meals": [m["name"] for m in meals],
                                "comparison": mcd_data.compare_on_sale(products)}))
             return
         if path == "/api/nearby":

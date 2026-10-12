@@ -24,8 +24,8 @@ BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE_DIR = os.path.join(BASE, "data", "cache")
 TOKEN_ENV = "MCD_MCP_TOKEN"
 
-# ---- 只读白名单（35 个工具中剔除 8 个写/交易类）----
-# 写/交易类（严禁调用）：
+# ---- 只读白名单（单一事实来源在 mcp_client.py 客户端层；此处引用以保持一致）----
+# 写/交易类（严禁调用，双层防御：客户端 call_tool 与本模块 safe_call 均校验）：
 WRITE_TOOLS = {
     "draw-lottery",            # 抽奖（扣积分/次数）
     "delivery-create-address", # 创建配送地址
@@ -36,17 +36,20 @@ WRITE_TOOLS = {
     "mall-create-order",       # 商城兑换下单
     "cancel-order",            # 取消订单
 }
-READ_ONLY_TOOLS = {
-    "delivery-query-stores", "query-lottery-info", "query-party-store-date",
-    "campaign-calendar", "query-my-coupons", "delivery-query-addresses",
-    "query-meal-assistance", "query-promotions", "query-survey-coupon",
-    "mall-product-detail", "query-party-city", "order-list",
-    "mall-order-detail", "query-party-store", "available-coupons",
-    "now-time-info", "query-nearby-stores", "query-my-prizes",
-    "mall-order-list", "list-nutrition-foods", "query-store-coupons",
-    "query-my-account", "query-meals", "query-meal-detail",
-    "mall-points-products", "query-order", "query-party-store-session",
-}
+try:
+    from mcp_client import READ_ONLY_TOOLS
+except Exception:  # noqa: BLE001  # 兜底：直接运行本模块时
+    READ_ONLY_TOOLS = frozenset({
+        "delivery-query-stores", "query-lottery-info", "query-party-store-date",
+        "campaign-calendar", "query-my-coupons", "delivery-query-addresses",
+        "query-meal-assistance", "query-promotions", "query-survey-coupon",
+        "mall-product-detail", "query-party-city", "order-list",
+        "mall-order-detail", "query-party-store", "available-coupons",
+        "now-time-info", "query-nearby-stores", "query-my-prizes",
+        "mall-order-list", "list-nutrition-foods", "query-store-coupons",
+        "query-my-account", "query-meals", "query-meal-detail",
+        "mall-points-products", "query-order", "query-party-store-session",
+    })
 
 
 def safe_call(client, name, arguments=None):

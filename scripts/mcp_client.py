@@ -17,6 +17,22 @@ import urllib.error
 MCP_URL = "https://mcp.mcd.cn"
 PROTOCOL_VERSION = "2024-11-05"
 
+# ---- 只读白名单（最高优先级红线，客户端层强制）----
+# 服务端 35 个工具中剔除 8 个写/交易类（下单/扣减/领券/抽奖/建地址/计价/取消）。
+# call_tool() 是所有 MCP 调用的唯一出口（含 CLI --tool），白名单在此统一强制，
+# 任何代码路径（业务脚本、前端服务、命令行）都无法触达写操作。
+READ_ONLY_TOOLS = frozenset({
+    "delivery-query-stores", "query-lottery-info", "query-party-store-date",
+    "campaign-calendar", "query-my-coupons", "delivery-query-addresses",
+    "query-meal-assistance", "query-promotions", "query-survey-coupon",
+    "mall-product-detail", "query-party-city", "order-list",
+    "mall-order-detail", "query-party-store", "available-coupons",
+    "now-time-info", "query-nearby-stores", "query-my-prizes",
+    "mall-order-list", "list-nutrition-foods", "query-store-coupons",
+    "query-my-account", "query-meals", "query-meal-detail",
+    "mall-points-products", "query-order", "query-party-store-session",
+})
+
 
 def _load_env_file():
     """从项目根目录 .env 读取环境变量（不覆盖已存在的系统环境变量）。
@@ -117,6 +133,11 @@ class McDonaldMCPClient:
             return []
 
     def call_tool(self, name, arguments=None):
+        """所有 MCP 调用的唯一出口：白名单外一律拒绝（含 CLI --tool 入口）。"""
+        if name not in READ_ONLY_TOOLS:
+            raise ValueError(
+                f"🚫 只读红线：工具「{name}」不在只读白名单内，本作品禁止任何写/交易操作。"
+            )
         return self._post({
             "method": "tools/call",
             "params": {"name": name, "arguments": arguments or {}},
@@ -144,8 +165,9 @@ class McDonaldMCPClient:
 
 def main():
     import argparse
-    ap = argparse.ArgumentParser(description="麦当劳 MCP 真实调用客户端（只读）")
-    ap.add_argument("--tool", default="query-my-account", help="要调用的工具名")
+    ap = argparse.ArgumentParser(description="麦当劳 MCP 真实调用客户端（只读，白名单强制）")
+    ap.add_argument("--tool", default="query-my-account",
+                    help=f"要调用的工具名（仅限只读白名单内 {len(READ_ONLY_TOOLS)} 个）")
     ap.add_argument("--args", default="{}", help="工具参数 JSON")
     args = ap.parse_args()
     client = McDonaldMCPClient()

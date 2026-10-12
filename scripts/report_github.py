@@ -317,7 +317,9 @@ def aggregate():
     try:
         all_comments = _fetch_all_comments(f"{API}/repos/{repo}/issues/comments", token)
     except RuntimeError:
+        result["_github_ok"] = False  # 网络失败标记：调用方（如 serve.py）不应缓存全 0 结果
         return result
+    result["_github_ok"] = True
     by_issue = {}
     for c in all_comments:
         issue_url = c.get("issue_url") or ""
