@@ -1,34 +1,61 @@
-# 缺失产品图清单（22 款，更新于 2026-10-12）
+# 缺失产品图清单（53 款，更新于 2026-10-12）
 
-> 本轮进展：二轮搜图 + 白底化处理后，图库从 29 款 → 27 款（新增奶昔、美味鲜蔬杯；
-> 剔除 4 款不合格：榴莲麦旋风/菠菜卷为广告海报、肉夹馍/樱花麦旋风抠图异常）。
-> 以下 22 款仍无可信图片，找到后放入 `web/assets/products/`（文件名用左侧 id），
-> 告诉我一声即可接入页面。
+> 数据模型升级后产品库共 81 款，已接入图片 28 款（官方菜单图 12 + 实物白底图 16），
+> 咔滋脆鸡堡/抹茶麦旋风 2 款暂用设计稿插画。
+> 以下 53 款待补图，找到后放入 `web/assets/products/`（文件名用左侧 id），告诉我一声即可接入。
 
 | id（文件名） | 产品名 | 备注 |
 |---|---|---|
-| szechuan_sauce | 四川辣酱（麦辣酱） | 电影联名周边多、真实蘸酱图少 |
-| neworleans_wing | 新奥尔良烤翅 | 网图多为肯德基同款 |
-| lime_thai_chili | 青柠味泰椒酱 | 酱料类难搜 |
-| singapore_honey_mustard | 新加坡蜜糖芥末酱 | 酱料类难搜 |
-| french_cheese | 法式芝士酱 | 酱料类难搜 |
-| malay_satay | 马来沙嗲酱 | 酱料类难搜 |
-| mc_rice_bowl | 麦趣饭 | 仅优惠券截图 |
-| salted_egg_yolk_mooncake | 咸蛋黄鸡腿月饼 | 应季限量 |
-| crayfish_burger | 小龙虾堡 | 网图多为零食袋 |
-| hotcakes | 热香饼 | 年代久远 |
-| pineapple_shrimp_burger | 菠萝虾堡 | 仅文字海报 |
-| salt_baked_wing | 盐焗鸡翅 | 与咖喱鸡翅易混淆 |
-| qinghuajiao_double | 青花椒双堡 | 仅 App 截图 |
-| cheese_beef_moon | 芝香牛牛月亮堡 | 仅套餐海报 |
-| cod_brick | 鳕鱼金砖 | 仅广告横幅 |
-| taro_mcfloat | 香芋麦旋风 | 网图均为奥利奥款 |
-| hot_chocolate | 热朱古力 | 仅促销图 |
-| thai_charcoal_pork_burger | 泰式炭烤风味猪猪堡 | 仅文章配图 |
-| durian_flavor | 榴莲麦旋风 | 本轮搜到的是广告海报，已剔除 |
-| five_color_burger | 日食五色菠菜卷 | 本轮搜到的是宣传海报，已剔除 |
-| roujiamo | 肉夹馍（金招牌） | 上轮图抠图失败，已剔除 |
-| sakura_mcfloat | 樱花麦旋风 | 上轮图抠图异常，已剔除 |
-
-> 已接入 27 款：官方菜单图 12 张（透明底）+ 白底化实物照 15 张（含奶昔、鲜蔬杯）。
-> 全部图已统一为 1:1 白底风格，页面显示一致。
+| durian_flavor | 榴莲麦旋风（苏丹王榴莲） | 图难搜 |
+| five_color_veggie_roll | 五色蔬萃卷 | 五色系列拆分款，无图 |
+| five_color_chicken_roll | 五色嫩鸡麦饭卷 | 五色系列拆分款，无图 |
+| five_color_beef_roll | 五色至牛麦饭卷 | 五色系列拆分款，无图 |
+| five_color_happy_roll | 五色开心卷 | 五色系列拆分款，无图 |
+| lime_thai_chili | 青柠味泰椒酱 | 图难搜 |
+| singapore_honey_mustard | 新加坡蜜糖芥末酱 | 图难搜 |
+| french_cheese | 法式芝士酱 | 图难搜 |
+| malay_satay | 马来沙嗲酱 | 图难搜 |
+| mc_rice_bowl | 麦趣饭 | 图难搜 |
+| salted_egg_yolk_mooncake | 咸蛋黄鸡腿月饼 | 图难搜 |
+| crayfish_burger | 小龙虾堡 | 图难搜 |
+| roujiamo | 肉夹馍（金招牌） | 图难搜 |
+| hotcakes | 热香饼 | 图难搜 |
+| pineapple_shrimp_burger | 菠萝虾堡 | 图难搜 |
+| salt_baked_wing | 盐焗鸡翅 | 图难搜 |
+| qinghuajiao_double | 青花椒双堡 | 图难搜 |
+| cheese_beef_moon | 芝香牛牛月亮堡 | 图难搜 |
+| cod_brick | 鳕鱼金砖 | 图难搜 |
+| taro_mcfloat | 香芋麦旋风 | 图难搜 |
+| hot_chocolate | 热朱古力 | 图难搜 |
+| thai_charcoal_pork_burger | 泰式炭烤风味猪猪堡 | 图难搜 |
+| spicy_chicken_burger | 麦辣鸡腿堡 | 常供在售，官方菜单图可得 |
+| big_mac | 巨无霸 | 常供在售，官方菜单图可得 |
+| mcchicken | 麦香鸡 | 常供在售，官方菜单图可得 |
+| double_cheeseburger | 双层吉士堡 | 常供在售，官方菜单图可得 |
+| mantou_pork_burger | 馒火的芝香猪排堡 | 2015 限定，年代久远 |
+| cheese_shrimp_burger_2015 | 有芝好虾堡 | 2015 限定，年代久远 |
+| lucky_year_fish_burger | 年年有利堡 | 2015 新春限定 |
+| lucky_year_fu_burger | 年年有福堡 | 2015 新春限定 |
+| yuzu_black_pepper_beef_burger | 爽辣柚香黑椒辣牛堡 | 2015 限定 |
+| red_bean_pie | 红豆派 | 图难搜 |
+| mung_bean_pie | 绿豆派 | 官方口味清单收录，实物图少 |
+| banana_pie | 香蕉派 | 2026 双拼迷你派有官方图可裁 |
+| coconut_pie | 椰子派 | 官方口味清单收录，实物图少 |
+| corn_pie | 玉米派 | 官方口味清单收录，实物图少 |
+| chocolate_pie | 巧克力派 | 与奇巧三角派区分（普通巧克力派） |
+| orange_pie | 香橙派 | 官方口味清单收录，实物图少 |
+| strawberry_pie | 草莓派 | 官方口味清单收录，实物图少 |
+| red_bean_double_skin_pie | 红豆双皮奶派 | 2018 限定，图少 |
+| black_forest_pie | 黑森林派 | 官方口味清单收录，图少 |
+| kitkat_triangle_pie | 奇巧巧克力风味三角派 | 多次回归，开箱图多 |
+| matcha_dofu_pie | 抹茶豆乳派 | 社区资料，待补官方来源 |
+| matcha_black_honey_mochi_pie | 抹茶黑蜜麻薯派 | 2025 派Day 官方图可搜 |
+| apple_banana_mini_pie | 苹果香蕉双拼迷你派 | 2026 派Day 官方图可裁 |
+| red_bean_rice_cake_pie | 红豆年糕派 | 社区资料，待补官方来源 |
+| golden_arches_shrimp_burger | 金拱门虾堡 | 注意与菠萝虾堡区分 |
+| golden_pineapple_chicken_mcmuffin | 金菠萝鸡扒麦满分 | 早餐限定，图难搜 |
+| cheese_pineapple_grilled_burger | 芝士嘿凤梨板烧 | 图难搜 |
+| die_die_roll | 叠叠卷 | 早餐卷，图难搜 |
+| onion_cheese_shake_fries | 洋葱乳酪摇摇薯条 | 摇摇粉口味变体，图难搜 |
+| golden_onion_rings | 黄金洋葱圈 | 短期限定，图难搜 |
+| gongcai_chicken_wrap | 脆脆脆贡菜鸡肉卷 | 图难搜 |

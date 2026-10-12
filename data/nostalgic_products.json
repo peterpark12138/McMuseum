@@ -1,43 +1,7 @@
 {
-  "updated": "2026-10-10",
-  "note": "怀旧单品博物馆名录。verified=true 表示已结合麦当劳官方历史资料/官网新闻核实确凿发售或限定过；verified=false 表示待核实（社区提名/疑似非官方），赛前需人工确认或移除。下架/限定状态经 2026-10-10 联网核实（麦当劳中国官网 mcdonalds.com.cn 及公开报道）；标注「仍在售」者为常供经典，列入以作对比参照。",
+  "updated": "2026-10-12",
+  "note": "怀旧单品博物馆名录。verified=true 表示已结合麦当劳官方历史资料/官网新闻核实确凿发售或限定过；verified=false 表示待核实（社区提名/疑似非官方），赛前需人工确认或移除。下架/限定状态经 2026-10-10 联网核实（麦当劳中国官网 mcdonalds.com.cn 及公开报道）；标注「仍在售」者为常供经典，列入以作对比参照。 2026-10-12 数据模型升级：每款含 official_name/market/status/first_seen/last_confirmed_sale/vote_eligible/evidence_level/sources；status=on_sale/regional_on_sale/needs_verification 的款为在售参照（vote_eligible=false），不可投票；evidence_level A=官方原文/B=权威报道/C=社区资料待补证。",
   "products": [
-    {
-      "id": "szechuan_sauce",
-      "name": "四川辣酱（麦辣酱）",
-      "era": "2017–2018 限时回归",
-      "category": "蘸酱",
-      "story": "因动画《瑞克和莫蒂》走红的神秘蘸酱，2017 年国内限时回归，一酱难求，是麦门情怀鼻祖。",
-      "verified": true,
-      "tags": ["蘸酱", "限定", "情怀鼻祖"]
-    },
-    {
-      "id": "nen_niu_wufang",
-      "name": "嫩牛五方",
-      "era": "2005 初代 / 2014、2016 多次回归",
-      "category": "主食",
-      "story": "裹牛肉的卷饼，曾数度回归又下架，是麦门「薛定谔的常驻」选手。",
-      "verified": true,
-      "tags": ["主食", "多次回归", "经典"]
-    },
-    {
-      "id": "mexican_wrap",
-      "name": "墨西哥鸡肉卷",
-      "era": "早期经典（后由其他卷类取代）",
-      "category": "主食",
-      "story": "香辣鸡肉配蔬菜的软卷，是不少人学生时代的「豪华午餐」记忆。",
-      "verified": true,
-      "tags": ["主食", "经典", "学生时代"]
-    },
-    {
-      "id": "neworleans_wing",
-      "name": "新奥尔良烤翅",
-      "era": "经典烤翅系列",
-      "category": "小食",
-      "story": "微甜微辣的烤制鸡翅，曾经和麦辣鸡翅并称「麦门双翅」。",
-      "verified": true,
-      "tags": ["小食", "烤翅", "经典"]
-    },
     {
       "id": "sakura_mcfloat",
       "name": "樱花麦旋风",
@@ -45,7 +9,21 @@
       "category": "甜品",
       "story": "粉嫩樱花香草麦旋风，2019 年樱花季限定（麦当劳中国官网 2019-02-20 至 2019-03-19 推广），错过等一年。",
       "verified": true,
-      "tags": ["甜品", "春季限定", "颜值"]
+      "tags": [
+        "甜品",
+        "春季限定",
+        "颜值"
+      ],
+      "official_name": "樱花麦旋风",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2019-02",
+      "last_confirmed_sale": "2019-03-19（官网推广截止）",
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网 2019-02-20 推广页（官网存档）"
+      ]
     },
     {
       "id": "garlic_chili_sauce",
@@ -54,7 +32,21 @@
       "category": "蘸酱",
       "story": "麦乐鸡/麦辣鸡腿堡的经典蒜辣蘸酱，长期作为会员常点配酱，2026 年 4 月起门店陆续停止订货并售罄下架，被老粉念叨至今。",
       "verified": true,
-      "tags": ["蘸酱", "已下架", "怀旧"]
+      "tags": [
+        "蘸酱",
+        "已下架",
+        "怀旧"
+      ],
+      "official_name": "蒜蓉辣椒酱",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2010 前后",
+      "last_confirmed_sale": "2026-04（门店售罄下架）",
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "公开报道/会员端菜单记录"
+      ]
     },
     {
       "id": "durian_flavor",
@@ -63,16 +55,105 @@
       "category": "甜品",
       "story": "「臭」名昭著的榴莲限定甜品，2024 年 5–6 月以「苏丹王榴莲麦旋风」形式限时上线（麦当劳中国官网 2024-05-31 推广），爱者极爱，讨论度爆表。",
       "verified": true,
-      "tags": ["甜品", "争议", "话题王"]
+      "tags": [
+        "甜品",
+        "争议",
+        "话题王"
+      ],
+      "official_name": "榴莲麦旋风",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2024-05",
+      "last_confirmed_sale": "2024-06（官网 2024-05-31 推广）",
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网 2024-05-31 推广页（官网存档）"
+      ]
     },
     {
-      "id": "five_color_burger",
-      "name": "日食五色菠菜卷（2011 限定）",
-      "era": "2011 限定营销款",
+      "id": "five_color_veggie_roll",
+      "name": "五色蔬萃卷",
+      "era": "五色系列/麦饭卷（限定）",
       "category": "主食",
-      "story": "2011 年麦当劳中国推出「日食五色」健康概念系列，以菠菜汁饼皮包裹五色蔬菜与板烧鸡腿/纯牛肉，是本土化中式新品尝试。现均已下架，属于被遗忘的限定。",
+      "story": "「五色」健康概念系列的蔬菜卷款，以彩色饼皮包裹时蔬，属本土化健康限定尝试。",
       "verified": true,
-      "tags": ["主食", "限定", "中式"]
+      "tags": [
+        "主食",
+        "限定",
+        "中式"
+      ],
+      "official_name": "五色蔬萃卷",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
+    },
+    {
+      "id": "five_color_chicken_roll",
+      "name": "五色嫩鸡麦饭卷",
+      "era": "五色系列/麦饭卷（限定）",
+      "category": "主食",
+      "story": "麦饭卷系列嫩鸡款：薄饼包裹米饭与嫩鸡，米饭主食本土化的代表。",
+      "verified": true,
+      "tags": [
+        "主食",
+        "限定",
+        "中式"
+      ],
+      "official_name": "五色嫩鸡麦饭卷",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
+    },
+    {
+      "id": "five_color_beef_roll",
+      "name": "五色至牛麦饭卷",
+      "era": "五色系列/麦饭卷（限定）",
+      "category": "主食",
+      "story": "麦饭卷系列牛肉款：薄饼包裹米饭与牛肉，与嫩鸡款同期推出。",
+      "verified": true,
+      "tags": [
+        "主食",
+        "限定",
+        "中式"
+      ],
+      "official_name": "五色至牛麦饭卷",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
+    },
+    {
+      "id": "five_color_happy_roll",
+      "name": "五色开心卷",
+      "era": "五色系列（限定）",
+      "category": "主食",
+      "story": "「五色」系列开心卷款，同属健康概念限定家族。",
+      "verified": true,
+      "tags": [
+        "主食",
+        "限定",
+        "中式"
+      ],
+      "official_name": "五色开心卷",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
     },
     {
       "id": "lime_thai_chili",
@@ -81,7 +162,21 @@
       "category": "蘸酱",
       "story": "麦当劳中国「全球风味酱」系列之一，酸辣清新的青柠+泰椒风味，配麦乐鸡限定时段供应，后随系列结束下架。",
       "verified": true,
-      "tags": ["蘸酱", "限定", "全球风味"]
+      "tags": [
+        "蘸酱",
+        "限定",
+        "全球风味"
+      ],
+      "official_name": "青柠味泰椒酱",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2018",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "「全球风味酱」系列公开报道"
+      ]
     },
     {
       "id": "singapore_honey_mustard",
@@ -90,7 +185,21 @@
       "category": "蘸酱",
       "story": "「全球风味酱」系列的甜润款，蜜糖与芥末交织，是当时配麦乐鸡的人气蘸酱之一。",
       "verified": true,
-      "tags": ["蘸酱", "限定", "全球风味"]
+      "tags": [
+        "蘸酱",
+        "限定",
+        "全球风味"
+      ],
+      "official_name": "新加坡蜜糖芥末酱",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2018",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "「全球风味酱」系列公开报道"
+      ]
     },
     {
       "id": "french_cheese",
@@ -99,7 +208,21 @@
       "category": "蘸酱",
       "story": "「全球风味酱」系列中的咸香芝士款，浓郁奶香，限定供应后随系列下架。",
       "verified": true,
-      "tags": ["蘸酱", "限定", "全球风味"]
+      "tags": [
+        "蘸酱",
+        "限定",
+        "全球风味"
+      ],
+      "official_name": "法式芝士酱",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2018",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "「全球风味酱」系列公开报道"
+      ]
     },
     {
       "id": "malay_satay",
@@ -108,7 +231,21 @@
       "category": "蘸酱",
       "story": "「全球风味酱」系列的南洋风味，沙嗲烤肉酱香，限定供应，是麦乐鸡蘸酱里的异域记忆。",
       "verified": true,
-      "tags": ["蘸酱", "限定", "全球风味"]
+      "tags": [
+        "蘸酱",
+        "限定",
+        "全球风味"
+      ],
+      "official_name": "马来沙嗲酱",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2018",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "「全球风味酱」系列公开报道"
+      ]
     },
     {
       "id": "mc_rice_wrap",
@@ -117,7 +254,21 @@
       "category": "主食",
       "story": "2013 年「麦麦开饭」系列推出的米饭卷，以薄饼包裹米饭与菜肴，是麦当劳中国化主食尝试，福喜事件后停售。",
       "verified": true,
-      "tags": ["主食", "限定", "中式"]
+      "tags": [
+        "主食",
+        "限定",
+        "中式"
+      ],
+      "official_name": "麦饭卷",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2013",
+      "last_confirmed_sale": "2014-07（福喜事件后停售）",
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "麦麦开饭系列公开报道"
+      ]
     },
     {
       "id": "mc_rice_bowl",
@@ -126,7 +277,21 @@
       "category": "主食",
       "story": "同属 2013「麦麦开饭」系列的米饭盒，评价参差，推出一段日子后下架，是麦门里少见的「饭」记忆。",
       "verified": true,
-      "tags": ["主食", "限定", "中式"]
+      "tags": [
+        "主食",
+        "限定",
+        "中式"
+      ],
+      "official_name": "麦趣饭",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2013",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "麦麦开饭系列公开报道"
+      ]
     },
     {
       "id": "shake_fries",
@@ -135,7 +300,21 @@
       "category": "小食",
       "story": "配粉包自摇的趣味薯条，撒上调料粉摇匀后风味一新，是不少人的限定童年乐趣。",
       "verified": true,
-      "tags": ["小食", "限定", "趣味"]
+      "tags": [
+        "小食",
+        "限定",
+        "趣味"
+      ],
+      "official_name": "摇摇薯条",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "限定活动公开报道"
+      ]
     },
     {
       "id": "angus_burger",
@@ -144,7 +323,21 @@
       "category": "主食",
       "story": "以安格斯牛肉主打的 premium 汉堡线，2013 年前后在多地陆续下市（美国 2013、澳洲 2026 停售），中国曾售现已难觅。",
       "verified": true,
-      "tags": ["主食", "premium", "经典"]
+      "tags": [
+        "主食",
+        "premium",
+        "经典"
+      ],
+      "official_name": "安格斯牛肉堡",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2009 前后（全球高端线）",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "安格斯系列公开报道（美国 2013 下市等）"
+      ]
     },
     {
       "id": "matcha_mcfloat",
@@ -153,7 +346,19 @@
       "category": "甜品",
       "story": "微苦回甘的抹茶麦旋风，作为季节限定甜品出现，是麦旋风口味里的清流。",
       "verified": true,
-      "tags": ["甜品", "限定", "抹茶"]
+      "tags": [
+        "甜品",
+        "限定",
+        "抹茶"
+      ],
+      "official_name": "抹茶麦旋风",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
     },
     {
       "id": "cilantro_mcfloat",
@@ -162,7 +367,21 @@
       "category": "甜品",
       "story": "香菜风味冰旋风，凭借「黑暗料理」话题度成为现象级限定，爱恨分明。",
       "verified": true,
-      "tags": ["甜品", "限定", "话题王"]
+      "tags": [
+        "甜品",
+        "限定",
+        "话题王"
+      ],
+      "official_name": "香菜冰旋风",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2023 冬",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官方新品公告（香菜新地/冰旋风话题事件）"
+      ]
     },
     {
       "id": "purple_sweet_potato_pie",
@@ -171,7 +390,19 @@
       "category": "甜品",
       "story": "紫薯馅的限定派，绵密香甜的紫色外衣，是不少人惦记的节令甜点。",
       "verified": true,
-      "tags": ["甜品", "限定", "派"]
+      "tags": [
+        "甜品",
+        "限定",
+        "派"
+      ],
+      "official_name": "紫薯派",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
     },
     {
       "id": "taro_pie",
@@ -180,7 +411,21 @@
       "category": "甜品",
       "story": "香芋馅的派，常于春节等节点限时回归，是麦门派类里的人气常客。",
       "verified": true,
-      "tags": ["甜品", "限定", "派"]
+      "tags": [
+        "甜品",
+        "限定",
+        "派"
+      ],
+      "official_name": "香芋派",
+      "market": "中国内地",
+      "status": "on_sale",
+      "first_seen": "1990（随首店进入内地；官方称中国研发、全球特有）",
+      "last_confirmed_sale": null,
+      "vote_eligible": false,
+      "evidence_level": "B",
+      "sources": [
+        "麦当劳中国官网《麦当劳开启派DAY狂欢》2019-03-07 新闻稿 https://www.mcdonalds.com.cn/news/pie-day-2019-top-pie-cities-in-china（「全年供应菠萝派和香芋派」）"
+      ]
     },
     {
       "id": "salted_egg_yolk_mooncake",
@@ -189,7 +434,19 @@
       "category": "小食",
       "story": "麦当劳中秋限定，将咸蛋黄与鸡腿入月饼，脑洞与争议齐飞，是年度话题单品。",
       "verified": true,
-      "tags": ["小食", "中秋限定", "脑洞"]
+      "tags": [
+        "小食",
+        "中秋限定",
+        "脑洞"
+      ],
+      "official_name": "咸蛋黄鸡腿月饼",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
     },
     {
       "id": "crayfish_burger",
@@ -198,7 +455,19 @@
       "category": "主食",
       "story": "麻辣/蒜香小龙虾入堡的夏季限定，红油鲜香，是「麦门中式化」的流量担当。",
       "verified": true,
-      "tags": ["主食", "夏季限定", "中式"]
+      "tags": [
+        "主食",
+        "夏季限定",
+        "中式"
+      ],
+      "official_name": "小龙虾堡",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
     },
     {
       "id": "big_chicken_steak",
@@ -207,7 +476,21 @@
       "category": "小食",
       "story": "主打「那么大」份量的炸鸡排，外脆里嫩，是限定的大口满足款。",
       "verified": true,
-      "tags": ["小食", "限定", "炸鸡"]
+      "tags": [
+        "小食",
+        "限定",
+        "炸鸡"
+      ],
+      "official_name": "那么大鸡排",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2017",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "「那么大鸡排」公开报道"
+      ]
     },
     {
       "id": "roujiamo",
@@ -216,7 +499,21 @@
       "category": "主食",
       "story": "2021 年新春与哪吒 IP 联名推出的「金招牌肉夹馍」，仅早餐时段供应、只卖 24 天即下架，曾因「肉量」引发热议。",
       "verified": true,
-      "tags": ["主食", "新年限定", "中式"]
+      "tags": [
+        "主食",
+        "新年限定",
+        "中式"
+      ],
+      "official_name": "肉夹馍",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2021-01",
+      "last_confirmed_sale": "2021-02（仅售 24 天）",
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "2021 新春哪吒联名公开报道"
+      ]
     },
     {
       "id": "youtiao_doujiang",
@@ -225,7 +522,20 @@
       "category": "早餐",
       "story": "麦当劳中国早餐常供的「脆香油条」与「优品豆浆」，属于仍在售的经典早餐组合（非下架品，列入以作对比参照）。",
       "verified": true,
-      "tags": ["早餐", "常供", "仍在售"]
+      "tags": [
+        "早餐",
+        "常供",
+        "仍在售"
+      ],
+      "official_name": "油条 + 豆浆",
+      "market": "中国内地",
+      "status": "needs_verification",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": false,
+      "evidence_level": "B",
+      "sources": [],
+      "supply_note": "供应状态待核实（2026-10 用户提示，早餐菜单城市差异大）"
     },
     {
       "id": "treasure_triangle",
@@ -234,7 +544,19 @@
       "category": "小食",
       "story": "外形似三角形的酥皮炸物，内裹咖喱牛肉/蔬菜馅，是许多人记忆里「一口爆汁」的怀旧小食，现已下市。",
       "verified": true,
-      "tags": ["小食", "已下市", "怀旧"]
+      "tags": [
+        "小食",
+        "已下市",
+        "怀旧"
+      ],
+      "official_name": "珍宝三角",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2000 前后",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
     },
     {
       "id": "strawberry_milkshake",
@@ -243,7 +565,22 @@
       "category": "饮品",
       "story": "草莓风味的麦当劳奶昔，绵密粉红。2026 年奶昔系列重回常供，草莓味随之回归（仍在售）。",
       "verified": true,
-      "tags": ["饮品", "回归常供", "仍在售"]
+      "tags": [
+        "饮品",
+        "回归常供",
+        "仍在售"
+      ],
+      "official_name": "草莓奶昔",
+      "market": "中国内地",
+      "status": "regional_on_sale",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": false,
+      "evidence_level": "B",
+      "sources": [
+        "2026 奶昔回归门店菜单（区域）"
+      ],
+      "supply_note": "区域供应（约 15 城 44 店，2026-10 用户提示），非全国常供"
     },
     {
       "id": "twisty_fries",
@@ -252,7 +589,21 @@
       "category": "小食",
       "story": "扭成螺旋状的薯条，配双酱蘸食，造型与口感都不同于普通薯条，属限定趣味小食。",
       "verified": true,
-      "tags": ["小食", "限定", "趣味"]
+      "tags": [
+        "小食",
+        "限定",
+        "趣味"
+      ],
+      "official_name": "扭扭薯条",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "2019-01/2018-01 新品清单（食研百科等）"
+      ]
     },
     {
       "id": "hotcakes",
@@ -261,7 +612,20 @@
       "category": "早餐",
       "story": "麦当劳早餐经典热香饼（pancakes），淋上枫糖，是早餐常供组合的一员（仍在售）。",
       "verified": true,
-      "tags": ["早餐", "常供", "仍在售"]
+      "tags": [
+        "早餐",
+        "常供",
+        "仍在售"
+      ],
+      "official_name": "热香饼",
+      "market": "中国内地",
+      "status": "needs_verification",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": false,
+      "evidence_level": "B",
+      "sources": [],
+      "supply_note": "供应状态待核实（2026-10 用户提示）"
     },
     {
       "id": "apple_pie",
@@ -270,7 +634,22 @@
       "category": "甜品",
       "story": "麦当劳甜品站常供的经典苹果派，金黄酥皮裹苹果馅，是跨越世代的甜点（仍在售）。",
       "verified": true,
-      "tags": ["甜品", "常供", "仍在售"]
+      "tags": [
+        "甜品",
+        "常供",
+        "仍在售"
+      ],
+      "official_name": "苹果派",
+      "market": "中国内地",
+      "status": "on_sale",
+      "first_seen": "1990（随首店进入内地；1968 美国首发）",
+      "last_confirmed_sale": "2026-03（派Day 双拼迷你派返场）",
+      "vote_eligible": false,
+      "evidence_level": "B",
+      "sources": [
+        "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day",
+        "麦当劳中国官网《麦当劳开启派DAY狂欢》2019-03-07 新闻稿 https://www.mcdonalds.com.cn/news/pie-day-2019-top-pie-cities-in-china"
+      ]
     },
     {
       "id": "kakazu_crispy_chicken",
@@ -279,7 +658,19 @@
       "category": "主食",
       "story": "以酥脆鸡排为主角的限定汉堡，咔滋作响，是炸鸡控的限定之选。",
       "verified": true,
-      "tags": ["主食", "限定", "炸鸡"]
+      "tags": [
+        "主食",
+        "限定",
+        "炸鸡"
+      ],
+      "official_name": "咔滋脆鸡堡",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
     },
     {
       "id": "mccool",
@@ -288,7 +679,19 @@
       "category": "饮品",
       "story": "麦当劳中国曾推出的碳酸饮料系列（橙味/葡萄味等），气泡清爽，现已下市。",
       "verified": true,
-      "tags": ["饮品", "已下市", "怀旧"]
+      "tags": [
+        "饮品",
+        "已下市",
+        "怀旧"
+      ],
+      "official_name": "麦乐酷",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
     },
     {
       "id": "pineapple_shrimp_burger",
@@ -297,7 +700,19 @@
       "category": "主食",
       "story": "菠萝与虾肉入堡的限定汉堡，酸甜果香配鲜虾，是夏日限定的创意款。",
       "verified": true,
-      "tags": ["主食", "限定", "中式"]
+      "tags": [
+        "主食",
+        "限定",
+        "中式"
+      ],
+      "official_name": "菠萝虾堡",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
     },
     {
       "id": "salt_baked_wing",
@@ -306,7 +721,19 @@
       "category": "小食",
       "story": "以盐焗风味腌制的限定鸡翅，咸香入味，是麦翅家族的限定变体。",
       "verified": true,
-      "tags": ["小食", "限定", "鸡翅"]
+      "tags": [
+        "小食",
+        "限定",
+        "鸡翅"
+      ],
+      "official_name": "盐焗鸡翅",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
     },
     {
       "id": "veggie_cup",
@@ -315,7 +742,20 @@
       "category": "小食",
       "story": "盛装玉米、胡萝卜等生鲜蔬菜的配餐小杯，健康轻食选择，常作为配餐（仍在售）。",
       "verified": true,
-      "tags": ["小食", "常供", "轻食"]
+      "tags": [
+        "小食",
+        "常供",
+        "轻食"
+      ],
+      "official_name": "美味鲜蔬杯",
+      "market": "中国内地",
+      "status": "needs_verification",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": false,
+      "evidence_level": "B",
+      "sources": [],
+      "supply_note": "供应状态待核实（2026-10 用户提示）"
     },
     {
       "id": "milkshake",
@@ -324,7 +764,22 @@
       "category": "饮品",
       "story": "麦当劳经典奶昔系列，2026 年重回常供（香草/草莓等），是甜品站的回归之作（仍在售）。",
       "verified": true,
-      "tags": ["饮品", "回归常供", "仍在售"]
+      "tags": [
+        "饮品",
+        "回归常供",
+        "仍在售"
+      ],
+      "official_name": "奶昔",
+      "market": "中国内地",
+      "status": "regional_on_sale",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": false,
+      "evidence_level": "B",
+      "sources": [
+        "2026 奶昔回归门店菜单（区域）"
+      ],
+      "supply_note": "区域供应（约 15 城 44 店，2026-10 用户提示），非全国常供"
     },
     {
       "id": "shake_fries_fun",
@@ -333,7 +788,19 @@
       "category": "小食",
       "story": "配粉包自摇的趣味薯条玩法，与摇摇薯条同源，限定期间带来「摇一摇更入味」的乐趣。",
       "verified": true,
-      "tags": ["小食", "限定", "趣味"]
+      "tags": [
+        "小食",
+        "限定",
+        "趣味"
+      ],
+      "official_name": "薯条摇摇乐",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
     },
     {
       "id": "peach_pie",
@@ -342,7 +809,21 @@
       "category": "甜品",
       "story": "蜜桃果馅的限定派，清甜果香，季节性出现在甜品站。",
       "verified": true,
-      "tags": ["甜品", "限定", "派"]
+      "tags": [
+        "甜品",
+        "限定",
+        "派"
+      ],
+      "official_name": "蜜桃派",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2018-03（蜜桃风味派）",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "2018-03/2019-02 新品清单（食研百科等）"
+      ]
     },
     {
       "id": "mango_pie",
@@ -351,7 +832,21 @@
       "category": "甜品",
       "story": "芒果果馅的限定派，热带果香，是派类里的季节限定。",
       "verified": true,
-      "tags": ["甜品", "限定", "派"]
+      "tags": [
+        "甜品",
+        "限定",
+        "派"
+      ],
+      "official_name": "芒果派",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2018-11",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "2018-11 新品清单（食研百科等）"
+      ]
     },
     {
       "id": "custard_pie",
@@ -360,7 +855,19 @@
       "category": "甜品",
       "story": "奶黄馅的限定派，常于春节等节点推出，咸甜流心深受喜爱。",
       "verified": true,
-      "tags": ["甜品", "限定", "派"]
+      "tags": [
+        "甜品",
+        "限定",
+        "派"
+      ],
+      "official_name": "奶黄派",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
     },
     {
       "id": "qinghuajiao_double",
@@ -369,7 +876,19 @@
       "category": "主食",
       "story": "以青花椒风味主打的限定双牛/双层堡，麻香微辣，是川味限定的代表。",
       "verified": true,
-      "tags": ["主食", "限定", "川味"]
+      "tags": [
+        "主食",
+        "限定",
+        "川味"
+      ],
+      "official_name": "青花椒双堡",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
     },
     {
       "id": "braised_spicy_burger",
@@ -378,7 +897,19 @@
       "category": "主食",
       "story": "板烧鸡腿堡的卤辣风味限定版，卤香带辣，是经典板烧的限定变体。",
       "verified": true,
-      "tags": ["主食", "限定", "板烧"]
+      "tags": [
+        "主食",
+        "限定",
+        "板烧"
+      ],
+      "official_name": "卤辣板烧鸡腿堡",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
     },
     {
       "id": "cheese_beef_moon",
@@ -387,7 +918,19 @@
       "category": "主食",
       "story": "以芝士与牛肉为主角的限定「月亮堡」，造型与口味俱创意，是限定趣味款。",
       "verified": true,
-      "tags": ["主食", "限定", "创意"]
+      "tags": [
+        "主食",
+        "限定",
+        "创意"
+      ],
+      "official_name": "芝香牛牛月亮堡",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
     },
     {
       "id": "vcut_wedges",
@@ -396,7 +939,19 @@
       "category": "小食",
       "story": "V 字形切法的薯角（土豆角），外脆内软，常作为配餐限定小食。",
       "verified": true,
-      "tags": ["小食", "限定", "薯角"]
+      "tags": [
+        "小食",
+        "限定",
+        "薯角"
+      ],
+      "official_name": "V-CUT薯角",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
     },
     {
       "id": "cod_brick",
@@ -405,7 +960,19 @@
       "category": "小食",
       "story": "鳕鱼制成、形如金砖的炸物限定，外酥里嫩，是海鲜类限定小食。",
       "verified": true,
-      "tags": ["小食", "限定", "海鲜"]
+      "tags": [
+        "小食",
+        "限定",
+        "海鲜"
+      ],
+      "official_name": "鳕鱼金砖",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
     },
     {
       "id": "curry_wing",
@@ -414,7 +981,19 @@
       "category": "小食",
       "story": "咖喱风味的限定鸡翅（「骨碌碌」滚动造型/吃法），咖喱香浓，是麦翅的限定变体。",
       "verified": true,
-      "tags": ["小食", "限定", "咖喱"]
+      "tags": [
+        "小食",
+        "限定",
+        "咖喱"
+      ],
+      "official_name": "骨碌碌咖喱鸡翅",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
     },
     {
       "id": "grilled_chicken_burger",
@@ -423,7 +1002,21 @@
       "category": "主食",
       "story": "麦当劳中国常供经典汉堡，酱烤鸡腿排鲜嫩多汁，是长青款（仍在售）。",
       "verified": true,
-      "tags": ["主食", "常供", "仍在售"]
+      "tags": [
+        "主食",
+        "常供",
+        "仍在售"
+      ],
+      "official_name": "原味板烧鸡腿堡",
+      "market": "中国内地",
+      "status": "on_sale",
+      "first_seen": "2005（2015 年官方称 10 周年）",
+      "last_confirmed_sale": null,
+      "vote_eligible": false,
+      "evidence_level": "B",
+      "sources": [
+        "麦当劳中国官网《盘点你的2015》（板烧 10 周年） https://www.mcdonalds.com.cn/news/mcdonalds-2015"
+      ]
     },
     {
       "id": "taro_mcfloat",
@@ -432,7 +1025,19 @@
       "category": "甜品",
       "story": "香芋风味的麦旋风，绵密芋香，是麦旋风口味里的限定经典。",
       "verified": true,
-      "tags": ["甜品", "限定", "麦旋风"]
+      "tags": [
+        "甜品",
+        "限定",
+        "麦旋风"
+      ],
+      "official_name": "香芋麦旋风",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
     },
     {
       "id": "maple_pancake_burger",
@@ -441,7 +1046,19 @@
       "category": "主食",
       "story": "以枫糖/松饼元素入堡的限定汉堡，甜咸交织的早餐风创意款，是麦门里的季节限定趣味。",
       "verified": true,
-      "tags": ["主食", "限定", "枫糖"]
+      "tags": [
+        "主食",
+        "限定",
+        "枫糖"
+      ],
+      "official_name": "枫糖松饼汉堡",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
     },
     {
       "id": "hot_chocolate",
@@ -450,7 +1067,20 @@
       "category": "饮品",
       "story": "麦当劳 McCafé 的温热朱古力饮品，醇厚可可香，是秋冬常供的暖饮（仍在售）。",
       "verified": true,
-      "tags": ["饮品", "常供", "仍在售"]
+      "tags": [
+        "饮品",
+        "常供",
+        "仍在售"
+      ],
+      "official_name": "热朱古力",
+      "market": "中国内地",
+      "status": "needs_verification",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": false,
+      "evidence_level": "B",
+      "sources": [],
+      "supply_note": "供应状态待核实（2026-10 用户提示）"
     },
     {
       "id": "thai_charcoal_pork_burger",
@@ -459,7 +1089,725 @@
       "category": "主食",
       "story": "以泰式炭烤风味腌制的猪堡（猪猪堡），南洋香料 + 炭烤香气，是 2025–2026 的限定创意款（麦当劳官方新闻曾推广）。",
       "verified": true,
-      "tags": ["主食", "限定", "泰式"]
+      "tags": [
+        "主食",
+        "限定",
+        "泰式"
+      ],
+      "official_name": "泰式炭烤风味猪猪堡",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "麦当劳官方新闻推广（2025–2026 限定）"
+      ]
+    },
+    {
+      "id": "spicy_chicken_burger",
+      "name": "麦辣鸡腿堡",
+      "era": "常供经典（仍在售）",
+      "category": "主食",
+      "story": "专为中国消费者研发的辣味鸡腿堡，2015 官方人气榜经典汉堡冠军，「差不多每秒卖出 4 个」；2020 年仍是年度汉堡销量冠军（每秒 6 份）。常供在售，列入以作对比参照。",
+      "verified": true,
+      "tags": [
+        "主食",
+        "常供",
+        "仍在售"
+      ],
+      "official_name": "麦辣鸡腿堡",
+      "market": "中国内地",
+      "status": "on_sale",
+      "first_seen": "2005（2015 年官方称「十年经典」）",
+      "last_confirmed_sale": null,
+      "vote_eligible": false,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网《2015麦当劳人气榜》 https://www.mcdonalds.com.cn/news/top-list-2015",
+        "麦当劳中国官网/官方新闻（2020 年度销量冠军）"
+      ]
+    },
+    {
+      "id": "big_mac",
+      "name": "巨无霸",
+      "era": "常供经典（仍在售）",
+      "category": "主食",
+      "story": "双层牛肉+特制酱料的全球符号级汉堡，2015 官方人气榜经典汉堡第 3 名。常供在售，列入以作对比参照。",
+      "verified": true,
+      "tags": [
+        "主食",
+        "常供",
+        "仍在售"
+      ],
+      "official_name": "巨无霸",
+      "market": "中国内地",
+      "status": "on_sale",
+      "first_seen": "1968 全球首发 / 1990 随中国内地首店进入",
+      "last_confirmed_sale": null,
+      "vote_eligible": false,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网《2015麦当劳人气榜》 https://www.mcdonalds.com.cn/news/top-list-2015"
+      ]
+    },
+    {
+      "id": "mcchicken",
+      "name": "麦香鸡",
+      "era": "常供经典（仍在售）",
+      "category": "主食",
+      "story": "经典鸡肉堡，2015 官方人气榜经典汉堡第 4 名。常供在售，列入以作对比参照。",
+      "verified": true,
+      "tags": [
+        "主食",
+        "常供",
+        "仍在售"
+      ],
+      "official_name": "麦香鸡",
+      "market": "中国内地",
+      "status": "on_sale",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": false,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网《2015麦当劳人气榜》 https://www.mcdonalds.com.cn/news/top-list-2015"
+      ]
+    },
+    {
+      "id": "double_cheeseburger",
+      "name": "双层吉士堡",
+      "era": "常供经典（仍在售）",
+      "category": "主食",
+      "story": "双层吉士的经典芝士牛肉堡，2015 官方人气榜经典汉堡第 5 名。常供在售，列入以作对比参照。",
+      "verified": true,
+      "tags": [
+        "主食",
+        "常供",
+        "仍在售"
+      ],
+      "official_name": "双层吉士堡",
+      "market": "中国内地",
+      "status": "on_sale",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": false,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网《2015麦当劳人气榜》 https://www.mcdonalds.com.cn/news/top-list-2015"
+      ]
+    },
+    {
+      "id": "mantou_pork_burger",
+      "name": "馒火的芝香猪排堡",
+      "era": "2015 限定（25 周年摩登中国风）",
+      "category": "主食",
+      "story": "以蒸制芝麻馒头做堡底、双层猪排配脆培根与青花椒风味酱的「摩登中国风」限定，2015 官方人气榜限时汉堡冠军，25 周年记忆款。",
+      "verified": true,
+      "tags": [
+        "主食",
+        "限定",
+        "中式"
+      ],
+      "official_name": "馒火的芝香猪排堡",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2015-09",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网《2015麦当劳人气榜》 https://www.mcdonalds.com.cn/news/top-list-2015",
+        "麦当劳 25 周年「摩登中国风」公开报道"
+      ]
+    },
+    {
+      "id": "cheese_shrimp_burger_2015",
+      "name": "有芝好虾堡",
+      "era": "2015 限定",
+      "category": "主食",
+      "story": "芝士与虾排组合的限时汉堡，2015 官方人气榜限时汉堡第 2 名。",
+      "verified": true,
+      "tags": [
+        "主食",
+        "限定",
+        "海鲜"
+      ],
+      "official_name": "有芝好虾堡",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2015",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网《2015麦当劳人气榜》 https://www.mcdonalds.com.cn/news/top-list-2015"
+      ]
+    },
+    {
+      "id": "lucky_year_fish_burger",
+      "name": "年年有利堡",
+      "era": "2015 新春限定",
+      "category": "主食",
+      "story": "2015 新春限定鱼堡，「年年有利」谐音彩头款，官方人气榜限时汉堡第 3 名。",
+      "verified": true,
+      "tags": [
+        "主食",
+        "新春限定",
+        "彩头"
+      ],
+      "official_name": "年年有利堡",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2015",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网《2015麦当劳人气榜》 https://www.mcdonalds.com.cn/news/top-list-2015"
+      ]
+    },
+    {
+      "id": "lucky_year_fu_burger",
+      "name": "年年有福堡",
+      "era": "2015 新春限定",
+      "category": "主食",
+      "story": "2015 新春限定堡，「年年有福」谐音彩头款，官方人气榜限时汉堡第 4 名。",
+      "verified": true,
+      "tags": [
+        "主食",
+        "新春限定",
+        "彩头"
+      ],
+      "official_name": "年年有福堡",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2015",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网《2015麦当劳人气榜》 https://www.mcdonalds.com.cn/news/top-list-2015"
+      ]
+    },
+    {
+      "id": "yuzu_black_pepper_beef_burger",
+      "name": "爽辣柚香黑椒辣牛堡",
+      "era": "2015 限定",
+      "category": "主食",
+      "story": "柚香果香融合黑椒辣牛肉的限时汉堡，2015 官方人气榜限时汉堡第 5 名。",
+      "verified": true,
+      "tags": [
+        "主食",
+        "限定",
+        "创意"
+      ],
+      "official_name": "爽辣柚香黑椒辣牛堡",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2015",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网《2015麦当劳人气榜》 https://www.mcdonalds.com.cn/news/top-list-2015"
+      ]
+    },
+    {
+      "id": "red_bean_pie",
+      "name": "红豆派",
+      "era": "春节定期回归（节令返场）",
+      "category": "甜品",
+      "story": "「每年春节时段推出的红豆派，已经成为很多中国顾客新年期待的定期回归的产品」（官方原文），是派类里的新春仪式感。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "新春限定",
+        "派"
+      ],
+      "official_name": "红豆派",
+      "market": "中国内地",
+      "status": "seasonal_return",
+      "first_seen": "1990 前后（派随首店进入内地）",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day",
+        "麦当劳中国官网《麦当劳开启派DAY狂欢》2019-03-07 新闻稿 https://www.mcdonalds.com.cn/news/pie-day-2019-top-pie-cities-in-china"
+      ]
+    },
+    {
+      "id": "mung_bean_pie",
+      "name": "绿豆派",
+      "era": "限定",
+      "category": "甜品",
+      "story": "官方派类口味清单收录的绿豆馅限定派，清润解腻。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "派"
+      ],
+      "official_name": "绿豆派",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day",
+        "麦当劳中国官网《麦当劳开启派DAY狂欢》2019-03-07 新闻稿 https://www.mcdonalds.com.cn/news/pie-day-2019-top-pie-cities-in-china"
+      ]
+    },
+    {
+      "id": "banana_pie",
+      "name": "香蕉派",
+      "era": "限定（多次返场）",
+      "category": "甜品",
+      "story": "香蕉馅限定派；2026 派Day 以「双拼迷你派」形式与苹果派一同惊喜返场。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "派"
+      ],
+      "official_name": "香蕉派",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": "2026-03（双拼迷你派返场）",
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day"
+      ]
+    },
+    {
+      "id": "coconut_pie",
+      "name": "椰子派",
+      "era": "限定",
+      "category": "甜品",
+      "story": "椰香果馅的限定派，官方派类口味清单收录。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "派"
+      ],
+      "official_name": "椰子派",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day"
+      ]
+    },
+    {
+      "id": "corn_pie",
+      "name": "玉米派",
+      "era": "限定",
+      "category": "甜品",
+      "story": "甜玉米馅的限定派，官方派类口味清单收录。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "派"
+      ],
+      "official_name": "玉米派",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day"
+      ]
+    },
+    {
+      "id": "chocolate_pie",
+      "name": "巧克力派",
+      "era": "限定",
+      "category": "甜品",
+      "story": "巧克力馅限定派，2018-12 曾以「巧克力派」上新，官方派类口味清单收录。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "派"
+      ],
+      "official_name": "巧克力派",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2018-12",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day",
+        "2018-12 新品清单（食研百科等）"
+      ]
+    },
+    {
+      "id": "orange_pie",
+      "name": "香橙派",
+      "era": "限定",
+      "category": "甜品",
+      "story": "香橙果馅的限定派，官方派类口味清单收录。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "派"
+      ],
+      "official_name": "香橙派",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day"
+      ]
+    },
+    {
+      "id": "strawberry_pie",
+      "name": "草莓派",
+      "era": "限定",
+      "category": "甜品",
+      "story": "草莓果馅的限定派（2018-09 劳草莓派等变体），官方派类口味清单收录。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "派"
+      ],
+      "official_name": "草莓派",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day"
+      ]
+    },
+    {
+      "id": "red_bean_double_skin_pie",
+      "name": "红豆双皮奶派",
+      "era": "2018 新春限定",
+      "category": "甜品",
+      "story": "红豆双皮奶风味的限定派（2018-01 上新），粤式甜品入派的中式化尝试。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "新春限定",
+        "派"
+      ],
+      "official_name": "红豆双皮奶派",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2018-01",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day",
+        "2018-01 新品清单（食研百科等）"
+      ]
+    },
+    {
+      "id": "black_forest_pie",
+      "name": "黑森林派",
+      "era": "限定",
+      "category": "甜品",
+      "story": "黑森林（巧克力樱桃）风味的限定派，官方派类口味清单收录。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "派"
+      ],
+      "official_name": "黑森林派",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day"
+      ]
+    },
+    {
+      "id": "kitkat_triangle_pie",
+      "name": "奇巧巧克力风味三角派",
+      "era": "限定（多次经典回归）",
+      "category": "甜品",
+      "story": "与奇巧 KitKat 联名的巧克力三角派：千层可可酥皮裹浓郁巧克力流心，曾封「冬季必吃」，多次限时回归引发排队与开箱潮。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "联名",
+        "话题王"
+      ],
+      "official_name": "奇巧巧克力风味三角派",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2019 冬季（首推）",
+      "last_confirmed_sale": "2025 冬（经典回归）",
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "TVBS 食尚玩家《麦当劳 kitkat 巧克力三角派爆浆》",
+        "麦当劳官方小红书新品公告（回归）"
+      ]
+    },
+    {
+      "id": "matcha_dofu_pie",
+      "name": "抹茶豆乳派",
+      "era": "限定",
+      "category": "甜品",
+      "story": "抹茶豆乳风味的限定派，豆香与茶香清苦回甘，是抹茶控的限定心愿款。",
+      "verified": false,
+      "tags": [
+        "甜品",
+        "限定",
+        "抹茶"
+      ],
+      "official_name": "抹茶豆乳派",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
+    },
+    {
+      "id": "matcha_black_honey_mochi_pie",
+      "name": "抹茶黑蜜麻薯派",
+      "era": "2025 派Day（第十一届）",
+      "category": "甜品",
+      "story": "2025 年第十一届派Day 推出的限定新品：抹茶馅 + 黑蜜 + 麻薯口感，派Day 期间优惠价 3.14 元。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "抹茶"
+      ],
+      "official_name": "抹茶黑蜜麻薯派",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2025-03",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day（2025 届官方记录）"
+      ]
+    },
+    {
+      "id": "apple_banana_mini_pie",
+      "name": "苹果香蕉双拼迷你派",
+      "era": "2026 派Day（第十二届）",
+      "category": "甜品",
+      "story": "2026 年第十二届派Day 以全新「双拼迷你派」形式，让苹果派与香蕉派惊喜返场，一次品尝两款人气口味。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "派"
+      ],
+      "official_name": "苹果香蕉双拼迷你派",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2026-03",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day"
+      ]
+    },
+    {
+      "id": "red_bean_rice_cake_pie",
+      "name": "红豆年糕派",
+      "era": "新春限定（年糕馅）",
+      "category": "甜品",
+      "story": "红豆年糕风味的限定派，糯叽叽年糕口感叠加红豆沙，是新春派类的年味变体。",
+      "verified": false,
+      "tags": [
+        "甜品",
+        "新春限定",
+        "派"
+      ],
+      "official_name": "红豆年糕派",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
+    },
+    {
+      "id": "golden_arches_shrimp_burger",
+      "name": "金拱门虾堡",
+      "era": "限定",
+      "category": "主食",
+      "story": "以虾排为主角的限定堡（与菠萝虾堡为不同单品，不合并），金色虾排配塔塔酱。",
+      "verified": false,
+      "tags": [
+        "主食",
+        "限定",
+        "海鲜"
+      ],
+      "official_name": "金拱门虾堡",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
+    },
+    {
+      "id": "golden_pineapple_chicken_mcmuffin",
+      "name": "金菠萝鸡扒麦满分",
+      "era": "限定（早餐）",
+      "category": "早餐",
+      "story": "麦满分早餐系列限定款：烤鸡扒 + 金菠萝圈，果香解腻，是早餐限定里的清流。",
+      "verified": false,
+      "tags": [
+        "早餐",
+        "限定",
+        "创意"
+      ],
+      "official_name": "金菠萝鸡扒麦满分",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
+    },
+    {
+      "id": "cheese_pineapple_grilled_burger",
+      "name": "芝士嘿凤梨板烧",
+      "era": "限定（凤梨板烧）",
+      "category": "主食",
+      "story": "板烧鸡腿堡的凤梨芝士限定变体，「嘿凤梨」话题名，果香配酱烤鸡排。",
+      "verified": false,
+      "tags": [
+        "主食",
+        "限定",
+        "板烧"
+      ],
+      "official_name": "芝士嘿凤梨板烧",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
+    },
+    {
+      "id": "die_die_roll",
+      "name": "叠叠卷",
+      "era": "限定（早餐卷）",
+      "category": "早餐",
+      "story": "层层叠起的早餐蛋饼卷类限定，口感层层递进，是早餐本土化的趣味尝试。",
+      "verified": false,
+      "tags": [
+        "早餐",
+        "限定",
+        "创意"
+      ],
+      "official_name": "叠叠卷",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
+    },
+    {
+      "id": "onion_cheese_shake_fries",
+      "name": "洋葱乳酪摇摇薯条",
+      "era": "限定（摇摇粉口味）",
+      "category": "小食",
+      "story": "摇摇薯条的洋葱乳酪口味变体，摇一摇裹粉，咸香浓郁。",
+      "verified": false,
+      "tags": [
+        "小食",
+        "限定",
+        "趣味"
+      ],
+      "official_name": "洋葱乳酪摇摇薯条",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
+    },
+    {
+      "id": "golden_onion_rings",
+      "name": "黄金洋葱圈",
+      "era": "限定",
+      "category": "小食",
+      "story": "金黄酥脆的洋葱圈限定小食，蘸酱食用，是麦门小食里的西洋风短期款。",
+      "verified": false,
+      "tags": [
+        "小食",
+        "限定",
+        "西式"
+      ],
+      "official_name": "黄金洋葱圈",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": []
+    },
+    {
+      "id": "gongcai_chicken_wrap",
+      "name": "脆脆脆贡菜鸡肉卷",
+      "era": "限定",
+      "category": "主食",
+      "story": "冰皮麦香卷皮裹酥脆鸡柳与贡菜（配木耳/胡萝卜/生菜/酸笋），麻辣酱汁提香，「一口下去嘎吱嘎吱」的近期话题新品。",
+      "verified": true,
+      "tags": [
+        "主食",
+        "限定",
+        "中式"
+      ],
+      "official_name": "脆脆脆贡菜鸡肉卷",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "麦当劳新品品鉴会实测记录（百度百家号 2025–2026）"
+      ]
     }
   ]
 }

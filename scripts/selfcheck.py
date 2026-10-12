@@ -138,8 +138,8 @@ else:
 import hashlib as _hl
 cd_txt = read_text(os.path.join(BASE, "CONTEST_DECLARATION.md"))
 cd_sha = _hl.sha256(cd_txt.encode("utf-8")).hexdigest()
-# 官方原文（首次提交中的原样内容）SHA256
-OFFICIAL_CD_SHA = "8cc4b682463e366299bc3d20810efaf50aa3adf5e197e2937d3a56b6ee3e1000"
+# 官方原文 SHA256（逐字取自官方仓库 raw 文件，2026-10-12 核对）
+OFFICIAL_CD_SHA = "cd28101bcb29cc8fb24b372fe91ce6b42c4a1487a54e01f7ade0c8c6a84241b7"
 if len(cd_txt) < 50:
     add("CONTEST_DECLARATION 完整性", False, "内容过短，疑似缺失")
 elif cd_sha == OFFICIAL_CD_SHA:

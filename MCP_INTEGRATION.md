@@ -18,12 +18,17 @@
   **在调用层被硬性拦截**，任何代码路径都无法触达。
 - `scripts/selfcheck.py` 含防回归测试：逐一验证 8 个写工具被拒绝、只读工具放行。
 
+补充说明：白名单校验**同时存在于客户端 `scripts/mcp_client.py` 的 `call_tool()` 入口**（不在
+`READ_ONLY_TOOLS` 内一律抛 `ValueError`），即校验下沉到了最底层调用点，任何绕过
+`mcd_data.safe_call()` 的新增代码路径同样被拦截。`selfcheck.py` 对客户端层有独立
+拒绝测试（8 写工具逐一验证 + `mcp_client.py` 源码白名单断言 + 只读放行验证）。
+
 ## 3. 实际使用的工具与业务映射
 
 | 工具 | 业务价值 | 调用位置 |
 |------|---------|---------|
 | `query-my-account` | 会员身份确认（`accountId` 强身份去重）+ 积分换算投票（`availablePoint // 100`），仅读余额 | `revival.py real_account_info()` |
-| `query-meals`（需 `storeCode`） | 「在售 vs 怀旧」对比：51 款怀旧单品中 12 款仍在售、其余确为绝版——复活赛主题的真实证据 | `mcd_data.get_current_meals()` |
+| `query-meals`（需 `storeCode`） | 「在售 vs 怀旧」对比：将 MCP 实时返回的在售餐品与本地怀旧单品库（47 款，供应状态按证据分级标注）做交集对照，展示哪些怀旧单品当前仍在售 | `mcd_data.get_current_meals()` |
 | `delivery-query-addresses` → `delivery-query-stores` | 省份自动识别（仅取省级，不读取/不落盘地址原文）+ 附近门店展示 | `mcd_data._get_address_and_stores()` |
 | `list-nutrition-foods` | 160 款餐品实时营养库（前端可搜索） | `mcd_data.get_nutrition()` |
 | `campaign-calendar` | 营销活动日历（「麦麦现在」页） | `mcd_data.get_campaigns()` |

@@ -23,8 +23,7 @@ const HALL_IMG = {
   braised_spicy_burger: "assets/products/braised_spicy_burger.png",
   grilled_chicken_burger: "assets/products/grilled_chicken_burger.png",
   // 网络搜集实物照（已逐张核对并白底化）
-  nen_niu_wufang: "assets/products/nen_niu_wufang.jpg",
-  mexican_wrap: "assets/products/mexican_wrap.jpg",
+  sakura_mcfloat: "assets/products/sakura_mcfloat.jpg",
   garlic_chili_sauce: "assets/products/garlic_chili_sauce.jpg",
   mc_rice_wrap: "assets/products/mc_rice_wrap.jpg",
   angus_burger: "assets/products/angus_burger.jpg",
@@ -125,7 +124,7 @@ function openMemberModal() {
       <h3>✅ 麦当劳会员已连接</h3>
       <p>当前可用积分 <b style="color:var(--red)">${fmt(ACCOUNT.availablePoint)}</b>。<br/><br/>
       投票规则：确认会员身份 = <b>1 张基础票</b>；额外票 = <b>积分 ÷ 100</b>（向下取整）。<br/>
-      全程只读 MCP：不扣积分、不代下单、不代抽奖。按会员号在中央服务统一去重，同一单品只能投一次。</p>
+      全程只读 MCP：不扣积分、不代下单、不代抽奖。按会员号在本地去重，同一单品只能投一次。</p>
       <button class="confirm-btn" id="modalOk">知道了</button>`;
   } else {
     body.innerHTML = `
@@ -218,7 +217,7 @@ async function startVote(pid) {
     <select id="voteProvince"><option value="">省份（可选，仅统计到省级）</option>${opts}</select>
     <div class="modal-note" id="provinceNote">正在尝试自动识别你的省份…</div>
     <button class="confirm-btn" id="doVote">确认投票</button>
-    <div class="modal-note">按会员号在中央服务统一去重；同一单品仅能投一次。</div>`;
+    <div class="modal-note">按会员号在本地去重；同一单品仅能投一次。</div>`;
   openModal();
   $("#doVote").addEventListener("click", doVote);
 
@@ -302,7 +301,7 @@ async function loadRank() {
   $("#stVoted").textContent = fmt(votedCnt);
   $("#rankUpdated").textContent = "数据更新于 " + new Date().toTimeString().slice(0, 5);
   $("#rankSource").textContent = d.source === "github"
-    ? "（GitHub 共享榜 · 跨用户真实聚合）"
+    ? "（GitHub 共享榜 · 匿名票数聚合）"
     : "（本地榜 · " + (d.source || "local") + "）";
   const note = $("#rankNote");
   if (d.fallback && province) {
