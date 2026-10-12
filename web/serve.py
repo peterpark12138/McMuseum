@@ -52,6 +52,33 @@ def _use_github():
 _GH_CACHE = {"ts": 0.0, "data": None}
 _GH_TTL = 60  # 秒：GitHub 聚合的进程内缓存，保护 API 限流（未认证 60 次/小时）
 
+_ACCT_CACHE = {"ts": 0.0, "data": None}
+_ACCT_TTL = 300  # 秒：会员状态缓存（积分变化不敏感，护 MCP 调用）
+
+
+def _account_status():
+    """会员连接状态（只读）。返回 {"connected": bool, "availablePoint": int|None}。
+
+    仅返回积分数字，绝不返回会员唯一标识；无 token 或未解析到积分时
+    connected=false（前端据此显示「会员未连接」引导，不伪造数据）。
+    """
+    now = time.time()
+    if _ACCT_CACHE["data"] is not None and now - _ACCT_CACHE["ts"] < _ACCT_TTL:
+        return _ACCT_CACHE["data"]
+    if not mcd_data.token_available():
+        out = {"connected": False, "availablePoint": None}
+        _ACCT_CACHE["ts"], _ACCT_CACHE["data"] = now, out
+        return out
+    try:
+        points, member_id = revival.real_account_info()  # 标识只用一次即丢弃，不回传
+        # connected 看会员标识是否解析成功（积分可为 0，0 也是合法值）
+        out = {"connected": bool(member_id),
+               "availablePoint": int(points) if points is not None else None}
+    except Exception:  # noqa: BLE001
+        out = {"connected": False, "availablePoint": None}
+    _ACCT_CACHE["ts"], _ACCT_CACHE["data"] = now, out
+    return out
+
 
 def _github_totals():
     """从 GitHub 聚合真实共享榜，返回 (totals, province_totals) 或 (None, None)。
@@ -98,11 +125,15 @@ class Handler(BaseHTTPRequestHandler):
         if path in ("/", "/index.html"):
             self._serve_file(os.path.join(HERE, "index.html"), "text/html")
             return
-        if path == "/style.css":
-            self._serve_file(os.path.join(HERE, "style.css"), "text/css")
-            return
         if path == "/app.js":
             self._serve_file(os.path.join(HERE, "app.js"), "application/javascript")
+            return
+        if path.startswith("/assets/"):
+            # 设计稿素材（png/jpg）；防目录穿越
+            rel = path[len("/assets/"):].replace("..", "")
+            ext = os.path.splitext(rel)[1].lower()
+            ctype = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg"}.get(ext, "application/octet-stream")
+            self._serve_file(os.path.join(HERE, "assets", rel), ctype)
             return
         if path == "/api/products":
             # 投票大厅单品列表：票数取自当前数据源（本地或 GitHub 共享榜）
@@ -162,6 +193,10 @@ class Handler(BaseHTTPRequestHandler):
 
         # ---- 麦当劳实时只读增强（公开营销类数据支持缓存快照，无 token 也可展示；
         #      用户专属数据（抽奖/附近门店）无 token 时优雅降级，公开部署不影响可用性）----
+        if path == "/api/account":
+            # 会员连接状态 + 可用积分（只读 query-my-account；绝不返回会员标识，300s 缓存）
+            self._send(*_json(_account_status()))
+            return
         if path == "/api/nutrition":
             qs = urllib.parse.parse_qs(parsed.query)
             name = (qs.get("name", [None])[0] or "").strip()

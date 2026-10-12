@@ -1,265 +1,392 @@
-// 麦麦复活赛 前端逻辑：投票大厅 / 复活榜 / 投票交互
-const $ = (s, el = document) => el.querySelector(s);
-const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+/* ============================================================
+   麦麦复活赛 · 老麦返场许愿池
+   视觉：设计稿 1:1 还原；数据：全部来自真实 API
+   ============================================================ */
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
 
-const ICONS = ["🍔","🍟","🥤","🍦","🍗","🌭","🥟","🥞","🍩","🍱","🧇","🍪"];
+const DEADLINE = "2026-10-25T23:59:59+08:00"; // 大赛投票截止（与报名截止同日）
+
+/* 设计稿产品插画（仅映射数据中真实存在的单品，无图用 emoji） */
+const HALL_IMG = {
+  taro_pie: "assets/v-taro.png",
+  kakazu_crispy_chicken: "assets/v-crispy.png",
+  matcha_mcfloat: "assets/v-mcflurry.png",
+};
+const PODIUM_IMG = {
+  taro_pie: "assets/s-taro.png",
+  kakazu_crispy_chicken: "assets/s-crispy.png",
+};
+const MEDALS = ["assets/medal-1st.png", "assets/medal-2nd.png", "assets/medal-3rd.png"];
 
 let PRODUCTS = [];
 let PROVINCES = [];
-let AUTO_PROVINCE = "";
+let ACCOUNT = { connected: false, availablePoint: null };
+let rankLoaded = false, nowLoaded = false;
 
-function iconFor(p, i) {
-  if (/甜品|麦旋风|派|奶昔|圣代|冰淇淋|雪/.test(p.category || "")) return "🍦";
-  if (/饮|可乐|酷|茶|朱古力/.test(p.name + (p.category||""))) return "🥤";
-  if (/鸡|翅|鸡排|鸡腿|炸/.test(p.name + (p.category||""))) return "🍗";
-  if (/薯|薯角|薯条/.test(p.name)) return "🍟";
-  if (/卷|饼|肉夹馍|馍|三角/.test(p.name)) return "🥟";
-  return ICONS[i % ICONS.length];
+/* ---------------- 工具 ---------------- */
+function escapeHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+}
+function fmt(n) { return Number(n || 0).toLocaleString("zh-CN"); }
+
+function toast(msg, type) {
+  const t = $("#toast");
+  t.textContent = msg;
+  t.className = "toast" + (type === "err" ? " err" : "");
+  clearTimeout(t._h);
+  t._h = setTimeout(() => t.classList.add("hidden"), 2600);
 }
 
-// ---- 视图切换 ----
-$$(".tab").forEach(t => t.addEventListener("click", () => {
-  $$(".tab").forEach(x => x.classList.remove("active"));
-  t.classList.add("active");
-  const v = t.dataset.view;
-  $("#view-hall").classList.toggle("hidden", v !== "hall");
-  $("#view-rank").classList.toggle("hidden", v !== "rank");
-  $("#view-now").classList.toggle("hidden", v !== "now");
-  if (v === "rank") loadRank();
-  if (v === "now") loadNow();
-}));
+function iconFor(p) {
+  const t = (p.category || "") + (p.name || "");
+  if (/蘸酱|酱/.test(t)) return "🥫";
+  if (/派/.test(t)) return "🥧";
+  if (/麦旋风|冰淇淋|甜筒|雪糕|奶昔/.test(t)) return "🍦";
+  if (/咖啡|奶茶|可乐|饮|朱古力/.test(t)) return "🥤";
+  if (/薯条|鸡|鸡块|翅|鸡排|小食|丸子/.test(t)) return "🍗";
+  if (/卷|饼|馍/.test(t)) return "🌯";
+  if (/早餐|粥|麦满分|蛋/.test(t)) return "🍳";
+  if (/堡|汉堡/.test(t)) return "🍔";
+  if (/饭|面/.test(t)) return "🍚";
+  return "🍔";
+}
 
-// ---- 加载省份枚举（受控，防脏数据）----
-async function loadProvinces() {
+function votedSet() {
+  try { return new Set(JSON.parse(sessionStorage.getItem("mcvoted") || "[]")); }
+  catch (e) { return new Set(); }
+}
+function markVoted(pid) {
+  const s = votedSet(); s.add(pid);
+  sessionStorage.setItem("mcvoted", JSON.stringify([...s]));
+}
+
+/* ---------------- 页面切换 ---------------- */
+function switchPage(key) {
+  $$(".page").forEach(p => p.classList.remove("active"));
+  $("#page-" + key).classList.add("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  if (key === "rank" && !rankLoaded) { rankLoaded = true; loadRank(); }
+  if (key === "now" && !nowLoaded) { nowLoaded = true; loadNow(); }
+}
+$$(".nav a").forEach(a => {
+  a.addEventListener("click", e => { e.preventDefault(); switchPage(a.dataset.page); });
+});
+
+/* ---------------- 会员状态 ---------------- */
+async function loadAccount() {
   try {
-    PROVINCES = await (await fetch("/api/provinces")).json();
+    ACCOUNT = await (await fetch("/api/account")).json();
   } catch (e) {
-    PROVINCES = [];
+    ACCOUNT = { connected: false, availablePoint: null };
   }
-  const sel = $("#province-filter");
-  if (sel) {
-    PROVINCES.forEach(p => sel.add(new Option(p, p)));
-  }
-}
-
-// ---- 自动识别省份（仅省级，不取地址）----
-async function detectProvince() {
-  try {
-    const d = await (await fetch("/api/detect-province")).json();
-    AUTO_PROVINCE = d.province || "";
-  } catch (e) {
-    AUTO_PROVINCE = "";
-  }
-}
-
-// ---- 加载单品 ----
-async function loadProducts() {
-  try {
-    const res = await fetch("/api/products");
-    PRODUCTS = await res.json();
-    renderGrid();
-  } catch (e) {
-    $("#hall-empty").classList.remove("hidden");
-  }
-}
-
-function renderGrid() {
-  const grid = $("#grid");
-  grid.innerHTML = "";
-  if (!PRODUCTS.length) { $("#hall-empty").classList.remove("hidden"); return; }
-  $("#hall-empty").classList.add("hidden");
-  PRODUCTS.forEach((p, i) => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <div class="card-ribbon">怀旧</div>
-      <div class="card-band">${iconFor(p, i)}</div>
-      <div class="card-body">
-        <div class="card-name">${p.name}</div>
-        <span class="card-era">${p.era || "限定"}</span>
-        <div class="card-story">${p.story || ""}</div>
-        <div class="card-foot">
-          <span class="votes-pill"><b>${p.votes}</b> 票</span>
-          <button class="vote-btn" data-id="${p.id}">投一票</button>
-        </div>
-      </div>`;
-    card.querySelector(".vote-btn").addEventListener("click", () => openVote(p));
-    grid.appendChild(card);
+  $$(".acct-pill").forEach(el => {
+    el.textContent = ACCOUNT.connected
+      ? `可用积分 ${fmt(ACCOUNT.availablePoint)}`
+      : "会员未连接";
   });
 }
 
-// ---- 复活榜 ----
-async function loadRank() {
-  const list = $("#rank-list");
-  list.innerHTML = "<div class='state'>加载中…</div>";
-  try {
-    const sel = $("#province-filter");
-    const province = sel ? sel.value : "";
-    const url = province ? `/api/leaderboard?province=${encodeURIComponent(province)}` : "/api/leaderboard";
-    const res = await fetch(url);
-    const data = await res.json();
-    const items = data.items || [];
-    if (!items.length) {
-      list.innerHTML = "";
-      $("#rank-empty").classList.remove("hidden");
-      return;
-    }
-    $("#rank-empty").classList.add("hidden");
-    const max = items[0].votes || 1;
-    const notice = (data.fallback && province)
-      ? `<div class="state notice">${escapeHtml(province)} 还没有人投票，先看看全国榜 👇</div>`
-      : "";
-    list.innerHTML = notice + items.map((it, i) => `
-      <div class="rank-row ${i < 3 ? "top" + (i + 1) : ""}">
-        <div class="rank-no">${i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}</div>
-        <div class="rank-main">
-          <div class="rank-name">${it.name}</div>
-          <div class="rank-bar"><i style="width:${(it.votes / max * 100).toFixed(1)}%"></i></div>
-        </div>
-        <div class="rank-votes">${it.votes} 票</div>
-      </div>`).join("");
-  } catch (e) {
-    list.innerHTML = "";
-    $("#rank-empty").textContent = "榜单加载失败，请确认服务运行中。";
-    $("#rank-empty").classList.remove("hidden");
+function openMemberModal() {
+  const body = $("#modalBody");
+  if (ACCOUNT.connected) {
+    body.innerHTML = `
+      <h3>✅ 麦当劳会员已连接</h3>
+      <p>当前可用积分 <b style="color:var(--red)">${fmt(ACCOUNT.availablePoint)}</b>。<br/><br/>
+      投票规则：确认会员身份 = <b>1 张基础票</b>；额外票 = <b>积分 ÷ 100</b>（向下取整）。<br/>
+      全程只读 MCP：不扣积分、不代下单、不代抽奖。按会员号在中央服务统一去重，同一单品只能投一次。</p>
+      <button class="confirm-btn" id="modalOk">知道了</button>`;
+  } else {
+    body.innerHTML = `
+      <h3>会员未连接</h3>
+      <p>当前部署为<strong>只读展示</strong>：可浏览怀旧单品、查看共享榜与麦麦现在实时数据。<br/><br/>
+      想投出你的复活票：在你自己的 WorkBuddy 或本地运行本项目并配置
+      <code>MCD_MCP_TOKEN</code>（麦当劳会员 Token）后，投票会自动校验你的真实会员身份并回流共享榜。<br/><br/>
+      详见 <a href="https://github.com/peterpark12138/McMuseum" target="_blank" rel="noopener" style="color:var(--red)">项目 README</a>。</p>
+      <button class="confirm-btn" id="modalOk">知道了</button>`;
   }
+  $("#modalOk").addEventListener("click", closeModal);
+  openModal();
 }
-$("#refresh-rank").addEventListener("click", loadRank);
-$("#province-filter").addEventListener("change", loadRank);
+$$(".member-btn").forEach(b => b.addEventListener("click", openMemberModal));
 
-// 营养库搜索
-function bindNutrition() {
-  const input = $("#nut-input");
-  const btn = $("#nut-btn");
-  if (!input || !btn) return;
-  const go = () => loadNutrition(input.value.trim());
-  btn.addEventListener("click", go);
-  input.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
-}
-bindNutrition();
-
-// ---- 投票弹窗 ----
-let current = null;
-function openVote(p) {
-  current = p;
-  const opts = PROVINCES.map(x =>
-    `<option value="${x}"${x === AUTO_PROVINCE ? " selected" : ""}>${x}</option>`).join("");
-  const hint = AUTO_PROVINCE
-    ? `<p class="auto-hint">📍 已自动识别为 <b>${escapeHtml(AUTO_PROVINCE)}</b>，可修改（仅统计到省级，不保存地址）</p>`
-    : `<p class="auto-hint dim">未自动识别到省份，默认计入全国；也可手动选择</p>`;
-  $("#modal-body").innerHTML = `
-    <h3>给《${p.name}》打 call？</h3>
-    <p>将以你的 <b>麦当劳会员身份</b> 投票：<br/>1 票基础身份票 + 每 100 积分再加 1 票。</p>
-    <div class="modal-field">
-      <label for="vote-province">省份（自动识别 · 可修改）</label>
-      <select id="vote-province" class="province-select">
-        <option value="">全国（不分省）</option>
-        ${opts}
-      </select>
-      ${hint}
-    </div>
-    <button class="confirm-btn" id="do-vote">确认投票</button>
-    <button class="cancel-btn" id="cancel-vote">再想想</button>`;
-  $("#modal").classList.remove("hidden");
-  $("#do-vote").addEventListener("click", doVote);
-  $("#cancel-vote").addEventListener("click", closeModal);
-}
-function closeModal() { $("#modal").classList.add("hidden"); current = null; }
-$("#modal-close").addEventListener("click", closeModal);
+/* ---------------- 弹窗 ---------------- */
+function openModal() { $("#modal").classList.remove("hidden"); }
+function closeModal() { $("#modal").classList.add("hidden"); }
+$("#modalClose").addEventListener("click", closeModal);
 $("#modal").addEventListener("click", e => { if (e.target.id === "modal") closeModal(); });
 
+/* ---------------- 投票大厅 ---------------- */
+async function loadProducts() {
+  try {
+    PRODUCTS = await (await fetch("/api/products")).json();
+  } catch (e) {
+    PRODUCTS = [];
+  }
+  renderHall();
+  const total = PRODUCTS.reduce((s, p) => s + (p.votes || 0), 0);
+  $("#heroStat").textContent = `已投出 ${fmt(total)} 张复活票 · 候选 ${PRODUCTS.length} 款老味道等你召回`;
+}
+
+function renderHall() {
+  const q = ($("#searchInput").value || "").trim();
+  const sort = $("#hallSort").value;
+  const voted = votedSet();
+  let list = PRODUCTS.filter(p => !q || p.name.includes(q));
+  if (sort === "hot") list = [...list].sort((a, b) => (b.votes || 0) - (a.votes || 0));
+  if (sort === "few") list = [...list].sort((a, b) => (a.votes || 0) - (b.votes || 0));
+  if (sort === "name") list = [...list].sort((a, b) => a.name.localeCompare(b.name, "zh"));
+
+  const total = PRODUCTS.reduce((s, p) => s + (p.votes || 0), 0);
+  const topId = [...PRODUCTS].sort((a, b) => (b.votes || 0) - (a.votes || 0))[0];
+  const grid = $("#voteGrid");
+  $("#hallEmpty").classList.toggle("hidden", list.length > 0);
+
+  grid.innerHTML = list.map(p => {
+    const pct = total ? Math.round((p.votes || 0) / total * 100) : 0;
+    const img = HALL_IMG[p.id];
+    const imgHtml = img
+      ? `<div class="card-img"><img alt="${escapeHtml(p.name)}" src="${img}"></div>`
+      : `<div class="card-img emoji">${iconFor(p)}</div>`;
+    const badge = (topId && topId.id === p.id && (topId.votes || 0) > 0)
+      ? "呼声最高"
+      : (Array.isArray(p.tags) && p.tags[0]) || p.category || "怀旧单品";
+    const isVoted = voted.has(p.id);
+    return `<div class="card" data-name="${escapeHtml(p.name)}">
+      ${imgHtml}
+      <div class="card-name-row"><span class="pad"></span><div class="card-name">${escapeHtml(p.name)}</div><div class="card-badge">${escapeHtml(badge)}</div></div>
+      <div class="card-desc">${escapeHtml(p.story || "")}</div>
+      <div class="card-votes">
+        <div class="row"><span class="num">${fmt(p.votes)} 票</span><span class="pct">占 ${pct}%</span></div>
+        <div class="progress"><i style="width:${Math.min(100, pct)}%"></i></div>
+      </div>
+      <button class="vote-btn ${isVoted ? "voted" : ""}" data-pid="${escapeHtml(p.id)}" onclick="startVote('${escapeHtml(p.id)}')">${isVoted ? "已投" : "投一票"}</button>
+    </div>`;
+  }).join("");
+}
+
+$("#searchInput").addEventListener("input", renderHall);
+$("#hallSort").addEventListener("change", renderHall);
+function refreshHall(btn) {
+  btn.classList.remove("spin"); void btn.offsetWidth; btn.classList.add("spin");
+  loadProducts();
+}
+
+/* ---------------- 投票流程 ---------------- */
+let voteTarget = null;
+
+async function startVote(pid) {
+  if (votedSet().has(pid)) return;
+  voteTarget = pid;
+  const p = PRODUCTS.find(x => x.id === pid) || { name: pid };
+  const opts = PROVINCES.map(pr => `<option value="${escapeHtml(pr)}">${escapeHtml(pr)}</option>`).join("");
+  $("#modalBody").innerHTML = `
+    <h3>为《${escapeHtml(p.name)}》投一票</h3>
+    <p>将以你的麦当劳会员身份确认投票：<br/>
+    基础票 <b>1</b> 张 + 积分票（积分 ÷ 100，向下取整）。全程只读 MCP，不扣积分。</p>
+    <select id="voteProvince"><option value="">省份（可选，仅统计到省级）</option>${opts}</select>
+    <div class="modal-note" id="provinceNote">正在尝试自动识别你的省份…</div>
+    <button class="confirm-btn" id="doVote">确认投票</button>
+    <div class="modal-note">按会员号在中央服务统一去重；同一单品仅能投一次。</div>`;
+  openModal();
+  $("#doVote").addEventListener("click", doVote);
+
+  // 自动识别省份（仅省级，不取地址）
+  try {
+    const r = await (await fetch("/api/detect-province")).json();
+    const note = $("#provinceNote");
+    if (r && r.province && $("#voteProvince")) {
+      $("#voteProvince").value = r.province;
+      note.textContent = `📍 已自动识别为「${r.province}」，可手动纠正`;
+    } else if (note) {
+      note.textContent = "未识别到省份，可不选或手动选择（不影响投票）";
+    }
+  } catch (e) {
+    const note = $("#provinceNote");
+    if (note) note.textContent = "省份识别不可用，可不选（不影响投票）";
+  }
+}
+
 async function doVote() {
-  if (!current) return;
-  const btn = $("#do-vote");
+  const btn = $("#doVote");
   btn.disabled = true; btn.textContent = "投票中…";
-  const provinceEl = $("#vote-province");
-  const province = provinceEl ? provinceEl.value : "";
+  const province = $("#voteProvince").value || null;
   try {
     const res = await fetch("/api/vote", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ product: current.id, province })
+      body: JSON.stringify({ product: voteTarget, province }),
     });
     const data = await res.json();
     if (data.ok) {
-      $("#modal-body").innerHTML = `
-        <div class="ok-emoji">🎉</div>
-        <h3>投票成功！</h3>
-        <div class="big">+${data.val} 票</div>
-        <p>${escapeHtml(data.msg)}</p>
-        <button class="confirm-btn" id="done">好耶</button>`;
-      $("#done").addEventListener("click", closeModal);
-      toast("投票成功，感谢支持老麦 🍟", "ok");
-      // 同步更新本地数据
-      const p = PRODUCTS.find(x => x.id === current.id);
-      if (p) p.votes += data.val;
-      renderGrid();
-      if (!$("#view-rank").classList.contains("hidden")) loadRank();
+      markVoted(voteTarget);
+      $("#modalBody").innerHTML = `
+        <div class="vote-result">
+          <div class="big">🎉</div>
+          <h3>投票成功！</h3>
+          <p style="text-align:left">${escapeHtml(data.msg).replace(/\n/g, "<br/>")}</p>
+          <button class="confirm-btn" id="modalDone">太好了</button>
+        </div>`;
+      $("#modalDone").addEventListener("click", () => { closeModal(); loadProducts(); });
+      $$(`[data-pid="${CSS.escape(voteTarget)}"]`).forEach(b => {
+        b.classList.add("voted"); b.textContent = "已投";
+      });
+      loadAccount();
     } else {
-      $("#modal-body").innerHTML = `
-        <div class="ok-emoji">😅</div>
-        <h3>投票没成功</h3>
-        <p>${escapeHtml(data.msg)}</p>
-        <button class="confirm-btn" id="done">知道了</button>`;
-      $("#done").addEventListener("click", closeModal);
+      $("#modalBody").innerHTML = `
+        <div class="vote-result">
+          <div class="big">🙁</div>
+          <h3>投票没成功</h3>
+          <p style="text-align:left">${escapeHtml(data.msg || "未知原因")}</p>
+          <button class="confirm-btn" id="modalDone">知道了</button>
+        </div>`;
+      $("#modalDone").addEventListener("click", closeModal);
       toast("投票未成功，看提示～", "err");
     }
   } catch (e) {
-    $("#modal-body").innerHTML = `<h3>网络错误</h3><p>无法连接服务，请确认 serve.py 在运行。</p>
-      <button class="confirm-btn" id="done">关闭</button>`;
-    $("#done").addEventListener("click", closeModal);
-  } finally {
-    btn.disabled = false; btn.textContent = "确认投票";
+    $("#modalBody").innerHTML = `
+      <h3>网络错误</h3>
+      <p>无法连接服务，请确认服务运行中。</p>
+      <button class="confirm-btn" id="modalDone">关闭</button>`;
+    $("#modalDone").addEventListener("click", closeModal);
   }
 }
 
-// ---- 麦麦现在（麦当劳实时只读增强）----
+/* ---------------- 复活榜 ---------------- */
+async function loadRank() {
+  const province = $("#provinceFilter").value;
+  const url = "/api/leaderboard" + (province ? `?province=${encodeURIComponent(province)}` : "");
+  let d;
+  try {
+    d = await (await fetch(url)).json();
+  } catch (e) {
+    $("#rankEmpty").classList.remove("hidden");
+    return;
+  }
+  const items = d.items || [];
+  const total = items.reduce((s, x) => s + (x.votes || 0), 0);
+  const votedCnt = items.filter(x => (x.votes || 0) > 0).length;
+
+  $("#stTotal").textContent = fmt(total);
+  $("#stVoted").textContent = fmt(votedCnt);
+  $("#rankUpdated").textContent = "数据更新于 " + new Date().toTimeString().slice(0, 5);
+  $("#rankSource").textContent = d.source === "github"
+    ? "（GitHub 共享榜 · 跨用户真实聚合）"
+    : "（本地榜 · " + (d.source || "local") + "）";
+  const note = $("#rankNote");
+  if (d.fallback && province) {
+    note.textContent = `「${province}」暂无投票记录，已为你回退展示全国榜。`;
+    note.classList.remove("hidden");
+  } else {
+    note.classList.add("hidden");
+  }
+
+  renderPodium(items, total);
+  renderRankRows(items, total);
+  $("#rankEmpty").classList.toggle("hidden", items.length > 0);
+}
+
+function renderPodium(items, total) {
+  const voted = votedSet();
+  const top3 = items.slice(0, 3);
+  if (!top3.length) { $("#podium").innerHTML = `<div class="state-box">虚位以待，第一票等你来投！</div>`; return; }
+  const order = [1, 0, 2].filter(i => i < top3.length); // 2nd, 1st, 3rd
+  $("#podium").innerHTML = order.map(i => {
+    const it = top3[i];
+    const isFirst = i === 0;
+    const img = PODIUM_IMG[it.id];
+    const prodHtml = img
+      ? `<img alt class="rays" src="assets/rays.png"><img alt="${escapeHtml(it.name)}" class="prod" src="${img}">`
+      : `<img alt class="rays" src="assets/rays.png"><div class="prod emoji">${iconFor(it)}</div>`;
+    const isVoted = voted.has(it.id);
+    return `<div class="top3-card ${isFirst ? "first" : "other"}">
+      <div class="medal"><img alt="${i + 1}" src="${MEDALS[i]}"></div>
+      <div class="top3-img">${prodHtml}</div>
+      <div class="name">${escapeHtml(it.name)}</div>
+      <div class="votes">${fmt(it.votes)} 票</div>
+      <button class="vote-btn ${isVoted ? "voted" : ""}" data-pid="${escapeHtml(it.id)}" onclick="startVote('${escapeHtml(it.id)}')">${isVoted ? "已投" : "投一票"}</button>
+    </div>`;
+  }).join("");
+}
+
+function renderRankRows(items, total) {
+  const voted = votedSet();
+  const top1 = items.length ? (items[0].votes || 1) : 1;
+  const rest = items.slice(3);
+  $("#rankList").innerHTML = rest.map((it, idx) => {
+    const pct = total ? Math.round((it.votes || 0) / total * 100) : 0;
+    const bar = Math.max(2, Math.round((it.votes || 0) / top1 * 100));
+    const isVoted = voted.has(it.id);
+    return `<div class="rank-row">
+      <div class="rank-no">${idx + 4}</div>
+      <div class="rank-info"><div class="name">${escapeHtml(it.name)}</div><div class="votes">${fmt(it.votes)} 票 · 占 ${pct}%</div></div>
+      <div class="progress"><i style="width:${bar}%"></i></div>
+      <button class="rank-vote ${isVoted ? "voted" : ""}" data-pid="${escapeHtml(it.id)}" onclick="startVote('${escapeHtml(it.id)}')">${isVoted ? "已投" : "投一票"}</button>
+    </div>`;
+  }).join("");
+}
+
+$("#provinceFilter").addEventListener("change", loadRank);
+function refreshRank(btn) {
+  btn.classList.remove("spin"); void btn.offsetWidth; btn.classList.add("spin");
+  loadRank();
+}
+
+/* ---------------- 麦麦现在 ---------------- */
+function nowFallback(text) {
+  return `<div class="state-box">${escapeHtml(text)}</div>`;
+}
+
 async function loadNow() {
   await Promise.allSettled([loadOnSale(), loadCampaigns(), loadMall(), loadLottery(), loadNutrition(), loadNearby()]);
 }
 
 async function loadOnSale() {
-  const box = $("#onsale-list");
-  box.innerHTML = "<div class='state'>加载中…</div>";
+  const box = $("#availList"), foot = $("#availFoot");
+  box.innerHTML = `<div class="state-box">在售比对加载中…</div>`;
   try {
     const d = await (await fetch("/api/on-sale")).json();
     if (d.fallback) {
-      box.innerHTML = nowFallback("🍔 在售对比需要连接你的麦当劳账号（配置 MCD_MCP_TOKEN）后实时比对。");
+      box.innerHTML = nowFallback("🍔 在售对比需要连接你的麦当劳账号后实时比对。");
+      foot.textContent = "";
       return;
     }
     const cmp = d.comparison || {};
     const rows = (PRODUCTS.length ? PRODUCTS : await (await fetch("/api/products")).json())
       .map(p => ({ p, c: cmp[p.id] || { available: false, matched: null } }));
-    if (!rows.length) { box.innerHTML = ""; return; }
-    box.innerHTML = rows.map(({ p, c }) => {
-      const tag = c.available
-        ? `<span class="os-tag on">仍在售 · ${escapeHtml(c.matched || "")}</span>`
-        : `<span class="os-tag off">已绝版</span>`;
-      return `<div class="os-row">
-        <div class="os-name">${escapeHtml(p.name)} <span class="os-era">${escapeHtml(p.era || "")}</span></div>
-        ${tag}
-      </div>`;
-    }).join("") + `<p class="os-foot">当前在售餐品共 <b>${(d.meals || []).length}</b> 款 · 数据来自 query-meals 实时接口</p>`;
+    box.innerHTML = rows.map(({ p, c }) => `
+      <div class="avail-row">
+        <div class="l"><span class="name">${escapeHtml(p.name)}</span><span class="era">${escapeHtml(p.era || "")}</span></div>
+        ${c.available
+          ? `<div class="tag green">仍在售 · ${escapeHtml(c.matched || "")}</div>`
+          : `<div class="tag red">已绝版</div>`}
+      </div>`).join("");
+    foot.textContent = `当前在售餐品共 ${(d.meals || []).length} 款 · 数据来自 query-meals 实时接口`;
   } catch (e) {
     box.innerHTML = nowFallback("在售对比加载失败，请确认服务运行中。");
+    foot.textContent = "";
   }
 }
 
 async function loadCampaigns() {
-  const box = $("#campaigns-list");
-  box.innerHTML = "<div class='state'>加载中…</div>";
+  const box = $("#campaignGrid");
+  box.innerHTML = `<div class="state-box">营销活动加载中…</div>`;
   try {
     const d = await (await fetch("/api/campaigns")).json();
     if (d.fallback || !d.items || !d.items.length) {
       box.innerHTML = nowFallback("📣 营销活动日历需要连接麦当劳账号后实时展示。");
       return;
     }
-    box.innerHTML = d.items.map(it => `
-      <div class="camp-card">
-        ${it.image ? `<img src="${it.image}" alt="" loading="lazy"/>` : ""}
-        <div class="camp-body">
-          <div class="camp-title">${escapeHtml(it.title)}</div>
-          ${it.date ? `<div class="camp-date">${escapeHtml(it.date)}</div>` : ""}
+    box.innerHTML = d.items.slice(0, 6).map(it => `
+      <div class="campaign-card">
+        ${it.image
+          ? `<div class="cover"><img alt="" loading="lazy" src="${escapeHtml(it.image)}"></div>`
+          : `<div class="cover" style="background:#FFC72C">${escapeHtml((it.title || "麦麦活动").slice(0, 8))}</div>`}
+        <div class="body">
+          <div class="t">${escapeHtml(it.title)}</div>
+          ${it.date ? `<div class="d">${escapeHtml(it.date)}</div>` : ""}
         </div>
       </div>`).join("");
   } catch (e) {
@@ -268,19 +395,19 @@ async function loadCampaigns() {
 }
 
 async function loadMall() {
-  const box = $("#mall-list");
-  box.innerHTML = "<div class='state'>加载中…</div>";
+  const box = $("#mallGrid");
+  box.innerHTML = `<div class="state-box">积分商城加载中…</div>`;
   try {
     const d = await (await fetch("/api/points-mall")).json();
     if (d.fallback || !d.items || !d.items.length) {
       box.innerHTML = nowFallback("🎁 积分商城需要连接麦当劳账号后实时展示。");
       return;
     }
-    box.innerHTML = d.items.map(it => `
+    box.innerHTML = d.items.slice(0, 8).map(it => `
       <div class="mall-card">
-        <div class="mall-name">${escapeHtml(it.spuName)}</div>
-        <div class="mall-point">${escapeHtml(String(it.point))} 积分</div>
-        ${it.selling ? `<div class="mall-sell">${escapeHtml(it.selling)}</div>` : ""}
+        <div class="t">${escapeHtml(it.spuName)}</div>
+        <div class="pill">${escapeHtml(String(it.point))} 积分</div>
+        ${it.selling ? `<div class="s">${escapeHtml(it.selling)}</div>` : ""}
       </div>`).join("");
   } catch (e) {
     box.innerHTML = nowFallback("积分商城加载失败，请确认服务运行中。");
@@ -288,22 +415,22 @@ async function loadMall() {
 }
 
 async function loadLottery() {
-  const box = $("#lottery-box");
-  box.innerHTML = "<div class='state'>加载中…</div>";
+  const box = $("#lotteryWrap");
+  box.innerHTML = `<div class="state-box">抽奖信息加载中…</div>`;
   try {
     const d = await (await fetch("/api/lottery")).json();
     if (d.fallback || !d.info || !Object.keys(d.info).length) {
-      box.innerHTML = nowFallback("🎰 抽奖信息需要连接麦当劳账号后实时展示。");
+      box.innerHTML = nowFallback("🎰 抽奖信息为你的账号专属数据，连接麦当劳账号后展示。");
       return;
     }
     const info = d.info;
     const prizes = (info.prizes || []).filter(Boolean);
     box.innerHTML = `
       <div class="lottery-card">
-        <div class="lottery-status">${escapeHtml(info.activityStatusText || info.statusText || "活动中")}</div>
-        ${info.cost ? `<div class="lottery-cost">单次消耗：${escapeHtml(String(info.cost))}</div>` : ""}
-        ${prizes.length ? `<div class="lottery-prizes"><b>奖品含：</b>${prizes.map(escapeHtml).join("、")}</div>` : ""}
-        <p class="lottery-note">本作品仅读取活动信息，绝不代你抽奖 / 扣积分。</p>
+        <div class="t">${escapeHtml(info.activityStatusText || "抽奖活动")}</div>
+        ${info.cost ? `<div class="c">单次消耗：${escapeHtml(String(info.cost))} 积分</div>` : ""}
+        ${prizes.length ? `<div class="p">奖品含：${prizes.map(escapeHtml).join("、")}</div>` : ""}
+        <div class="n">本作品仅读取活动信息，绝不代你抽奖 / 扣积分。</div>
       </div>`;
   } catch (e) {
     box.innerHTML = nowFallback("抽奖信息加载失败，请确认服务运行中。");
@@ -311,71 +438,85 @@ async function loadLottery() {
 }
 
 async function loadNutrition(name) {
-  const box = $("#nut-list");
-  box.innerHTML = "<div class='state'>加载中…</div>";
+  const box = $("#nutList");
+  box.innerHTML = `<div class="state-box">营养数据加载中…</div>`;
   try {
     const url = name ? `/api/nutrition?name=${encodeURIComponent(name)}` : "/api/nutrition";
     const d = await (await fetch(url)).json();
     if (d.fallback || !d.items || !d.items.length) {
-      box.innerHTML = nowFallback(name ? "未找到匹配营养数据。" : "🥗 营养库需要连接麦当劳账号后实时展示。");
+      box.innerHTML = nowFallback(name ? "未找到匹配的营养数据，换个关键词试试。" : "🥗 营养库需要连接麦当劳账号后实时展示。");
       return;
     }
     box.innerHTML = d.items.slice(0, 40).map(it => `
-      <div class="nut-row">
-        <div class="nut-name">${escapeHtml(it.productName)}</div>
-        <div class="nut-metrics">
-          <span>🔥 ${escapeHtml(it.energyKcal)} kcal</span>
-          <span>💪 蛋白 ${escapeHtml(it.protein)}g</span>
-          <span>🧈 脂肪 ${escapeHtml(it.fat)}g</span>
-          <span>🍞 碳水 ${escapeHtml(it.carbohydrate)}g</span>
+      <div class="nut-row" data-name="${escapeHtml(it.productName)}">
+        <div class="t">${escapeHtml(it.productName)}</div>
+        <div class="m">
+          <span>${escapeHtml(it.energyKcal)} kcal</span>
+          <span>蛋白 ${escapeHtml(it.protein)}g</span>
+          <span>脂肪 ${escapeHtml(it.fat)}g</span>
+          <span>碳水 ${escapeHtml(it.carbohydrate)}g</span>
         </div>
-      </div>`).join("") + (d.items.length > 40 ? `<p class="os-foot">仅显示前 40 条，可缩小关键词。</p>` : "");
+      </div>`).join("");
   } catch (e) {
     box.innerHTML = nowFallback("营养库加载失败，请确认服务运行中。");
   }
 }
+$("#nutBtn").addEventListener("click", () => loadNutrition($("#nutInput").value.trim()));
+$("#nutInput").addEventListener("keydown", e => { if (e.key === "Enter") loadNutrition($("#nutInput").value.trim()); });
 
 async function loadNearby() {
-  const box = $("#nearby-box");
-  box.innerHTML = "<div class='state'>加载中…</div>";
+  const box = $("#nearbyWrap");
+  box.innerHTML = `<div class="state-box">门店信息加载中…</div>`;
   try {
     const d = await (await fetch("/api/nearby")).json();
-    if (d.fallback) {
-      box.innerHTML = nowFallback("📍 附近门店需要连接麦当劳账号（用于只读配送地址省份）后展示。");
+    if (d.fallback || !d.stores || !d.stores.length) {
+      box.innerHTML = nowFallback("📍 附近门店为你的账号专属数据，连接麦当劳账号后展示（仅取省级，不保存地址）。");
       return;
     }
-    const stores = d.stores || [];
-    const head = d.province ? `<p class="nearby-prov">已识别省份：<b>${escapeHtml(d.province)}</b>（仅省级，未保存地址）</p>` : "";
-    if (!stores.length) {
-      box.innerHTML = head + nowFallback("该地址暂无可配送门店数据。");
-      return;
-    }
-    box.innerHTML = head + stores.map(s => `
-      <div class="nearby-row">
-        <div class="nearby-name">🏠 ${escapeHtml(s.name)}</div>
-        ${s.address ? `<div class="nearby-addr">${escapeHtml(s.address)}</div>` : ""}
-      </div>`).join("");
+    box.innerHTML = `
+      ${d.province ? `<div class="store-prov">已识别省份：${escapeHtml(d.province)}（仅省级，未保存地址）</div>` : ""}
+      <div class="store-list" style="margin-top:10px">
+        ${d.stores.map(s => `
+          <div class="store-row">
+            <div class="t">${escapeHtml(s.name)}</div>
+            ${s.address ? `<div class="a">${escapeHtml(s.address)}</div>` : ""}
+          </div>`).join("")}
+      </div>`;
   } catch (e) {
-    box.innerHTML = nowFallback("附近门店加载失败，请确认服务运行中。");
+    box.innerHTML = nowFallback("门店信息加载失败，请确认服务运行中。");
   }
 }
 
-function nowFallback(msg) {
-  return `<div class="now-fallback">${escapeHtml(msg)}</div>`;
+/* ---------------- 倒计时 ---------------- */
+function tickCountdown() {
+  const diff = new Date(DEADLINE).getTime() - Date.now();
+  const t = Math.max(0, diff);
+  const d = Math.floor(t / 86400000);
+  const h = Math.floor(t % 86400000 / 3600000);
+  const m = Math.floor(t % 3600000 / 60000);
+  const cd = $("#countdown");
+  if (cd) {
+    cd.querySelector('[data-cd=d]').textContent = String(d).padStart(2, "0");
+    cd.querySelector('[data-cd=h]').textContent = String(h).padStart(2, "0");
+    cd.querySelector('[data-cd=m]').textContent = String(m).padStart(2, "0");
+  }
+  const st = $("#stCd");
+  if (st) st.textContent = `${d}天${String(h).padStart(2, "0")}时`;
+}
+tickCountdown();
+setInterval(tickCountdown, 30000);
+
+/* ---------------- 初始化 ---------------- */
+async function loadProvinces() {
+  try {
+    PROVINCES = await (await fetch("/api/provinces")).json();
+  } catch (e) {
+    PROVINCES = [];
+  }
+  const sel = $("#provinceFilter");
+  PROVINCES.forEach(p => sel.add(new Option(p, p)));
 }
 
-function escapeHtml(s) {
-  return String(s || "").replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
-}
-
-let toastTimer;
-function toast(msg, kind) {
-  const t = $("#toast");
-  t.textContent = msg;
-  t.className = "toast " + (kind || "");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.add("hidden"), 2600);
-}
-
-loadProvinces().then(detectProvince);
-loadProducts();
+(async function init() {
+  await Promise.allSettled([loadAccount(), loadProvinces(), loadProducts()]);
+})();
