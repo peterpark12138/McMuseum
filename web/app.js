@@ -24,6 +24,7 @@ $$(".tab").forEach(t => t.addEventListener("click", () => {
   const v = t.dataset.view;
   $("#view-hall").classList.toggle("hidden", v !== "hall");
   $("#view-rank").classList.toggle("hidden", v !== "rank");
+  $("#view-now").classList.toggle("hidden", v !== "now");
   if (v === "rank") loadRank();
   if (v === "now") loadNow();
 }));
