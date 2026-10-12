@@ -52,6 +52,39 @@ let PROVINCES = [];
 let ACCOUNT = { connected: false, availablePoint: null };
 let rankLoaded = false, nowLoaded = false;
 
+/* 在线投票能力（由 /api/vote-capabilities 如实下发）；
+   公开部署默认 voting_available=false —— 按钮置灰并引导本机投票，绝不假成功。 */
+let VOTE_CAPS = { voting_available: false, mode: "unknown", code: "", msg: "", how_to_vote: "" };
+
+async function loadVoteCapabilities() {
+  try {
+    VOTE_CAPS = await (await fetch("/api/vote-capabilities")).json();
+  } catch (e) {
+    VOTE_CAPS = { voting_available: false, mode: "unknown",
+                  msg: "无法获取投票能力状态，按不可用处理。", how_to_vote: "" };
+  }
+  renderVoteTip();
+}
+
+function renderVoteTip() {
+  const tip = $("#voteTip"), txt = $("#voteTipText");
+  if (!tip || !txt) return;
+  if (VOTE_CAPS.voting_available) { tip.classList.add("hidden"); return; }
+  txt.innerHTML = `<b>本站点未开启在线投票</b>：公开服务无法安全验证麦当劳会员身份，也不会代替访客持有会员凭证。
+    你可以照常浏览与看榜；真实投票请在本机执行
+    <code>python scripts/revival.py vote --product &lt;单品id&gt; --from-mcp</code>，或让 WorkBuddy「麦麦复活赛」Skill 代你投票。`;
+  tip.classList.remove("hidden");
+}
+
+/* 按钮文案/样式：不可用时显示为不可用态，点击后引导本机流程 */
+function voteBtnHtml(pid, isVoted, cls) {
+  const can = !!VOTE_CAPS.voting_available;
+  const label = isVoted ? "已投" : (can ? "投一票" : "🔒 本机投票");
+  const state = isVoted ? "voted" : (can ? "" : "unavailable");
+  const title = isVoted ? "" : (can ? "" : "在线投票不可用，点此查看本机投票方式");
+  return `<button class="${cls} ${state}" data-pid="${escapeHtml(pid)}" title="${escapeHtml(title)}" onclick="startVote('${escapeHtml(pid)}')">${label}</button>`;
+}
+
 /* ---------------- 工具 ---------------- */
 function escapeHtml(s) {
   return String(s ?? "").replace(/[&<>"']/g, c => ({
@@ -129,9 +162,14 @@ function openMemberModal() {
   } else {
     body.innerHTML = `
       <h3>会员未连接</h3>
-      <p>当前部署为<strong>只读展示</strong>：可浏览怀旧单品、查看共享榜与麦麦现在实时数据。<br/><br/>
-      想投出你的复活票：在你自己的 WorkBuddy 或本地运行本项目并配置
-      <code>MCD_MCP_TOKEN</code>（麦当劳会员 Token）后，投票会自动校验你的真实会员身份并回流共享榜。<br/><br/>
+      <p>当前部署为<strong>只读展示</strong>：可浏览怀旧单品、查看共享榜与麦麦现在实时数据。
+      这里没有、也不会索取你的麦当劳会员凭证。<br/><br/>
+      想投出你的复活票：在<b>你自己的本机</b>运行本项目并配置
+      <code>MCD_MCP_TOKEN</code>（你自己的麦当劳会员 Token），投票时真实调用
+      <code>query-my-account</code> 校验身份，再匿名回流共享榜。</p>
+      <div class="cli-box">python scripts/revival.py vote --product &lt;单品id&gt; --from-mcp</div>
+      <p style="font-size:12.5px;color:var(--gray-b);margin-top:10px">
+      本机想让网页也能投：<code>MCMUSEUM_ENABLE_SERVER_VOTE=1 python web/serve.py</code>。
       详见 <a href="https://github.com/peterpark12138/McMuseum" target="_blank" rel="noopener" style="color:var(--red)">项目 README</a>。</p>
       <button class="confirm-btn" id="modalOk">知道了</button>`;
   }
@@ -190,7 +228,7 @@ function renderHall() {
         <div class="row"><span class="num">${fmt(p.votes)} 票</span><span class="pct">占 ${pct}%</span></div>
         <div class="progress"><i style="width:${Math.min(100, pct)}%"></i></div>
       </div>
-      <button class="vote-btn ${isVoted ? "voted" : ""}" data-pid="${escapeHtml(p.id)}" onclick="startVote('${escapeHtml(p.id)}')">${isVoted ? "已投" : "投一票"}</button>
+      ${voteBtnHtml(p.id, isVoted, "vote-btn")}
     </div>`;
   }).join("");
 }
@@ -205,8 +243,35 @@ function refreshHall(btn) {
 /* ---------------- 投票流程 ---------------- */
 let voteTarget = null;
 
+/* 在线投票不可用时的引导弹窗：说清为什么、给出本机做法，不提供"确认投票"按钮 */
+function showVoteUnavailable(pid) {
+  const p = PRODUCTS.find(x => x.id === pid) || { name: pid };
+  const why = escapeHtml(VOTE_CAPS.msg || "本站点未开启在线投票。");
+  const how = escapeHtml(VOTE_CAPS.how_to_vote || "");
+  $("#modalBody").innerHTML = `
+    <div class="vote-result">
+      <div class="big">🔒</div>
+      <h3>本站不提供在线投票</h3>
+      <p style="text-align:left">
+        浏览怀旧单品与复活榜照常可用；但<b>真实会员投票需要验证「你自己的」麦当劳会员身份</b>，
+        公开站点拿不到、也不该保存任何人的会员凭证，所以这里不会假装投票成功。<br/><br/>
+        ${why}
+      </p>
+      <p style="text-align:left;font-weight:900;margin-top:10px">为你投《${escapeHtml(p.name)}》的方式（本机）：</p>
+      <div class="cli-box">python scripts/revival.py vote --product ${escapeHtml(pid)} --from-mcp</div>
+      <p style="text-align:left;font-size:12.5px;color:var(--gray-b);margin-top:10px">
+        ${how ? escapeHtml(how) + "<br/>" : ""}
+        或在 WorkBuddy 里让「麦麦复活赛」Skill 代你投票。本机执行后，票数会匿名回流到 GitHub 共享榜。
+      </p>
+      <button class="confirm-btn" id="modalDone">知道了</button>
+    </div>`;
+  $("#modalDone").addEventListener("click", closeModal);
+  openModal();
+}
+
 async function startVote(pid) {
   if (votedSet().has(pid)) return;
+  if (!VOTE_CAPS.voting_available) { showVoteUnavailable(pid); return; }
   voteTarget = pid;
   const p = PRODUCTS.find(x => x.id === pid) || { name: pid };
   const opts = PROVINCES.map(pr => `<option value="${escapeHtml(pr)}">${escapeHtml(pr)}</option>`).join("");
@@ -250,11 +315,16 @@ async function doVote() {
     const data = await res.json();
     if (data.ok) {
       markVoted(voteTarget);
+      // 诚实回报：本地已计票 ≠ 共享榜已更新，未回流时必须明说
+      const shared = data.shared_board_reported;
       $("#modalBody").innerHTML = `
         <div class="vote-result">
           <div class="big">🎉</div>
-          <h3>投票成功！</h3>
+          <h3>投票成功（本机已计 ${fmt(data.val || 0)} 票）</h3>
           <p style="text-align:left">${escapeHtml(data.msg).replace(/\n/g, "<br/>")}</p>
+          ${shared ? "" : `<p style="text-align:left;color:#B4470F;font-size:13px;margin-top:10px">
+            ⚠️ 本次投票<b>未</b>回流到 GitHub 共享榜${data.shared_board_msg ? "：" + escapeHtml(data.shared_board_msg) : ""}。
+            共享榜只统计成功提交的票，未回流的票只存在于本机 votes.json。</p>`}
           <button class="confirm-btn" id="modalDone">太好了</button>
         </div>`;
       $("#modalDone").addEventListener("click", () => { closeModal(); loadProducts(); });
@@ -263,15 +333,18 @@ async function doVote() {
       });
       loadAccount();
     } else {
+      // 服务端能力不可用（501/503）时不显示"投票没成功"，而是引导本机流程
+      const unavail = data.voting_available === false || res.status === 501 || res.status === 503;
       $("#modalBody").innerHTML = `
         <div class="vote-result">
-          <div class="big">🙁</div>
-          <h3>投票没成功</h3>
+          <div class="big">${unavail ? "🔒" : "🙁"}</div>
+          <h3>${unavail ? "本站点不支持在线投票" : "投票没成功"}</h3>
           <p style="text-align:left">${escapeHtml(data.msg || "未知原因")}</p>
+          ${data.how_to_vote ? `<div class="cli-box">${escapeHtml(data.how_to_vote)}</div>` : ""}
           <button class="confirm-btn" id="modalDone">知道了</button>
         </div>`;
       $("#modalDone").addEventListener("click", closeModal);
-      toast("投票未成功，看提示～", "err");
+      toast(unavail ? "在线投票不可用，请用本机 CLI / Skill 投票" : "投票未成功，看提示～", "err");
     }
   } catch (e) {
     $("#modalBody").innerHTML = `
@@ -334,7 +407,7 @@ function renderPodium(items, total) {
       <div class="top3-img">${prodHtml}</div>
       <div class="name">${escapeHtml(it.name)}</div>
       <div class="votes">${fmt(it.votes)} 票</div>
-      <button class="vote-btn ${isVoted ? "voted" : ""}" data-pid="${escapeHtml(it.id)}" onclick="startVote('${escapeHtml(it.id)}')">${isVoted ? "已投" : "投一票"}</button>
+      ${voteBtnHtml(it.id, isVoted, "vote-btn")}
     </div>`;
   }).join("");
 }
@@ -351,7 +424,7 @@ function renderRankRows(items, total) {
       <div class="rank-no">${idx + 4}</div>
       <div class="rank-info"><div class="name">${escapeHtml(it.name)}</div><div class="votes">${fmt(it.votes)} 票 · 占 ${pct}%</div></div>
       <div class="progress"><i style="width:${bar}%"></i></div>
-      <button class="rank-vote ${isVoted ? "voted" : ""}" data-pid="${escapeHtml(it.id)}" onclick="startVote('${escapeHtml(it.id)}')">${isVoted ? "已投" : "投一票"}</button>
+      ${voteBtnHtml(it.id, isVoted, "rank-vote")}
     </div>`;
   }).join("");
 }
@@ -565,7 +638,12 @@ async function loadProvinces() {
 }
 
 (async function init() {
+  await loadVoteCapabilities();                 // 先拿能力，再渲染，避免按钮先亮后灰
   await Promise.allSettled([loadAccount(), loadProvinces(), loadProducts()]);
+  renderHall();                                 // 按最终能力重绘按钮状态
+  if (!VOTE_CAPS.voting_available) {
+    console.info("[McMuseum] 在线投票不可用：", VOTE_CAPS.code || VOTE_CAPS.mode);
+  }
 })();
 
 /* ---------------- 回到顶部 ---------------- */

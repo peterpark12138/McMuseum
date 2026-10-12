@@ -39,3 +39,23 @@
 
 - 所有抓取结果按 TTL 落盘 `data/cache/`（6 小时；已被 `.gitignore` 排除，不入库），避免高频打扰麦当劳接口（限 600 次/分钟）。
 - 无 `MCD_MCP_TOKEN` 时所有数据源优雅降级为空值 + 前端「连接账号后查看」占位，公开部署不持有任何 token。
+
+## 5. 会员身份的作用域（公开站点为什么不能帮你投票）
+
+`query-my-account` 返回的是**当前 Token 持有人**的会员信息。这意味着：
+
+- 服务端拿到的永远是「服务器自己那份 Token 的会员」，**不是访客的会员**；
+- 因此公开站点调用它去投票，等于「用作者/部署者的会员身份替所有人投票」，属于伪造票数；
+- 把访客的个人 Token 交给公开服务器保存，又会带来泄露与越权风险。
+
+本作品的结论是**公开站点默认不提供在线投票**，并把这条做成可验证的硬约束：
+
+| 部署形态 | `POST /api/vote` |
+|---|---|
+| 公开站点（默认） | **501** `vote_not_supported_here`（按钮置灰 + 本机 CLI 引导） |
+| 显式开启但无 Token | **503** `member_auth_unavailable` |
+| 可信本机（`MCMUSEUM_ENABLE_SERVER_VOTE=1` + 本人 Token） | 真实调用 `query-my-account` 认证后计票 |
+
+另有两条不可绕过：请求体携带任何 `member*` / `card*` / `openid` / `token` 字段一律 **400**
+`client_identity_not_accepted`；`from_mcp=True` 只表示"允许去认证"，**不等于已认证**，
+解析不出会员唯一标识即拒绝投票。验证方式：`python3 scripts/selfcheck.py` 与 `python3 scripts/smoke_http.py`。

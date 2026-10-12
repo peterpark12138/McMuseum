@@ -117,20 +117,41 @@ python3 scripts/build_leaderboard.py
 无需第三方框架，仅用 Python 标准库起一个本地服务即可：
 
 ```bash
-# 确保已设好 MCD_MCP_TOKEN（投票功能需要真实会员身份）
-export MCD_MCP_TOKEN="你的Token"
-python3 web/serve.py
+python3 web/serve.py                                  # 浏览 / 看榜；在线投票关闭（默认安全）
+MCMUSEUM_ENABLE_SERVER_VOTE=1 python3 web/serve.py    # 本机可信环境：额外开启网页投票
 # 浏览器打开 http://127.0.0.1:8000
 ```
 
 页面提供两个视图：
 
-- **投票大厅**：浏览 47 款怀旧单品卡片，点击「投一票」即用你的麦当劳会员身份投票（1 基础票 + 每 100 积分 1 票）。
+- **投票大厅**：浏览 81 款怀旧单品卡片（其中 68 款在投票池内）。
 - **复活榜**：实时展示各单品累计票数（带进度条与 🥇🥈🥉）。
 
-> 前端页与 Skill 共用同一套 `revival.py` 逻辑，投票数据直接写入 `data/votes.json`，与命令行完全一致。
+#### 4.x.1 投票能力边界（先读这段，再谈"能不能在网页上投票"）
 
-#### 4.x.1 部署上线（公开站点 + 实时共享榜）
+真实投票需要验证**访客自己**的麦当劳会员身份。公开部署的服务器拿不到、也不应该持有任何人的
+会员凭证，所以本作品把能力边界做成了**可验证的硬约束**，而不是文案承诺：
+
+| 部署形态 | 浏览 / 看榜 | 网页在线投票 | `POST /api/vote` 行为 |
+|---|---|---|---|
+| 公开站点（默认） | ✅ 可用 | ❌ 不可用 | **HTTP 501** `vote_not_supported_here`，按钮置灰并给出本机 CLI |
+| 显式开启但无会员 Token | ✅ 可用 | ❌ 不可用 | **HTTP 503** `member_auth_unavailable` |
+| 可信本机（`MCMUSEUM_ENABLE_SERVER_VOTE=1` + 你自己的 Token） | ✅ 可用 | ✅ 可用 | 与 CLI 走同一个 `revival.record_vote`，真实调用 `query-my-account` |
+
+三条不可绕过的规则：
+
+1. **不接受客户端提交的会员标识**：请求体里出现 `member*` / `card*` / `openid` / `token` 等字段一律 **400**
+   `client_identity_not_accepted`。服务端只信任自己调用 `query-my-account` 得到的身份。
+2. **`from_mcp=True` 不等于"已认证"**：它只表示"允许真的去调 `query-my-account` 认证"，解析不出会员唯一标识就拒绝投票。
+3. **绝不假成功**：投票失败按语义返回 401（认证失败）/ 409（重复投票）/ 400（参数错误）；
+   GitHub 共享榜回流失败时在响应里如实给出 `shared_board_reported: false` + 原因，前端会明确提示"未回流共享榜"。
+
+前端通过 `GET /api/vote-capabilities` 拉取能力声明，不可用时把按钮渲染为「🔒 本机投票」灰态并弹出本机投票指引
+（`python scripts/revival.py vote --product <单品id> --from-mcp`），**不会出现"点了显示投票成功但根本没投"**。
+
+> 前端页与 Skill / CLI 共用同一套 `revival.py` 逻辑，投票数据写入 `data/votes.json`，三种入口完全一致。
+
+#### 4.x.2 部署上线（公开站点 + 实时共享榜）
 
 公开站点只负责"展示博物馆 + 实时共享榜"，**不持有任何 Token**；投票由用户在本机 / WorkBuddy 用
 **自己的麦当劳会员账号**完成，结果自动匿名回流到 GitHub Issue，任何人打开站点即可看到真实榜单。
@@ -140,10 +161,11 @@ python3 web/serve.py
 ```bash
 LEADERBOARD_SOURCE=github         # 榜单走 GitHub 真实聚合（跨用户、防伪造）
 GITHUB_BOT_LOGIN=你的GitHub用户名  # 信任锚点；公开部署无需 GITHUB_TOKEN，只读公开 Issue 即可
-# ⚠️ 切勿在公开站点配置 MCD_MCP_TOKEN / GITHUB_TOKEN（投票走用户本地，不在服务端）
+# ⚠️ 切勿在公开站点配置 MCD_MCP_TOKEN / GITHUB_TOKEN
+# ⚠️ 切勿在公开站点设置 MCMUSEUM_ENABLE_SERVER_VOTE=1（那等于让服务端用一份 Token 替所有人投票）
 ```
 
-本地预览仍用 `python3 web/serve.py`（默认本地数据源；设 `LEADERBOARD_SOURCE=github` 可本地预览共享榜）。
+启动日志会打印当前实例的投票能力（✅ / ❌ + code），可直接核对。
 
 > 数据闭环：用户本地 / WorkBuddy 投票（自身麦当劳账号）→ 匿名回流 GitHub Issue → 公开站点聚合展示。
 > 不依赖任何自建服务器，零运维成本；共享榜默认只读公开数据，无需在服务端存放任何密钥。
@@ -155,9 +177,32 @@ GITHUB_BOT_LOGIN=你的GitHub用户名  # 信任锚点；公开部署无需 GITH
 - **仅麦当劳会员可投票**：未连接麦当劳账号（无有效 `MCD_MCP_TOKEN` / `query-my-account` 无法返回会员标识）时，投票被拒绝——本作品**已取消 WorkBuddy 账号 / 匿名降级投票**。
 - **票数构成**：确认会员身份 = 1 基础票；额外票数 = `积分 ÷ 100`（向下取整）。无积分即仅 1 票。
   每次投票的结果消息与前端都会**逐项展示**「基础票 / 积分票 / 合计票重」——积分加权反映的是会员在麦当劳生态内的长期活跃度，作为产品「复活意愿强度」的趣味加成；**一人对同一单品只有一次投票机会**，加权不改变「一人一票」的原则。
-- **强身份去重（作用域说明）**：去重发生在**中央投票服务**（本仓库的 `revival.py` 运行实例，含公开站点）——所有有效投票都经 `record_vote` 统一入口，按麦当劳会员唯一标识在 `votes.json` 全局去重后，才由唯一机器人账号匿名写入 GitHub Issue 共享榜。**这不是"每个用户自己向 GitHub 发评论"的松散模型**：共享榜仅信任机器人账号评论（防伪造），普通用户评论不计入，因此不存在"换个本地环境重复计票"的路径。自建部署者运行的是独立实例，其榜单与官方站点彼此独立、互不混票。
+- **强身份去重（作用域，边界说清楚）**：
+  - **已实现**：每个 `revival.py` 运行实例内，所有投票都经 `record_vote` 统一入口，按麦当劳会员唯一标识
+    （会员号 / openid / 卡号等）在该实例的 `votes.json` 里去重——同一会员对同一单品只能计一次。
+  - **未实现（不假装已实现）**：**跨实例 / 跨用户的全局去重目前做不到**。共享榜是**匿名票数聚合**
+    （只有票种 / 增量 / 省份 / 日期，刻意不含任何会员标识，否则就泄露身份了），因此无法在共享榜层面
+    判断"这两票是不是同一个人"。若同一会员在两份独立部署里各投一次，共享榜会各计一次。
+    这是"匿名性"与"全局去重"不可兼得的取舍，本作品选择**保护用户身份**，并在此如实声明该边界。
+  - **防伪造仍然成立**：共享榜仅信任机器人账号的评论（以 `GITHUB_BOT_LOGIN` 为锚点），
+    普通用户自己在 Issue 下写 `vote ...` 不计入；票种还必须在白名单 `mcp` / `backfill` 内。
 - **仅读取**：积分仅用于换算票数，绝不调用任何扣减 / 下单接口，不触碰用户资金。
 - **遵守反刷榜**：不提供任何机器人 / 脚本批量刷票路径。
+
+### 5.1 自己验证这些边界（两条命令）
+
+```bash
+python3 scripts/selfcheck.py     # 逻辑层：能力声明 / 身份字段拒绝 / 状态码 / 脱敏 / 无效身份不产票 / 回执诚实
+python3 scripts/smoke_http.py    # 端到端：真起服务，验证 501 / 503 / 400 与"无 Token 仍可浏览"
+```
+
+`smoke_http.py` 会依次拉起三种部署形态的服务并断言：
+
+| 场景 | 断言 |
+|---|---|
+| 公开站点 | 浏览 200、`/api/vote-capabilities` 返回不可用、`POST /api/vote` = **501** 且 `ok=false, val=0` |
+| 开启投票但无 Token | `POST /api/vote` = **503**、浏览仍 200 |
+| 可信本机 + 伪造会员标识 | `POST /api/vote` = **400** `client_identity_not_accepted`（不会走到真实投票） |
 
 ---
 
@@ -184,7 +229,8 @@ McMuseum/
 │   ├── mcp_client.py        # 麦当劳 MCP 真实调用客户端（只读）
 │   ├── report_github.py      # 可选：GitHub 后端匿名聚合
 │   ├── build_leaderboard.py  # 生成可视化榜单数据
-│   └── selfcheck.py         # 一键自检（含内容充分性检查）
+│   ├── selfcheck.py         # 一键自检（含内容充分性 + 投票能力边界检查）
+│   └── smoke_http.py        # HTTP 端到端冒烟：起真实服务验证投票能力边界
 ├── data/
 │   ├── nostalgic_products.json  # 怀旧单品名录（已核实）
 │   └── votes.json               # 本地投票累计（运行时生成）

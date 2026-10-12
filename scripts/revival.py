@@ -307,8 +307,21 @@ def auto_detect_province():
     return ""
 
 
+# 最近一次投票的结构化回执（供 web/serve.py 如实回报共享榜状态，不夸大）。
+# 字段：product / ok / val / province / github_reported(bool) / github_msg(str)
+LAST_VOTE_RESULT = {
+    "product": None, "ok": False, "val": 0,
+    "province": None, "github_reported": False, "github_msg": "",
+}
+
+
 def record_vote(product, province=None, from_mcp=False, auto_province=True):
     """记录一票。仅麦当劳会员账号可投票（已取消降级）。
+
+    重要语义：`from_mcp=True` **不是**"已认证会员"的标记，它只表示
+    "本次调用允许真实调用 query-my-account 去认证"。真正的认证发生在下面的
+    real_account_info()，解析不到会员唯一标识即拒绝投票。
+    公开站点不应调用本函数（无法取得访客的会员凭证），见 web/serve.py 的能力边界。
 
     返回 (msg, ok, val)。
     票数 = 1（确认会员身份的基础票） + 积分票（积分 // POINTS_RATE）。
@@ -319,6 +332,8 @@ def record_vote(product, province=None, from_mcp=False, auto_province=True):
     votes = load_json(VOTES, {"totals": {}, "province_totals": {}, "member_voted": {}})
     pid = product
     name = next((p["name"] for p in get_products() if p["id"] == pid), pid)
+    LAST_VOTE_RESULT.update({"product": pid, "ok": False, "val": 0, "province": province,
+                             "github_reported": False, "github_msg": ""})
 
     # 省份维度：未提供时自动探测（仅麦当劳会员路径，因需 MCP 连接）
     auto_detected = False
@@ -366,6 +381,8 @@ def record_vote(product, province=None, from_mcp=False, auto_province=True):
     # 后台上报到 GitHub 共享榜（匿名、仅作者 token 可写；未配置自动跳过）。
     # 放在 record_vote 内，确保命令行与前端 /api/vote 都能回流到共享榜。
     # 上报结果显式告知（诚实原则）：本地票若未回流共享榜，用户应知情。
+    # 注意：票已写入本地 votes.json 才算成功；GitHub 回流失败**不**回滚本地票，
+    # 但必须如实写进回执（github_reported=False + 原因），绝不能让上层宣称"共享榜已更新"。
     report_note = ""
     try:
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -375,7 +392,13 @@ def record_vote(product, province=None, from_mcp=False, auto_province=True):
         ok_r, m_r = _rpt(pid, "mcp", val, province)
         report_note = f"\n   共享榜：{'已匿名回流 GitHub ✅' if ok_r else f'未回流（{m_r}）'}"
     except Exception as e:  # noqa: BLE001
+        ok_r, m_r = False, str(e)
         report_note = f"\n   共享榜：未回流（{e}）"
+
+    LAST_VOTE_RESULT.update({
+        "product": pid, "ok": True, "val": val, "province": province,
+        "github_reported": bool(ok_r), "github_msg": (m_r or "") if ok_r else (m_r or "未回流"),
+    })
 
     region_line = ""
     if province:

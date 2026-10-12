@@ -202,6 +202,18 @@ button,.nav a,.tag,.card-badge,.cd-cell,.stat-box,.hero-tag,.banner-tag,.votes-p
 }
 .vote-btn:hover{filter:brightness(1.05)}
 .vote-btn.voted{background:var(--dark);color:var(--yellow);cursor:default}
+/* 在线投票不可用（公开部署）：明确置灰，点击后引导本机投票，绝不给假成功 */
+.vote-btn.unavailable{background:#EFECE7;color:#9A9A9A}
+.vote-btn.unavailable:hover{filter:none}
+.rank-vote.unavailable{background:#EFECE7;color:#9A9A9A}
+.rank-vote.unavailable:hover{filter:none}
+.cli-box{background:#232323;color:#FFE9B8;font-size:12.5px;line-height:1.75;border-radius:10px;
+  padding:10px 12px;margin-top:10px;overflow-x:auto;user-select:all;word-break:break-all;
+  font-family:ui-monospace,Menlo,Consolas,monospace}
+.vote-tip{display:flex;align-items:center;gap:8px;background:#FFF8E3;border:1px solid #F3DFA6;
+  color:#8A6A1F;font-size:13px;line-height:1.7;border-radius:12px;padding:10px 14px;margin-bottom:18px}
+.vote-tip.hidden{display:none}
+.vote-tip b{color:#6B4E00}
 
 /* ================= 页脚 ================= */
 .footer{background:var(--dark);padding:56px clamp(20px,7vw,120px);display:flex;flex-direction:column;gap:28px}
@@ -604,6 +616,11 @@ button,.nav a,.tag,.card-badge,.cd-cell,.stat-box,.hero-tag,.banner-tag,.votes-p
           刷新
         </button>
       </div>
+    </div>
+
+    <div class="vote-tip hidden" id="voteTip">
+      <span>🔒</span>
+      <div id="voteTipText"></div>
     </div>
 
     <div class="grid" id="voteGrid"></div>

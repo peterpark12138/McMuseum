@@ -384,6 +384,193 @@ try:
 except Exception as _e:
     add("客户端层只读白名单(含 CLI 无绕过)", False, f"检查失败: {_e}")
 
+# ===== 9.12 投票能力边界（公开站点不得伪造能力 / 不得假成功 / 不得谎报共享榜） =====
+print("\n🔒 投票能力边界检查")
+try:
+    sys.path.insert(0, WEB)
+    import serve as _sv  # noqa: E402
+
+    def _swap_env(k, v):
+        """临时设置/清除环境变量，返回还原函数（保证测试互不污染）。"""
+        old = os.environ.get(k)
+        if v is None:
+            os.environ.pop(k, None)
+        else:
+            os.environ[k] = v
+        def _restore():
+            if old is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = old
+        return _restore
+
+    # (a) 默认（公开部署）：在线投票不可用 —— 501 明确拒绝，绝不是假的 200 成功
+    _r1 = _swap_env("MCMUSEUM_ENABLE_SERVER_VOTE", None)
+    try:
+        _caps = _sv.vote_capability()
+    finally:
+        _r1()
+    _def_ok = (_caps["voting_available"] is False and _caps["http_status"] == 501
+               and _caps["mode"] == "public-browse-only" and bool(_caps["how_to_vote"]))
+    add("公开部署默认关闭在线投票(501)", _def_ok,
+        f"mode={_caps.get('mode')} code={_caps.get('code')} http={_caps.get('http_status')}"
+        if _def_ok else f"能力声明异常：{_caps}")
+
+    # (b) 显式开启但无会员 Token：503，不能计票
+    _r2 = _swap_env("MCMUSEUM_ENABLE_SERVER_VOTE", "1")
+    _r3 = _swap_env("MCD_MCP_TOKEN", "")
+    try:
+        _caps2 = _sv.vote_capability()
+    finally:
+        _r3(); _r2()
+    _notok_ok = (_caps2["voting_available"] is False and _caps2["http_status"] == 503
+                 and _caps2["mode"] == "server-vote-enabled-no-token")
+    add("开启但无会员 Token 时拒绝投票(503)", _notok_ok,
+        f"mode={_caps2.get('mode')} http={_caps2.get('http_status')}" if _notok_ok
+        else f"能力声明异常：{_caps2}")
+
+    # (c) 不接受客户端提交的会员标识（防止把任意字符串当已认证身份）
+    _clean = _sv._client_identity_fields({"product": "a", "province": "上海"})
+    _dirty = _sv._client_identity_fields({"product": "a", "member_id": "1", "cardNo": "2"})
+    _idf_ok = (not _clean) and set(_dirty) == {"member_id", "cardNo"}
+    add("拒绝客户端提交的会员标识字段", _idf_ok,
+        f"正常请求放行；身份类字段被识别拦截：{sorted(_dirty)}" if _idf_ok
+        else f"识别异常 clean={_clean} dirty={sorted(_dirty)}")
+
+    # (d) 失败原因 -> 语义正确的 HTTP 状态码
+    _st_ok = (_sv._vote_http_status("该麦当劳会员已为《X》投过票") == 409
+              and _sv._vote_http_status("未能从 query-my-account 解析出麦当劳会员唯一标识") == 401
+              and _sv._vote_http_status("省份「火星」不在可选范围内") == 400)
+    add("投票失败原因映射语义状态码", _st_ok,
+        "重复=409 / 认证失败=401 / 参数错误=400" if _st_ok else "状态码映射不正确")
+
+    # (e) 错误信息脱敏：Token 不得进入响应或日志
+    _r4 = _swap_env("MCD_MCP_TOKEN", "SUPERSECRET_TOKEN_VALUE_123")
+    try:
+        _rd = _sv._redact("授权失败 Bearer abcdef1234567890 / token=SUPERSECRET_TOKEN_VALUE_123")
+    finally:
+        _r4()
+    _red_ok = ("SUPERSECRET_TOKEN_VALUE_123" not in _rd) and ("abcdef1234567890" not in _rd)
+    add("错误信息脱敏(不含 Token)", _red_ok, f"脱敏后：{_rd}" if _red_ok else f"仍有明文凭证：{_rd}")
+except Exception as _e:
+    add("投票能力边界(serve.py)", False, f"检查失败: {_e}")
+
+# 9.13 投票核心：无效身份不产票 + GitHub 回流失败如实回执（纯本地，不触网）
+try:
+    import tempfile as _tf
+    import shutil as _sh
+    import revival as _rv3
+    _tmpdir = _tf.mkdtemp(prefix="mcmuseum-selftest-")
+    _tmpvotes = os.path.join(_tmpdir, "votes.json")
+    _orig_rai, _orig_votes = _rv3.real_account_info, _rv3.VOTES
+    try:
+        _rv3.VOTES = _tmpvotes
+        # 场景1：认证失败（等价于 token 无效 / 读不到会员信息）
+        def _boom():
+            raise RuntimeError("MCP 认证失败")
+        _rv3.real_account_info = _boom
+        _, _o1, _v1 = _rv3.record_vote("sakura_mcfloat", None, from_mcp=True)
+        # 场景2：能读到积分但解析不出会员唯一标识（无法安全去重 -> 宁可拒绝）
+        _rv3.real_account_info = lambda: (100, None)
+        _, _o2, _v2 = _rv3.record_vote("sakura_mcfloat", None, from_mcp=True)
+        _no_vote = (_o1 is False and _o2 is False and _v1 == 0 and _v2 == 0
+                    and not os.path.exists(_tmpvotes))
+        add("无效会员身份不产生票数", _no_vote,
+            "认证失败 / 无会员标识均被拒绝，且未写入任何票" if _no_vote
+            else f"异常：ok1={_o1}, ok2={_o2}, val1={_v1}, val2={_v2}")
+
+        # 场景3：本地计票成功但 GitHub 回流失败 —— 回执必须 github_reported=False
+        import report_github as _rg3
+        _orig_rv = _rg3.report_vote
+        _rg3.report_vote = lambda *a, **k: (False, "模拟：GitHub 提交失败")
+        _rv3.real_account_info = lambda: (250, "selftest-member-0001")
+        try:
+            _, _o3, _v3 = _rv3.record_vote("sakura_mcfloat", "上海", from_mcp=True)
+            _rec = dict(_rv3.LAST_VOTE_RESULT)
+        finally:
+            _rg3.report_vote = _orig_rv
+        _gh_honest = (_o3 is True and _rec.get("github_reported") is False
+                      and bool(_rec.get("github_msg")))
+        add("GitHub 回流失败时如实回执(不谎报)", _gh_honest,
+            f"本地计 {_v3} 票；shared_board_reported={_rec.get('github_reported')}, "
+            f"msg={str(_rec.get('github_msg'))[:40]}" if _gh_honest
+            else f"回执不诚实：{_rec}")
+    finally:
+        _rv3.real_account_info, _rv3.VOTES = _orig_rai, _orig_votes
+        _sh.rmtree(_tmpdir, ignore_errors=True)
+except Exception as _e:
+    add("投票核心(无效身份不产票/回执诚实)", False, f"检查失败: {_e}")
+
+# 9.14 前端静态资源不得出现任何凭证；投票入口必须走能力探测
+try:
+    _app = read_text(os.path.join(WEB, "app.js"))
+    _idx = read_text(os.path.join(WEB, "index.html"))
+    _leak = bool(_re.search(r"(ghp_[A-Za-z0-9]{10,}|github_pat_[A-Za-z0-9_]{10,})", _app + _idx))
+    add("前端静态文件无明文凭证", not _leak,
+        "index.html / app.js 未发现 token 串" if not _leak else "发现疑似 token，立即撤销并清除")
+    _gate = ("vote-capabilities" in _app) and ("unavailable" in _app) and ("showVoteUnavailable" in _app)
+    add("前端投票入口按能力置灰并引导本机", _gate,
+        "调 /api/vote-capabilities，不可用则置灰并给出本机 CLI" if _gate
+        else "前端未做能力探测，可能出现「点了给假成功」")
+except Exception as _e:
+    add("前端投票入口检查", False, f"检查失败: {_e}")
+
+# 9.15 共享榜：无信任锚点时不得承认任何票（否则任何人可伪造刷榜）
+try:
+    import report_github as _rg4
+    _t_none, _pt_none = _rg4._tally_comments(
+        [{"user": {"login": "anyone"}, "body": "vote mcp +999 全国 2026-10-11"}], None)
+    _anchor_ok = (_t_none == 0 and _pt_none == {})
+    add("无信任锚点时不承认任何票", _anchor_ok,
+        "bot_login 为空 -> 0 票（杜绝无锚点时的伪造刷榜）" if _anchor_ok
+        else f"危险：无锚点仍计入 {_t_none} 票")
+    # 票种白名单：未验证票（如 guest/anon）即使由机器人发出也不计入
+    _t2, _ = _rg4._tally_comments(
+        [{"user": {"login": "bot"}, "body": "vote guest +50 全国 2026-10-11"},
+         {"user": {"login": "bot"}, "body": "vote mcp +2 广东 2026-10-11"}], "bot")
+    _vt_ok = (_t2 == 2)
+    add("共享榜票种白名单(拒绝未验证票)", _vt_ok,
+        "仅 mcp/backfill 计票，guest 类被丢弃" if _vt_ok else f"异常：计入 {_t2} 票")
+
+    # 幂等重试：POST 超时后回查到同一 rid -> 视为已写入，绝不重复提交
+    _orig_req4 = _rg4._req
+    _posts = []
+    def _flaky(url, method="GET", data=None, token=None):
+        if method == "POST":
+            _posts.append((data or {}).get("body", ""))
+            raise RuntimeError("GitHub API 网络错误: timed out")
+        _mm = _rg4._RID_RE.search(_posts[-1] if _posts else "")
+        return [{"body": f"vote mcp +1 全国 2026-10-11 rid={_mm.group(1)}"}] if _mm else []
+    _rg4._req = _flaky
+    try:
+        _ok4, _ = _rg4._post_comment("https://x/1/comments", "vote mcp +1 全国 2026-10-11",
+                                     None, "https://x/1")
+    finally:
+        _rg4._req = _orig_req4
+    _idem_ok = (_ok4 is True and len(_posts) == 1)
+    add("共享榜提交幂等(超时不重复计票)", _idem_ok,
+        f"超时后回查确认已写入，仅提交 {len(_posts)} 次" if _idem_ok
+        else f"可能重复计票：ok={_ok4}, POST 次数={len(_posts)}")
+
+    # 4xx 不重试：鉴权/限流失败重试也无意义，且不会"半成功"
+    _posts2 = []
+    def _fourxx(url, method="GET", data=None, token=None):
+        if method == "POST":
+            _posts2.append(1)
+            raise RuntimeError("GitHub API 403: forbidden")
+        return []
+    _rg4._req = _fourxx
+    try:
+        _ok5, _ = _rg4._post_comment("https://x/1/comments", "vote mcp +1 全国 2026-10-11",
+                                     None, "https://x/1", retries=2)
+    finally:
+        _rg4._req = _orig_req4
+    _no_retry_ok = (_ok5 is False and len(_posts2) == 1)
+    add("共享榜 4xx 失败不重试", _no_retry_ok,
+        "403 仅尝试 1 次即失败上报" if _no_retry_ok else f"异常重试：{len(_posts2)} 次")
+except Exception as _e:
+    add("共享榜信任锚点检查", False, f"检查失败: {_e}")
+
 # 10. 真实依赖配置状态
 mcp_tok = os.environ.get("MCD_MCP_TOKEN")
 gh_repo = os.environ.get("GITHUB_REPO")

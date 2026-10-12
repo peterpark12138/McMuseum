@@ -4,7 +4,8 @@
 麦麦复活赛 · 后台真实统计（GitHub Issue 作为零服务器后端）
 
 设计要点：
-- 每个怀旧单品对应一个 GitHub Issue；每条「有效投票」由机器人**匿名**评论一条记录（仅含票种/增量/省份/日期，不含任何用户身份）。
+- 每个怀旧单品对应一个 GitHub Issue；每条「有效投票」由机器人**匿名**评论一条记录
+  （仅含票种/增量/省份/日期/幂等 rid，不含任何用户身份）。
 - 真实全民榜 = 聚合所有单品 Issue 的匿名投票评论。
 - 投票资格与「强身份去重」由 revival.py 在本地完成：仅麦当劳会员账号可投票，以会员唯一标识（会员号 / openid / 卡号等）为去重主键，每会员每单品仅一次。
 - 本后端只负责把「已通过麦当劳会员校验的一票」匿名归档，做到「真实跨用户统计 + 防刷 + 零门槛（无需 GitHub 账号）」三者兼得。
@@ -19,6 +20,7 @@
 import os
 import re
 import json
+import time
 import uuid
 import datetime
 import argparse
@@ -35,6 +37,12 @@ BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PRODUCTS = os.path.join(BASE, "data", "nostalgic_products.json")
 ISSUE_MAP = os.path.join(BASE, "data", "issue_map.json")
 API = "https://api.github.com"
+
+# 合法票种白名单：只认「已通过麦当劳会员校验」的票(mcp) 与 幂等补报(backfill)。
+# 任何其他票种（如未来的 guest/anon/未验证票）一律不计入共享榜，防止未验证票混入。
+VOTE_TYPES = ("mcp", "backfill")
+MAX_DELTA = 1000          # 单条评论的票数上限，防异常数据污染榜单
+_RID_RE = re.compile(r"\brid=([0-9a-f]{8,32})\b")
 
 
 def _req(url, method="GET", data=None, token=None):
@@ -78,12 +86,63 @@ def _save_map(m):
         json.dump(m, f, ensure_ascii=False, indent=2)
 
 
+def _has_rid(comments_url_base, rid, token=None):
+    """回查某条 rid 的评论是否已存在（POST 成功但响应丢失时的防重复提交）。"""
+    try:
+        cs = _fetch_all_comments(comments_url_base, token, max_pages=10)
+    except RuntimeError:
+        return False      # 读不到就不敢断言"已提交"，交给调用方保守重试
+    for c in cs:
+        mm = _RID_RE.search(c.get("body") or "")
+        if mm and mm.group(1) == rid:
+            return True
+    return False
+
+
+def _post_comment(url, body, token, verify_url_base, retries=1):
+    """幂等地提交一条评论。返回 (ok, msg)。
+
+    GitHub 评论接口没有幂等键，网络超时会造成「其实写成功了但以为失败」，
+    直接重试就会重复计票。这里的做法：正文带唯一 rid；失败后先回查该 rid
+    是否已在评论里，已存在即视为成功（绝不重复写），否则退避重试。
+    4xx（鉴权/限流/参数错误）不重试——重试也不会成功，且不会"半成功"。
+    """
+    rid = uuid.uuid4().hex[:12]
+    full = f"{body} rid={rid}"
+    last = ""
+    for attempt in range(retries + 1):
+        try:
+            _req(url, "POST", {"body": full}, token)
+            return True, "已匿名记录"
+        except RuntimeError as e:
+            last = str(e)
+            if re.search(r"GitHub API 4\d\d", last):
+                return False, last          # 4xx：不重试
+            if _has_rid(verify_url_base, rid, token):
+                return True, "已匿名记录（首次提交响应丢失，回查确认已写入）"
+            if attempt < retries:
+                time.sleep(1.5 * (attempt + 1))
+    return False, last or "提交失败（原因未知）"
+
+
 def report_vote(product_id, vtype, value, province=None):
-    """匿名上报一条有效投票到该单品对应的 GitHub Issue。返回 (ok, msg)。"""
+    """匿名上报一条有效投票到该单品对应的 GitHub Issue。返回 (ok, msg)。
+
+    只上报「已在本地通过麦当劳会员身份校验」的票；票种必须是 VOTE_TYPES 之一，
+    否则即便写进去聚合时也会被丢弃（双保险，防止未验证票混入共享榜）。
+    """
     repo = os.environ.get("GITHUB_REPO")
     token = os.environ.get("GITHUB_TOKEN")
     if not repo or not token:
         return False, "未配置 GITHUB_REPO/GITHUB_TOKEN，跳过后台上报（本地演示模式）"
+    if vtype not in VOTE_TYPES:
+        return False, f"票种 {vtype} 不在共享榜白名单内，拒绝上报"
+    try:
+        value = int(value)
+    except (TypeError, ValueError):
+        return False, f"票数 {value} 非法，拒绝上报"
+    if value <= 0 or value > MAX_DELTA:
+        return False, f"票数 {value} 超出合法范围（1~{MAX_DELTA}），拒绝上报"
     m = _load_map()
     num = m.get(product_id)
     if not num:
@@ -91,11 +150,10 @@ def report_vote(product_id, vtype, value, province=None):
     url = f"{API}/repos/{repo}/issues/{num}/comments"
     # 匿名记录：仅含 票种/增量/省份/日期，不含任何用户身份
     body = f"vote {vtype} +{value} {province or '全国'} {datetime.date.today().isoformat()}"
-    try:
-        _req(url, "POST", {"body": body}, token)
-    except RuntimeError as e:
-        return False, f"后台上报失败: {e}"
-    return True, "后台已匿名记录（GitHub Issue 真实日志，零服务器）"
+    ok, msg = _post_comment(url, body, token, url)
+    if ok:
+        return True, "后台已匿名记录（GitHub Issue 真实日志，零服务器）"
+    return False, f"后台上报失败: {msg}"
 
 
 def setup(repo=None):
@@ -158,43 +216,65 @@ def _bot_login(token=None):
     机器人自身发布的评论，可彻底杜绝他人在 Issue 下伪造 `vote ...` 刷票。
 
     优先级：
-      1. 显式 GITHUB_BOT_LOGIN（公开部署可无 token，仅配此值即可）；
-      2. 由 GITHUB_REPO 的 owner 推断（公开只读部署默认）；
-      3. 有 token 时调用 /user 获取。
-    都没有则返回 None（此时不信任任何作者，等价于只聚合空）。
+      1. 显式 GITHUB_BOT_LOGIN（推荐，最明确）；
+      2. 有 token 时调用 /user 拿到「真实写评论的身份」（比猜 owner 更准确：若
+         机器人 token 不是仓库 owner，按 owner 过滤会把所有真实票过滤掉 = 漏票）；
+      3. 无 token 的只读公开部署：由 GITHUB_REPO 的 owner 推断。
+    都拿不到则返回 None —— 此时**不信任任何作者**，聚合结果必须为空（见 _tally_comments）。
     """
-    env = os.environ.get("GITHUB_BOT_LOGIN")
-    if env:
-        return env
     repo = os.environ.get("GITHUB_REPO") or ""
-    owner = repo.split("/")[0].strip() if "/" in repo else ""
-    if token and not owner:
+    key = (os.environ.get("GITHUB_BOT_LOGIN") or "", bool(token), repo)
+    if key in _BOT_CACHE:
+        return _BOT_CACHE[key]
+    login = (os.environ.get("GITHUB_BOT_LOGIN") or "").strip() or None
+    if not login and token:
         try:
             u = _req(f"{API}/user", "GET", token=token)
-            return u.get("login")
+            login = u.get("login") or None
         except RuntimeError:
-            return None
-    return owner or None
+            login = None
+    if not login:
+        owner = repo.split("/")[0].strip() if "/" in repo else ""
+        login = owner or None
+    _BOT_CACHE[key] = login
+    return login
+
+
+_BOT_CACHE = {}
 
 
 def _tally_comments(comments, bot_login):
-    """纯函数：从一个 Issue 的评论列表中，仅统计【机器人自身】发布的投票评论。
+    """纯函数：从一个 Issue 的评论列表中，仅统计【机器人自身】发布的合法投票评论。
 
     返回 (total, {province: votes})。不触网，便于自检与单测。
-    评论正文格式：vote <票种> +<增量> <省份|全国> <日期>
+    评论正文格式：vote <票种> +<增量> <省份|全国> <日期> rid=<幂等标记>
+
+    安全约束（缺一不可）：
+      - bot_login 为空 => 一条都不统计（否则任何人的 `vote ...` 都能刷榜）；
+      - 作者必须是机器人本人；
+      - 票种必须在 VOTE_TYPES 白名单内（mcp = 已过会员校验；backfill = 幂等补报）；
+      - 增量必须是 1~MAX_DELTA 的正整数。
     """
+    if not bot_login:
+        return 0, {}                      # 没有信任锚点 => 不承认任何票
     total = 0
     pt = {}
     pat = re.compile(r"^vote (\w+) \+(\d+)(?:\s+(\S+))?")
     for c in comments:
-        # 信任锚点：仅机器人自身评论计入
-        if bot_login and (c.get("user") or {}).get("login") != bot_login:
+        if (c.get("user") or {}).get("login") != bot_login:
             continue
         body = (c.get("body") or "").strip()
         mm = pat.match(body)
         if not mm:
             continue
-        val = int(mm.group(2))
+        if mm.group(1) not in VOTE_TYPES:
+            continue                      # 非白名票种 = 未验证票，丢弃
+        try:
+            val = int(mm.group(2))
+        except (TypeError, ValueError):
+            continue
+        if val <= 0 or val > MAX_DELTA:
+            continue
         prov = mm.group(3) or "全国"
         total += val
         if prov != "全国":
@@ -276,12 +356,13 @@ def backfill():
             print(f"  ⚠️ {pid} 未绑定 Issue，跳过")
             continue
         body = f"vote backfill +{delta} {prov} {today}"
-        try:
-            _req(f"{API}/repos/{repo}/issues/{num}/comments", "POST", {"body": body}, token)
+        url = f"{API}/repos/{repo}/issues/{num}/comments"
+        ok, msg = _post_comment(url, body, token, url)
+        if ok:
             done += 1
             print(f"  ✅ 已补报 {pid} +{delta}（{prov}）-> Issue #{num}")
-        except RuntimeError as e:
-            print(f"  ⚠️ 补报 {pid} 失败: {e}")
+        else:
+            print(f"  ⚠️ 补报 {pid} 失败: {msg}")
     print(f"补报完成：{done}/{len(plan)} 条。")
 
 

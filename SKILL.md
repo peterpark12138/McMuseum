@@ -68,3 +68,15 @@ description: 当用户想参加「麦麦复活赛」、为怀念的麦当劳下�
   连接自己的麦当劳账号（`MCD_MCP_TOKEN`），公开站点不持有任何 token。
 - **诚实边界**：终端用户本地投票时若无作者侧 Token，票只记在本地、不回流共享榜
   （投票结果消息会如实提示）。榜单来源（github / local）在 API 响应中带 `source` 字段，不夸大。
+
+## 七、网页投票的能力边界（不要误导用户）
+- **公开站点默认没有在线投票**。`POST /api/vote` 返回 **501** `vote_not_supported_here`；
+  显式开了 `MCMUSEUM_ENABLE_SERVER_VOTE=1` 但没配 Token 则返回 **503** `member_auth_unavailable`。
+  前端按钮会置灰为「🔒 本机投票」并弹出本机投票指引，**绝不能出现"点了显示成功其实没投"**。
+- 若用户说"我在网页上点了投票但没反应/报 501"，正确引导是让他**在本机执行**
+  `python scripts/revival.py vote --product <单品id> --from-mcp`，或由本 Skill 代投；
+  **不要用任何方式伪造一次投票成功**。
+- 服务端只信任自己调用 `query-my-account` 得到的会员身份：请求里带 `member*` / `card*` /
+  `openid` / `token` 等字段一律被拒（400 `client_identity_not_accepted`）。
+- 未实现的边界要如实说明：**跨用户全局去重做不到**（共享榜匿名聚合，不含会员标识），
+  去重作用域是「单个 `revival.py` 实例内的 `votes.json`」。

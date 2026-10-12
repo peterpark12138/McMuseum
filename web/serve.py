@@ -3,8 +3,17 @@
 """
 麦麦复活赛 · 本地/云端前端服务（展示 + 投票交互 + 看榜）
 
-- 包裹 scripts/revival.py，把投票/榜单能力以 JSON API 暴露给网页
-- 投票走真实麦当劳 MCP（需 MCD_MCP_TOKEN / .env），仅会员可投
+能力边界（重要，与真实能力保持一致）：
+- **浏览/看榜**：公开站点始终可用，无需任何凭证。
+- **真实会员投票**：需要访问"访客自己的"麦当劳会员凭证。公开服务不可能拿到，
+  也不应持有任何人的个人 Token，因此默认**不提供**在线投票：
+    * 默认（mode=public-browse-only）：POST /api/vote 返回 501 + 明确引导，
+      前端按钮置灰，绝不返回假的投票成功。
+    * 可信本机环境：显式设置 MCMUSEUM_ENABLE_SERVER_VOTE=1 且配置了
+      MCD_MCP_TOKEN（你自己的）时，才允许"服务端代你调 query-my-account 投票"，
+      此时 POST /api/vote 与 CLI 走完全相同的 revival.record_vote 逻辑。
+- **不接受客户端提交的会员标识**：任何 member/account/card/openid 等字段一律 400 拒绝，
+  避免把客户端任意字符串当成已认证身份。
 - 榜单支持两种数据源：
     * 本地（默认）：读 data/votes.json，单机演示
     * GitHub 共享榜：设 LEADERBOARD_SOURCE=github 后，从 Issue 评论聚合
@@ -12,12 +21,14 @@
 - 纯标准库，无第三方依赖；绑定 0.0.0.0 + $PORT 便于云端部署
 
 运行：
-    python web/serve.py
+    python web/serve.py                      # 浏览/看榜可用，在线投票不可用（默认安全）
+    MCMUSEUM_ENABLE_SERVER_VOTE=1 python web/serve.py   # 本机可信环境：开启在线投票
 然后浏览器打开 http://127.0.0.1:8000
 """
 import os
 import sys
 import json
+import re
 import time
 import urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -42,6 +53,84 @@ import mcd_data  # noqa: E402
 def _json(data, status=200):
     body = json.dumps(data, ensure_ascii=False).encode("utf-8")
     return status, {"Content-Type": "application/json; charset=utf-8"}, body
+
+
+# ---- 真实会员投票的能力边界 ----
+LOCAL_CLI_HINT = ("在本机执行：python scripts/revival.py vote --product <单品id> --from-mcp "
+                  "（或在 WorkBuddy 里让「麦麦复活赛」Skill 代你投票）")
+
+# 客户端提交这些字段 = 试图用客户端字符串冒充会员身份，一律拒绝
+_IDENTITY_FIELD_HINTS = ("member", "account", "card", "openid", "unionid", "userid",
+                         "phone", "mobile", "token", "credential", "secret", "会员", "账号")
+
+
+def server_vote_enabled():
+    """是否显式开启"服务端代投"（仅可信本机环境）。默认关闭。"""
+    return os.environ.get("MCMUSEUM_ENABLE_SERVER_VOTE", "").strip().lower() in ("1", "true", "yes", "on")
+
+
+def vote_capability():
+    """当前实例能否在此完成"真实麦当劳会员投票"。返回结构化能力描述（永远不撒谎）。"""
+    if not server_vote_enabled():
+        return {
+            "voting_available": False,
+            "mode": "public-browse-only",
+            "code": "vote_not_supported_here",
+            "http_status": 501,
+            "msg": ("本站点未开启在线投票：公开服务无法安全验证麦当劳会员身份，"
+                    "也不会代替访客持有会员凭证。请使用本机 CLI 或 WorkBuddy Skill 投票。"),
+            "how_to_vote": LOCAL_CLI_HINT,
+        }
+    if not mcd_data.token_available():
+        return {
+            "voting_available": False,
+            "mode": "server-vote-enabled-no-token",
+            "code": "member_auth_unavailable",
+            "http_status": 503,
+            "msg": "已开启服务端投票但未配置 MCD_MCP_TOKEN，无法完成会员身份验证；投票未执行。",
+            "how_to_vote": LOCAL_CLI_HINT,
+        }
+    return {
+        "voting_available": True,
+        "mode": "trusted-local-server",
+        "code": "ok",
+        "http_status": 200,
+        "msg": ("本实例为可信本机环境（已显式开启 MCMUSEUM_ENABLE_SERVER_VOTE 且已配置会员 Token），"
+                "可在此投票：与 CLI 走同一套 revival.record_vote 逻辑。"),
+        "how_to_vote": "",
+    }
+
+
+def _redact(text):
+    """错误信息脱敏：绝不把 Token / 凭证写进响应或日志。"""
+    s = str(text)
+    for k in ("MCD_MCP_TOKEN", "GITHUB_TOKEN"):
+        v = (os.environ.get(k) or "").strip()
+        if v and len(v) >= 6:
+            s = s.replace(v, "***")
+    # Bearer xxx 形式的兜底脱敏
+    s = re.sub(r"(?i)(bearer\s+)[A-Za-z0-9._\-]{8,}", r"\1***", s)
+    return s
+
+
+def _client_identity_fields(data):
+    """挑出客户端试图提交的"会员身份类"字段（不接受，仅用于报错提示）。"""
+    if not isinstance(data, dict):
+        return []
+    return [k for k in data.keys()
+            if any(h in str(k).lower() for h in _IDENTITY_FIELD_HINTS)]
+
+
+def _vote_http_status(msg):
+    """把 record_vote 的失败原因映射为语义正确的 HTTP 状态码（不做字符串伪造成功）。"""
+    s = str(msg or "")
+    if "投过票" in s or "不能重复" in s:
+        return 409          # 重复投票（该会员该单品已计票）
+    if "query-my-account" in s or "会员唯一标识" in s or "无法确认麦当劳会员身份" in s:
+        return 401          # 会员身份验证失败（无 token / token 无效 / 读不到会员信息）
+    if "省份" in s:
+        return 400          # 省份不在受控枚举
+    return 400
 
 
 def _use_github():
@@ -193,6 +282,10 @@ class Handler(BaseHTTPRequestHandler):
 
         # ---- 麦当劳实时只读增强（公开营销类数据支持缓存快照，无 token 也可展示；
         #      用户专属数据（抽奖/附近门店）无 token 时优雅降级，公开部署不影响可用性）----
+        if path == "/api/vote-capabilities":
+            # 前端据此决定「投一票」按钮可用 / 置灰，并给出本地投票引导（不伪造能力）
+            self._send(*_json(vote_capability()))
+            return
         if path == "/api/account":
             # 会员连接状态 + 可用积分（只读 query-my-account；绝不返回会员标识，300s 缓存）
             self._send(*_json(_account_status()))
@@ -234,21 +327,56 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
         if parsed.path == "/api/vote":
+            # ① 先看这个实例有没有能力做"真实会员投票"（公开站点默认没有）
+            caps = vote_capability()
+            if not caps["voting_available"]:
+                self._send(*_json({"ok": False, "code": caps["code"], "mode": caps["mode"],
+                                   "msg": caps["msg"], "how_to_vote": caps["how_to_vote"],
+                                   "voting_available": False, "val": 0},
+                                  caps["http_status"]))
+                return
             length = int(self.headers.get("Content-Length", 0) or 0)
             raw = self.rfile.read(length) if length else b"{}"
             try:
                 data = json.loads(raw.decode("utf-8") or "{}")
             except Exception:
                 data = {}
+            if not isinstance(data, dict):
+                data = {}
+            # ② 绝不接受客户端提交的"会员标识"冒充已认证身份
+            bad = _client_identity_fields(data)
+            if bad:
+                self._send(*_json({"ok": False, "code": "client_identity_not_accepted",
+                                   "msg": ("不接受客户端提交的会员标识字段（" + "、".join(sorted(bad)) +
+                                           "）：服务端只信任自己调用 query-my-account 得到的会员身份。"),
+                                   "val": 0}, 400))
+                return
             product = data.get("product")
             province = data.get("province")
             if not product:
-                self._send(*_json({"ok": False, "msg": "缺少 product"}, 400))
+                self._send(*_json({"ok": False, "code": "bad_request", "msg": "缺少 product"}, 400))
                 return
-            # 仅麦当劳会员可投票：from_mcp=True 触发真实 query-my-account 读取。
-            # record_vote 内部会自动把有效票回流到 GitHub 共享榜（匿名、仅作者可写）。
-            msg, ok, val = revival.record_vote(product, province, from_mcp=True)
-            self._send(*_json({"ok": ok, "msg": msg, "val": val}))
+            # ③ 真实投票：from_mcp=True 触发真实 query-my-account（不是"当作已认证"，而是真的去认证）
+            try:
+                msg, ok, val = revival.record_vote(product, province, from_mcp=True)
+            except Exception as e:  # noqa: BLE001
+                self._send(*_json({"ok": False, "code": "vote_failed",
+                                   "msg": _redact(f"投票失败：{e}"), "val": 0}, 500))
+                return
+            info = getattr(revival, "LAST_VOTE_RESULT", {}) or {}
+            payload = {
+                "ok": ok,
+                "msg": _redact(msg),
+                "val": val,
+                # 共享榜回流的真实结果（失败时必须如实为 False，前端不得宣称已上榜）
+                "shared_board_reported": bool(info.get("github_reported", False)),
+                "shared_board_msg": _redact(info.get("github_msg", "")),
+            }
+            if ok:
+                self._send(*_json(payload, 200))
+            else:
+                payload["code"] = "vote_rejected"
+                self._send(*_json(payload, _vote_http_status(msg)))
             return
         self._send(*_json({"error": "not found"}, 404))
 
@@ -261,8 +389,14 @@ def main():
     host = os.environ.get("HOST", "0.0.0.0")
     srv = ThreadingHTTPServer((host, port), Handler)
     src = "GitHub 共享榜" if _use_github() else "本地"
+    caps = vote_capability()
     print(f"🍟 麦麦复活赛前端已启动: http://127.0.0.1:{port}  (bind {host}, 数据源={src})")
-    print("   投票需已配置 MCD_MCP_TOKEN（或 .env）；Ctrl+C 退出。")
+    if caps["voting_available"]:
+        print("   在线投票：✅ 已开启（可信本机环境 MCMUSEUM_ENABLE_SERVER_VOTE=1 + 会员 Token 已配置）")
+    else:
+        print(f"   在线投票：❌ 不可用（{caps['code']}）——浏览与看榜照常，真实投票请用 CLI / Skill：{LOCAL_CLI_HINT}")
+        print("   本机想开启在线投票：MCMUSEUM_ENABLE_SERVER_VOTE=1 python web/serve.py")
+    print("   Ctrl+C 退出。")
     srv.serve_forever()
 
 
