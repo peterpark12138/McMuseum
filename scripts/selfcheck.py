@@ -710,6 +710,41 @@ try:
 except Exception as _e:
     add("沙箱开关检查", False, f"检查失败: {_e}")
 
+# 9.19 文档诚实性防回归：文档不得把未实现的能力写成已实现
+try:
+    _docs_dir = os.path.join(BASE, "docs")
+    _scan = [os.path.join(BASE, "README.md"), os.path.join(BASE, "SKILL.md"),
+             os.path.join(_docs_dir, "DEMO_GUIDE.md")]
+    # 这些写法曾经出现过，会把"设计目标"说成"上线能力"，一律禁止再出现
+    # （"反刷榜"条款本身是真陈述：不提供批量刷票工具，故不在禁用列表内）
+    _banned = [
+        "从机制上杜绝", "跨用户真实聚合", "数据闭环", "自动匿名回流",
+        "强身份防刷", "防止多账号刷票", "全网共同",
+    ]
+    # 这些边界声明必须存在于 README，避免开头与后文自相矛盾
+    _required_readme = [
+        "全局去重没有实现",        # 断言"未实现"（而不是只字不提）
+        "demo_mode_vote_disabled",  # 断言演示票无入口
+        "单个本地账本实例",        # 断言去重作用域
+    ]
+    _hits = []
+    for _p in _scan:
+        if not os.path.isfile(_p):
+            continue
+        _txt = open(_p, encoding="utf-8").read()
+        for _b in _banned:
+            if _b in _txt:
+                _hits.append(f"{os.path.basename(_p)} 含禁用措辞「{_b}」")
+    _rm = open(os.path.join(BASE, "README.md"), encoding="utf-8").read()
+    _miss = [r for r in _required_readme if r not in _rm]
+    if _miss:
+        _hits.append(f"README 缺少边界断言 {_miss}")
+    add("文档诚实性（无越界措辞 + 边界声明在位）", not _hits,
+        "README/SKILL/DEMO_GUIDE 未发现把未实现写成已实现的措辞，且边界断言在位"
+        if not _hits else "；".join(_hits))
+except Exception as _e:
+    add("文档诚实性检查", False, f"检查失败: {_e}")
+
 # 10. 真实依赖配置状态
 mcp_tok = os.environ.get("MCD_MCP_TOKEN")
 gh_repo = os.environ.get("GITHUB_REPO")

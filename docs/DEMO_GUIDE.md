@@ -261,8 +261,18 @@ MCMUSEUM_REAL_INTEGRATION=1 python3 scripts/test_scenarios.py
 
 ## 9. 已知未实现 / 待办（如实列出）
 
+- **共享榜的输入源是单点，不是"全网共写一张榜"**：`_tally_comments` 只统计信任锚点账号
+  （`GITHUB_BOT_LOGIN` → token 持有者 → repo owner）**自身**发布的评论。因此：
+  - 只有**持有 GitHub 写权限凭证的那一方**（当前为本仓库作者）能把票回流到本仓库这张榜；
+  - 外部参与者在自己本机投票后，票只会进他自己的 `votes.json`，**不会**出现在公开榜上；
+  - 想让自己的票上榜，需 fork 后配置自己的 bot 凭证并跑 `report_github.py setup` 自建 Issue。
+  （这是当前架构的取舍：信任锚点换来"他人无法伪造灌票"，代价是牺牲了多写方。）
 - **跨实例全局去重未实现**（原因见第 4 节边界说明）。
 - 名录扩充到 81 款后，其中 **35 款尚未在 GitHub 建投票 Issue**，
   作者需执行 `python3 scripts/report_github.py setup` 补建并更新 `data/issue_map.json`；
   未绑定的单品在共享榜上没有对应条目（本地榜不受影响）。
+- 远端存在 **5 个孤儿 Issue**：GitHub 上共 51 个 Issue，而 `data/issue_map.json` 只绑定 46 个，
+  多出的 5 个对应已从名录删除的产品（`szechuan_sauce` / `nen_niu_wufang` / `mexican_wrap` /
+  `neworleans_wing` / `five_color_burger`）。它们仍在 GitHub 上保持 open，不影响计票
+  （未绑定的 Issue 不会被聚合读），但对外看起来像是"有产品没进名录"。
 - 8 款单品 `verified=false`（待用官方历史菜单核实），赛前需确认或从名录移除。
