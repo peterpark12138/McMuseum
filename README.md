@@ -254,13 +254,42 @@ python3 scripts/selfcheck.py        # 全项目自检：内容充分性 + MCP �
 **[REAL]** 真实集成默认**跳过**并显示 ⏭️（需加 `--real` 才执行），**跳过不算通过**。
 `--real` 只做只读验证（认证一次 + 读一次共享榜），不会投票、不会发评论。
 
-本机实测：`test_scenarios.py` ✅15 / ❌0 / ⏭️2，加 `--real` 后 ✅17 / ❌0 / ⏭️0，
-`smoke_http.py` ✅13 / ❌0，`selfcheck.py` ✅61 / ❌0。
+本机实测（2026-10-13）：`test_scenarios.py` ✅16 / ❌0 / ⏭️2，加 `--real` 后 ✅18 / ❌0 / ⏭️0，
+`smoke_http.py` ✅15 / ❌0，`selfcheck.py` ✅63 / ❌0，另有 `image_research.py verify` 校验图片档案。
+> 数字会随新增检查而变，以你自己跑出来的输出为准。
 
 **演示相关**：评审一键复现流程见 [docs/DEMO_GUIDE.md](docs/DEMO_GUIDE.md)，
 60–90 秒演示脚本见 [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)。
 现有 `docs/demo.gif` 是 960×540 / 146 帧 / **约 22 秒**的浏览片段，
 **不能**单独代表完整演示（未覆盖投票、去重与共享榜区分），需按脚本补录。
+
+---
+
+## 五·补、图片档案（覆盖率与图片状态，如实公开）
+
+图片与产品元数据的关系**已迁出前端**：原先硬编码在 `web/app.js` 的 `HALL_IMG` 常量里（无法追溯来源），
+现在每款产品在 `data/nostalgic_products.json` 里带七个字段：
+
+| 字段 | 用途 |
+|---|---|
+| `image` | 站点使用的本地图片路径 |
+| `image_status` | `verified` / `unverified` / `reconstruction` / `missing` |
+| `image_source_url` `image_source_name` | 出处网页与来源类型（官方 / 媒体 / 消费者 / AI 复原） |
+| `image_rights` `image_confidence` `image_note` | 授权情况、匹配置信度、年份/包装/复原说明 |
+
+```bash
+python3 scripts/image_research.py plan        # 生成待补图清单（CSV + JSON 检索词）
+python3 scripts/image_research.py verify      # 校验档案：缺字段 / 非法枚举 / 断链 / 重复 / 冒充已核实
+python3 scripts/image_research.py report      # 覆盖率与待处理清单
+```
+
+**当前覆盖率：26 / 81 = 32%**，且这 26 张**全部是 `unverified`** ——
+它们是仓库早期搜集的图，原始出处与授权没有留存，所以在补齐 provenance 之前**不沿用"已核实"的旧注释**。
+
+规则（既写进脚本，也写进流程）：`verified` 必须能给出出处，否则 `verify` 直接判错；
+AI 复原图一律 `reconstruction` 且必须写说明，**绝不**冒充历史实拍；没有明确许可的图不下载、不入库；
+缺图用统一占位卡，不拿别的产品图顶替。**一期不下载任何图片** —— 下载与 WebP 转换排在二期。
+详见 [docs/IMAGE_PLAN.md](docs/IMAGE_PLAN.md)。
 
 ---
 
@@ -288,8 +317,9 @@ McMuseum/
 │   ├── report_github.py      # 可选：GitHub 后端匿名聚合
 │   ├── build_leaderboard.py  # 生成可视化榜单数据
 │   ├── selfcheck.py         # 一键自检（内容充分性 + 只读红线 + 能力边界 + 账本健壮性）
+│   ├── image_research.py     # 图片档案采集/校验（plan/bootstrap/verify/report；一期不下载任何图）
 │   ├── smoke_http.py        # HTTP 端到端冒烟：真起 4 种部署形态验证能力边界
-│   └── test_scenarios.py    # 15 个场景测试（[MOCK] 离线可复现 / [REAL] 默认跳过）
+│   └── test_scenarios.py    # 16 个场景测试（[MOCK] 离线可复现 / [REAL] 默认跳过）
 ├── docs/
 │   ├── DEMO_GUIDE.md        # 评审可复现流程（模式 A/B、看榜、去重验证、清理测试数据）
 │   ├── DEMO_SCRIPT.md       # 60–90 秒演示脚本 + 现有 demo.gif 的评估

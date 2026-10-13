@@ -21,3 +21,7 @@ data/.votes.lock
 
 # 图片搜集中间产物与验证截图
 data/_*
+
+# 生成物（由 scripts/image_research.py plan 重新产出）
+data/image_plan.csv
+data/image_plan.json

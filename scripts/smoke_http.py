@@ -69,6 +69,13 @@ def main():
     try:
         st, d = call(port, "/api/products")
         check("公开站可浏览单品", st == 200 and len(d) > 0, f"HTTP {st}, {len(d)} 款")
+        # 图片档案七字段必须端到端透传到前端（不能只在数据里有、接口却丢掉）
+        _img_fields = ["image", "image_status", "image_source_url",
+                       "image_source_name", "image_rights", "image_confidence", "image_note"]
+        _no_field = [f for f in _img_fields if f not in (d[0] if d else {})]
+        check("产品接口透传图片档案七字段", not _no_field,
+              f"缺字段={_no_field or '无'}；样例 status={d[0].get('image_status') if d else '-'}")
+        # 榜单 image 字段的断言放在演示模式段那里做（公开站可能还没有票，断言会空过）
         st, d = call(port, "/api/leaderboard")
         check("公开站可看榜", st == 200, f"HTTP {st}, source={d.get('source')}")
         st, d = call(port, "/api/vote-capabilities")
@@ -118,7 +125,13 @@ def main():
         check("演示模式可浏览（无 Token）", st == 200 and demo_items > 0,
               f"HTTP {st}, {demo_items} 款，条目带 demo 标记="
               f"{all(x.get('demo') for x in d) if isinstance(d, list) else False}")
+        # 榜单条目必须带 image（这里用演示榜：它一定有 20 条票，断言不会空过）
         st, d = call(port, "/api/leaderboard")
+        _items = d.get("items") or []
+        check("榜单条目带 image 字段（不空过）",
+              st == 200 and len(_items) > 0 and all("image" in it for it in _items),
+              f"HTTP {st}, 条目数={len(_items)}（要求 >0），全部带 image="
+              f"{all('image' in it for it in _items) and len(_items) > 0}")
         check("演示模式榜单标注 demo 数据源", st == 200 and d.get("source") == "demo"
               and bool(d.get("demo_note")),
               f"HTTP {st}, source={d.get('source')}, 带演示数据说明={bool(d.get('demo_note'))}")

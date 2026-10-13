@@ -455,6 +455,47 @@ try:
 except Exception as e:  # noqa: BLE001
     check("15. 公开浏览接口不泄露凭证", False, f"检查失败: {e}")
 
+# ---- 场景 16：图片档案校验器必须真能抓出违规（避免"只跑绿、抓不出问题"） ----
+try:
+    import image_research as _irx
+
+    def _img(**kw):
+        base = dict(_irx.NO_STATUS)
+        base.update(kw)
+        return base
+
+    # 合规条目用一条没人复用的路径，避免它被"重复"提示合法地提及
+    _good = _img(id="p_good", image="assets/products/apple_pie.gif", image_status="verified",
+                 image_source_url="https://example.com/menu", image_source_name="官方",
+                 image_rights="官方公开素材", image_confidence="high", image_note="官网菜单图")
+    _bad = [
+        _good,
+        _img(id="p_verified_nosrc", image="assets/products/shake_fries.png",
+             image_status="verified", image_source_name="官方", image_confidence="high"),
+        _img(id="p_broken", image="assets/products/__not_exist__.png",
+             image_status="unverified", image_source_name="未知", image_confidence="low"),
+        _img(id="p_dup", image="assets/products/shake_fries.png",
+             image_status="unverified", image_source_name="未知", image_confidence="low"),
+        _img(id="p_enum", image_status="nope"),
+        _img(id="p_recon", image="assets/products/shake_fries.png",
+             image_status="reconstruction", image_source_name="AI 复原", image_confidence="low"),
+    ]
+    _errs, _ = _irx.collect_problems(_bad)
+    _want = {
+        "verified 缺出处": "却无 image_source_url",
+        "图片断链": "图片文件不存在",
+        "路径重复": "重复",
+        "状态枚举非法": "image_status 非法",
+        "AI 复原图无说明": "reconstruction 必须写",
+    }
+    _missed = [k for k, needle in _want.items() if not any(needle in e for e in _errs)]
+    _clean = not any("p_good" in e for e in _errs)
+    check("16. 图片档案校验器能抓出违规（不只跑绿）", not _missed and _clean,
+          f"注入 5 类违规全部被抓出={not _missed}；合规条目无误报={_clean}；"
+          f"共产生 {len(_errs)} 条问题记录")
+except Exception as e:  # noqa: BLE001
+    check("16. 图片档案校验器能抓出违规（不只跑绿）", False, f"检查失败: {e}")
+
 # ========== 真实集成测试（默认跳过） ==========
 print("\n🔌 真实集成测试")
 if os.environ.get("MCMUSEUM_REAL_INTEGRATION", "").strip().lower() not in ("1", "true", "yes", "on"):

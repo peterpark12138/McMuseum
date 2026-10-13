@@ -745,6 +745,21 @@ try:
 except Exception as _e:
     add("文档诚实性检查", False, f"检查失败: {_e}")
 
+# 9.20 图片档案完整性（七字段 + 引用自洽；规则与 image_research.collect_problems 共用一处实现）
+try:
+    sys.path.insert(0, os.path.join(BASE, "scripts"))
+    import image_research as _ir
+    _doc = _ir.load_doc()
+    _ps = _doc.get("products", [])
+    _errs, _paths = _ir.collect_problems(_ps)
+    _have = sum(1 for p in _ps if (p.get("image") or "").strip())
+    _cov = f"覆盖 {_have}/{len(_ps)}（{_have*100//max(len(_ps),1)}%）"
+    add("图片档案完整性（七字段 + 引用自洽 + 无冒充已核实）", not _errs,
+        f"{len(_ps)} 款、引用 {len(_paths)} 张图，{_cov}，无缺字段/非法枚举/断链/重复"
+        if not _errs else f"{len(_errs)} 处问题：{'；'.join(_errs[:3])}")
+except Exception as _e:
+    add("图片档案完整性检查", False, f"检查失败: {_e}")
+
 # 10. 真实依赖配置状态
 mcp_tok = os.environ.get("MCD_MCP_TOKEN")
 gh_repo = os.environ.get("GITHUB_REPO")

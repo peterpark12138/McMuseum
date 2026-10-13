@@ -23,7 +23,14 @@
       "evidence_level": "A",
       "sources": [
         "麦当劳中国官网 2019-02-20 推广页（官网存档）"
-      ]
+      ],
+      "image": "assets/products/sakura_mcfloat.jpg",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "garlic_chili_sauce",
@@ -46,7 +53,14 @@
       "evidence_level": "B",
       "sources": [
         "公开报道/会员端菜单记录"
-      ]
+      ],
+      "image": "assets/products/garlic_chili_sauce.jpg",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "durian_flavor",
@@ -69,7 +83,14 @@
       "evidence_level": "A",
       "sources": [
         "麦当劳中国官网 2024-05-31 推广页（官网存档）"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "five_color_veggie_roll",
@@ -90,7 +111,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "five_color_chicken_roll",
@@ -111,7 +139,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "five_color_beef_roll",
@@ -132,7 +167,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "five_color_happy_roll",
@@ -153,7 +195,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "lime_thai_chili",
@@ -176,7 +225,14 @@
       "evidence_level": "B",
       "sources": [
         "「全球风味酱」系列公开报道"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "singapore_honey_mustard",
@@ -199,7 +255,14 @@
       "evidence_level": "B",
       "sources": [
         "「全球风味酱」系列公开报道"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "french_cheese",
@@ -222,7 +285,14 @@
       "evidence_level": "B",
       "sources": [
         "「全球风味酱」系列公开报道"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "malay_satay",
@@ -245,7 +315,14 @@
       "evidence_level": "B",
       "sources": [
         "「全球风味酱」系列公开报道"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "mc_rice_wrap",
@@ -268,7 +345,14 @@
       "evidence_level": "B",
       "sources": [
         "麦麦开饭系列公开报道"
-      ]
+      ],
+      "image": "assets/products/mc_rice_wrap.jpg",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "mc_rice_bowl",
@@ -291,7 +375,14 @@
       "evidence_level": "B",
       "sources": [
         "麦麦开饭系列公开报道"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "shake_fries",
@@ -314,7 +405,14 @@
       "evidence_level": "B",
       "sources": [
         "限定活动公开报道"
-      ]
+      ],
+      "image": "assets/products/shake_fries.png",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "angus_burger",
@@ -337,7 +435,14 @@
       "evidence_level": "B",
       "sources": [
         "安格斯系列公开报道（美国 2013 下市等）"
-      ]
+      ],
+      "image": "assets/products/angus_burger.jpg",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "matcha_mcfloat",
@@ -358,7 +463,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "cilantro_mcfloat",
@@ -381,7 +493,14 @@
       "evidence_level": "A",
       "sources": [
         "麦当劳中国官方新品公告（香菜新地/冰旋风话题事件）"
-      ]
+      ],
+      "image": "assets/products/cilantro_mcfloat.jpg",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "purple_sweet_potato_pie",
@@ -402,7 +521,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "assets/products/purple_sweet_potato_pie.gif",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "taro_pie",
@@ -425,7 +551,14 @@
       "evidence_level": "B",
       "sources": [
         "麦当劳中国官网《麦当劳开启派DAY狂欢》2019-03-07 新闻稿 https://www.mcdonalds.com.cn/news/pie-day-2019-top-pie-cities-in-china（「全年供应菠萝派和香芋派」）"
-      ]
+      ],
+      "image": "assets/products/taro_pie.gif",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "salted_egg_yolk_mooncake",
@@ -446,7 +579,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "crayfish_burger",
@@ -467,7 +607,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "big_chicken_steak",
@@ -490,7 +637,14 @@
       "evidence_level": "B",
       "sources": [
         "「那么大鸡排」公开报道"
-      ]
+      ],
+      "image": "assets/products/big_chicken_steak.png",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "roujiamo",
@@ -513,7 +667,14 @@
       "evidence_level": "B",
       "sources": [
         "2021 新春哪吒联名公开报道"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "youtiao_doujiang",
@@ -535,7 +696,14 @@
       "vote_eligible": false,
       "evidence_level": "B",
       "sources": [],
-      "supply_note": "供应状态待核实（2026-10 用户提示，早餐菜单城市差异大）"
+      "supply_note": "供应状态待核实（2026-10 用户提示，早餐菜单城市差异大）",
+      "image": "assets/products/youtiao_doujiang.jpg",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "treasure_triangle",
@@ -556,7 +724,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "assets/products/treasure_triangle.jpg",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "strawberry_milkshake",
@@ -580,7 +755,14 @@
       "sources": [
         "2026 奶昔回归门店菜单（区域）"
       ],
-      "supply_note": "区域供应（约 15 城 44 店，2026-10 用户提示），非全国常供"
+      "supply_note": "区域供应（约 15 城 44 店，2026-10 用户提示），非全国常供",
+      "image": "assets/products/strawberry_milkshake.jpg",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "twisty_fries",
@@ -603,7 +785,14 @@
       "evidence_level": "B",
       "sources": [
         "2019-01/2018-01 新品清单（食研百科等）"
-      ]
+      ],
+      "image": "assets/products/twisty_fries.png",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "hotcakes",
@@ -625,7 +814,14 @@
       "vote_eligible": false,
       "evidence_level": "B",
       "sources": [],
-      "supply_note": "供应状态待核实（2026-10 用户提示）"
+      "supply_note": "供应状态待核实（2026-10 用户提示）",
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "apple_pie",
@@ -649,7 +845,14 @@
       "sources": [
         "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day",
         "麦当劳中国官网《麦当劳开启派DAY狂欢》2019-03-07 新闻稿 https://www.mcdonalds.com.cn/news/pie-day-2019-top-pie-cities-in-china"
-      ]
+      ],
+      "image": "assets/products/apple_pie.gif",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "kakazu_crispy_chicken",
@@ -670,7 +873,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "mccool",
@@ -691,7 +901,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "assets/products/mccool.jpg",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "pineapple_shrimp_burger",
@@ -712,7 +929,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "salt_baked_wing",
@@ -733,7 +957,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "veggie_cup",
@@ -755,7 +986,14 @@
       "vote_eligible": false,
       "evidence_level": "B",
       "sources": [],
-      "supply_note": "供应状态待核实（2026-10 用户提示）"
+      "supply_note": "供应状态待核实（2026-10 用户提示）",
+      "image": "assets/products/veggie_cup.jpg",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "milkshake",
@@ -779,7 +1017,14 @@
       "sources": [
         "2026 奶昔回归门店菜单（区域）"
       ],
-      "supply_note": "区域供应（约 15 城 44 店，2026-10 用户提示），非全国常供"
+      "supply_note": "区域供应（约 15 城 44 店，2026-10 用户提示），非全国常供",
+      "image": "assets/products/milkshake.jpg",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "shake_fries_fun",
@@ -800,7 +1045,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "assets/products/shake_fries_fun.png",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "peach_pie",
@@ -823,7 +1075,14 @@
       "evidence_level": "B",
       "sources": [
         "2018-03/2019-02 新品清单（食研百科等）"
-      ]
+      ],
+      "image": "assets/products/peach_pie.gif",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "mango_pie",
@@ -846,7 +1105,14 @@
       "evidence_level": "B",
       "sources": [
         "2018-11 新品清单（食研百科等）"
-      ]
+      ],
+      "image": "assets/products/mango_pie.gif",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "custard_pie",
@@ -867,7 +1133,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "assets/products/custard_pie.gif",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "qinghuajiao_double",
@@ -888,7 +1161,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "braised_spicy_burger",
@@ -909,7 +1189,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "assets/products/braised_spicy_burger.png",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "cheese_beef_moon",
@@ -930,7 +1217,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "vcut_wedges",
@@ -951,7 +1245,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "assets/products/vcut_wedges.jpg",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "cod_brick",
@@ -972,7 +1273,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "curry_wing",
@@ -993,7 +1301,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "assets/products/curry_wing.jpg",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "grilled_chicken_burger",
@@ -1016,7 +1331,14 @@
       "evidence_level": "B",
       "sources": [
         "麦当劳中国官网《盘点你的2015》（板烧 10 周年） https://www.mcdonalds.com.cn/news/mcdonalds-2015"
-      ]
+      ],
+      "image": "assets/products/grilled_chicken_burger.png",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "taro_mcfloat",
@@ -1037,7 +1359,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "maple_pancake_burger",
@@ -1058,7 +1387,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "assets/products/maple_pancake_burger.jpg",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "未知（未留存出处，复用前需人工确认）",
+      "image_confidence": "low",
+      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
       "id": "hot_chocolate",
@@ -1080,7 +1416,14 @@
       "vote_eligible": false,
       "evidence_level": "B",
       "sources": [],
-      "supply_note": "供应状态待核实（2026-10 用户提示）"
+      "supply_note": "供应状态待核实（2026-10 用户提示）",
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "thai_charcoal_pork_burger",
@@ -1103,7 +1446,14 @@
       "evidence_level": "B",
       "sources": [
         "麦当劳官方新闻推广（2025–2026 限定）"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "spicy_chicken_burger",
@@ -1127,7 +1477,14 @@
       "sources": [
         "麦当劳中国官网《2015麦当劳人气榜》 https://www.mcdonalds.com.cn/news/top-list-2015",
         "麦当劳中国官网/官方新闻（2020 年度销量冠军）"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "big_mac",
@@ -1150,7 +1507,14 @@
       "evidence_level": "A",
       "sources": [
         "麦当劳中国官网《2015麦当劳人气榜》 https://www.mcdonalds.com.cn/news/top-list-2015"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "mcchicken",
@@ -1173,7 +1537,14 @@
       "evidence_level": "A",
       "sources": [
         "麦当劳中国官网《2015麦当劳人气榜》 https://www.mcdonalds.com.cn/news/top-list-2015"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "double_cheeseburger",
@@ -1196,7 +1567,14 @@
       "evidence_level": "A",
       "sources": [
         "麦当劳中国官网《2015麦当劳人气榜》 https://www.mcdonalds.com.cn/news/top-list-2015"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "mantou_pork_burger",
@@ -1220,7 +1598,14 @@
       "sources": [
         "麦当劳中国官网《2015麦当劳人气榜》 https://www.mcdonalds.com.cn/news/top-list-2015",
         "麦当劳 25 周年「摩登中国风」公开报道"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "cheese_shrimp_burger_2015",
@@ -1243,7 +1628,14 @@
       "evidence_level": "A",
       "sources": [
         "麦当劳中国官网《2015麦当劳人气榜》 https://www.mcdonalds.com.cn/news/top-list-2015"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "lucky_year_fish_burger",
@@ -1266,7 +1658,14 @@
       "evidence_level": "A",
       "sources": [
         "麦当劳中国官网《2015麦当劳人气榜》 https://www.mcdonalds.com.cn/news/top-list-2015"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "lucky_year_fu_burger",
@@ -1289,7 +1688,14 @@
       "evidence_level": "A",
       "sources": [
         "麦当劳中国官网《2015麦当劳人气榜》 https://www.mcdonalds.com.cn/news/top-list-2015"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "yuzu_black_pepper_beef_burger",
@@ -1312,7 +1718,14 @@
       "evidence_level": "A",
       "sources": [
         "麦当劳中国官网《2015麦当劳人气榜》 https://www.mcdonalds.com.cn/news/top-list-2015"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "red_bean_pie",
@@ -1336,7 +1749,14 @@
       "sources": [
         "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day",
         "麦当劳中国官网《麦当劳开启派DAY狂欢》2019-03-07 新闻稿 https://www.mcdonalds.com.cn/news/pie-day-2019-top-pie-cities-in-china"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "mung_bean_pie",
@@ -1360,7 +1780,14 @@
       "sources": [
         "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day",
         "麦当劳中国官网《麦当劳开启派DAY狂欢》2019-03-07 新闻稿 https://www.mcdonalds.com.cn/news/pie-day-2019-top-pie-cities-in-china"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "banana_pie",
@@ -1383,7 +1810,14 @@
       "evidence_level": "A",
       "sources": [
         "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "coconut_pie",
@@ -1406,7 +1840,14 @@
       "evidence_level": "A",
       "sources": [
         "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "corn_pie",
@@ -1429,7 +1870,14 @@
       "evidence_level": "A",
       "sources": [
         "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "chocolate_pie",
@@ -1453,7 +1901,14 @@
       "sources": [
         "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day",
         "2018-12 新品清单（食研百科等）"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "orange_pie",
@@ -1476,7 +1931,14 @@
       "evidence_level": "A",
       "sources": [
         "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "strawberry_pie",
@@ -1499,7 +1961,14 @@
       "evidence_level": "A",
       "sources": [
         "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "red_bean_double_skin_pie",
@@ -1523,7 +1992,14 @@
       "sources": [
         "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day",
         "2018-01 新品清单（食研百科等）"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "black_forest_pie",
@@ -1546,7 +2022,14 @@
       "evidence_level": "A",
       "sources": [
         "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "kitkat_triangle_pie",
@@ -1570,7 +2053,14 @@
       "sources": [
         "TVBS 食尚玩家《麦当劳 kitkat 巧克力三角派爆浆》",
         "麦当劳官方小红书新品公告（回归）"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "matcha_dofu_pie",
@@ -1591,7 +2081,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "matcha_black_honey_mochi_pie",
@@ -1614,7 +2111,14 @@
       "evidence_level": "A",
       "sources": [
         "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day（2025 届官方记录）"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "apple_banana_mini_pie",
@@ -1637,7 +2141,14 @@
       "evidence_level": "A",
       "sources": [
         "麦当劳中国官网「派DAY」专页 https://www.mcdonalds.com.cn/page/pie-day"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "red_bean_rice_cake_pie",
@@ -1658,7 +2169,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "golden_arches_shrimp_burger",
@@ -1679,7 +2197,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "golden_pineapple_chicken_mcmuffin",
@@ -1700,7 +2225,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "cheese_pineapple_grilled_burger",
@@ -1721,7 +2253,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "die_die_roll",
@@ -1742,7 +2281,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "onion_cheese_shake_fries",
@@ -1763,7 +2309,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "golden_onion_rings",
@@ -1784,7 +2337,14 @@
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "C",
-      "sources": []
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     },
     {
       "id": "gongcai_chicken_wrap",
@@ -1807,7 +2367,14 @@
       "evidence_level": "B",
       "sources": [
         "麦当劳新品品鉴会实测记录（百度百家号 2025–2026）"
-      ]
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
     }
   ]
 }

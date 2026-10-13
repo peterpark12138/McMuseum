@@ -249,10 +249,13 @@ MCMUSEUM_REAL_INTEGRATION=1 python3 scripts/test_scenarios.py
 
 | 命令 | 结果 |
 |---|---|
-| `test_scenarios.py` | ✅15 / ❌0 / ⏭️2（默认，REAL 未执行） |
-| `test_scenarios.py --real` | ✅17 / ❌0 / ⏭️0（真实 MCP 认证成功；真实 GitHub 榜读取成功，46 款已绑定） |
-| `smoke_http.py` | ✅13 / ❌0 |
-| `selfcheck.py` | ✅61 / ❌0 / ⚠️1（提醒项为 8 款单品 `verified=false` 待核实） |
+| `test_scenarios.py` | ✅16 / ❌0 / ⏭️2（默认，REAL 未执行） |
+| `test_scenarios.py --real` | ✅18 / ❌0 / ⏭️0（真实 MCP 认证成功；真实 GitHub 榜读取成功，46 款已绑定） |
+| `smoke_http.py` | ✅15 / ❌0 |
+| `selfcheck.py` | ✅63 / ❌0 / ⚠️1（提醒项为 8 款单品 `verified=false` 待核实） |
+| `image_research.py verify` | ✅ 81 款 / 26 张引用图自洽（另有 plan / report 子命令） |
+
+> 数字会随后续新增检查而变，以你实际跑出来的输出为准。
 
 > `--real` 只做**只读**验证：调 `query-my-account` 确认能解析出会员标识、读一次共享榜，
 > 不会投票、不会发评论、不会改动 `data/votes.json`。
@@ -271,8 +274,8 @@ MCMUSEUM_REAL_INTEGRATION=1 python3 scripts/test_scenarios.py
 - 名录扩充到 81 款后，其中 **35 款尚未在 GitHub 建投票 Issue**，
   作者需执行 `python3 scripts/report_github.py setup` 补建并更新 `data/issue_map.json`；
   未绑定的单品在共享榜上没有对应条目（本地榜不受影响）。
-- 远端存在 **5 个孤儿 Issue**：GitHub 上共 51 个 Issue，而 `data/issue_map.json` 只绑定 46 个，
-  多出的 5 个对应已从名录删除的产品（`szechuan_sauce` / `nen_niu_wufang` / `mexican_wrap` /
-  `neworleans_wing` / `five_color_burger`）。它们仍在 GitHub 上保持 open，不影响计票
-  （未绑定的 Issue 不会被聚合读），但对外看起来像是"有产品没进名录"。
+- ~~孤儿 Issue~~（**已处理 2026-10-13**）：此前 GitHub 有 51 个 Issue、而 `data/issue_map.json`
+  只绑定 46 个，多出的 5 个对应已从名录删除的产品
+  （`szechuan_sauce` / `nen_niu_wufang` / `mexican_wrap` / `neworleans_wing` / `five_color_burger`）。
+  这 5 个（#1 #2 #3 #4 #8）**已关闭并留言说明原因**，现为「open 46 = 绑定 46」的一致性状态。
 - 8 款单品 `verified=false`（待用官方历史菜单核实），赛前需确认或从名录移除。

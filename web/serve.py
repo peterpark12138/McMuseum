@@ -346,14 +346,18 @@ class Handler(BaseHTTPRequestHandler):
                 totals = votes.get("totals", {})
                 province_totals = votes.get("province_totals", {})
                 source = "local"
-            name = {p["id"]: p["name"] for p in revival.get_products()}
+            # 产品榜/plain 榜单都带上图片路径（七字段档案由 image_research.py 维护）
+            _pmap = {p["id"]: p for p in revival.get_products()}
+            name = {k: v["name"] for k, v in _pmap.items()}
+            imgmap = {k: (v.get("image") or "") for k, v in _pmap.items()}
             if province and province in province_totals:
                 totals = province_totals[province]
                 used_fallback = False
             else:
                 used_fallback = bool(province)  # 该省暂无投票 -> 回退全国榜（前端会提示）
             items = sorted(totals.items(), key=lambda x: -x[1])
-            out = [{"id": i, "name": name.get(i, i), "votes": v} for i, v in items]
+            out = [{"id": i, "name": name.get(i, i), "votes": v,
+                    "image": imgmap.get(i, "")} for i, v in items]
             self._send(*_json({"province": province, "items": out,
                                "fallback": used_fallback, "source": source,
                                "demo": demo_mode(),

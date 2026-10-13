@@ -7,7 +7,8 @@ const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
 
 const DEADLINE = "2026-10-25T23:59:59+08:00"; // 大赛投票截止（与报名截止同日）
 
-/* 产品真实图（官方菜单图 + 网络搜集实物照，均已人工核对）；无图用 emoji 兜底 */
+/* 产品真实图：优先取产品数据里的图片档案（七字段，可被 image_research.py 校验），
+   HALL_IMG 仅作为历史兜底（迁移期安全网）。无图/加载失败一律走占位卡，绝不留破图。 */
 const HALL_IMG = {
   // 麦当劳官方菜单图（menu-img.mcd.cn）
   shake_fries: "assets/products/shake_fries.png",
@@ -41,6 +42,34 @@ const HALL_IMG = {
   kakazu_crispy_chicken: "assets/v-crispy.png",
   matcha_mcfloat: "assets/v-mcflurry.png",
 };
+
+/* 图片加载失败兜底：把 img 换成占位卡。任何失败都不允许影响投票 / 榜单 / 页面其它功能。
+   用法：<img ... data-fail-mode="parent|self" data-fallback="🍔" onerror="window.__mcImgFail(this)"> */
+window.__mcImgFail = function (el) {
+  try {
+    const mode = el.getAttribute("data-fail-mode") || "self";
+    const fb = el.getAttribute("data-fallback") || "🍔";
+    if (mode === "parent") {
+      const host = el.parentElement;
+      if (host) {
+        host.classList.add("emoji");
+        host.style.background = "radial-gradient(circle at 40% 30%,#FFF6E5,#FFE9B8)";
+        host.style.display = "flex";
+        host.style.alignItems = "center";
+        host.style.justifyContent = "center";
+        host.style.fontSize = "64px";
+        host.textContent = fb;
+      }
+      el.remove();
+      return;
+    }
+    const div = document.createElement("div");
+    div.className = ((el.className || "") + " emoji").trim();
+    div.textContent = fb;
+    el.replaceWith(div);
+  } catch (_e) { /* 兜底的兜底：静默失败，不影响主流程 */ }
+};
+
 const PODIUM_IMG = {
   taro_pie: "assets/s-taro.png",
   kakazu_crispy_chicken: "assets/s-crispy.png",
@@ -234,9 +263,10 @@ function renderHall() {
 
   grid.innerHTML = list.map(p => {
     const pct = total ? Math.round((p.votes || 0) / total * 100) : 0;
-    const img = HALL_IMG[p.id];
+    const img = p.image || HALL_IMG[p.id];
+    const _fb = escapeHtml(iconFor(p));
     const imgHtml = img
-      ? `<div class="card-img"><img alt="${escapeHtml(p.name)}" src="${img}"></div>`
+      ? `<div class="card-img"><img alt="${escapeHtml(p.name)}" src="${img}" data-fail-mode="parent" data-fallback="${_fb}" onerror="window.__mcImgFail(this)"></div>`
       : `<div class="card-img emoji">${iconFor(p)}</div>`;
     const badge = (topId && topId.id === p.id && (topId.votes || 0) > 0)
       ? "呼声最高"
@@ -424,9 +454,10 @@ function renderPodium(items, total) {
   $("#podium").innerHTML = order.map(i => {
     const it = top3[i];
     const isFirst = i === 0;
-    const img = PODIUM_IMG[it.id] || HALL_IMG[it.id];
+    const img = it.image || PODIUM_IMG[it.id] || HALL_IMG[it.id];
+    const _pFb = escapeHtml(iconFor(it));
     const prodHtml = img
-      ? `<img alt class="rays" src="assets/rays.png"><img alt="${escapeHtml(it.name)}" class="prod" src="${img}">`
+      ? `<img alt class="rays" src="assets/rays.png"><img alt="${escapeHtml(it.name)}" class="prod" src="${img}" data-fail-mode="self" data-fallback="${_pFb}" onerror="window.__mcImgFail(this)">`
       : `<img alt class="rays" src="assets/rays.png"><div class="prod emoji">${iconFor(it)}</div>`;
     const isVoted = voted.has(it.id);
     return `<div class="top3-card ${isFirst ? "first" : "other"}">
@@ -490,9 +521,10 @@ async function loadOnSale() {
     const render = () => {
       const show = expanded ? rows : rows.slice(0, COLLAPSED);
       box.innerHTML = show.map(({ p, c }) => {
-        const img = HALL_IMG[p.id];
+        const img = p.image || HALL_IMG[p.id];
+        const _aFb = escapeHtml(iconFor(p));
         const imgHtml = img
-          ? `<div class="img"><img alt="${escapeHtml(p.name)}" loading="lazy" src="${img}"></div>`
+          ? `<div class="img"><img alt="${escapeHtml(p.name)}" loading="lazy" src="${img}" data-fail-mode="parent" data-fallback="${_aFb}" onerror="window.__mcImgFail(this)"></div>`
           : `<div class="img" style="background:radial-gradient(circle at 40% 30%,#FFF6E5,#FFE9B8)">${iconFor(p)}</div>`;
         return `<div class="avail-card">
           ${imgHtml}
