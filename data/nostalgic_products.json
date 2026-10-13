@@ -24,13 +24,13 @@
       "sources": [
         "麦当劳中国官网 2019-02-20 推广页（官网存档）"
       ],
-      "image": "assets/products/sakura_mcfloat.jpg",
+      "image": "assets/products/sakura_mcfloat.png",
       "image_status": "unverified",
       "image_source_url": "",
       "image_source_name": "未知",
-      "image_rights": "未知（未留存出处，复用前需人工确认）",
-      "image_confidence": "low",
-      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
+      "image_rights": "用户 2026-10-13 直接提供（docs/替换产品图/），原始出处与授权待补录",
+      "image_confidence": "medium",
+      "image_note": "2026-10-13 用户提供的替换实拍图（docs/替换产品图/），已缩放至最长边 900px；出处与授权待人工补录后再评估是否升为 verified。"
     },
     {
       "id": "garlic_chili_sauce",
@@ -54,13 +54,13 @@
       "sources": [
         "公开报道/会员端菜单记录"
       ],
-      "image": "assets/products/garlic_chili_sauce.jpg",
+      "image": "assets/products/garlic_chili_sauce.png",
       "image_status": "unverified",
       "image_source_url": "",
       "image_source_name": "未知",
-      "image_rights": "未知（未留存出处，复用前需人工确认）",
-      "image_confidence": "low",
-      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
+      "image_rights": "用户 2026-10-13 直接提供（docs/替换产品图/），原始出处与授权待补录",
+      "image_confidence": "medium",
+      "image_note": "2026-10-13 用户提供的替换实拍图（docs/替换产品图/），已缩放至最长边 900px；出处与授权待人工补录后再评估是否升为 verified。"
     },
     {
       "id": "durian_flavor",
@@ -84,13 +84,13 @@
       "sources": [
         "麦当劳中国官网 2024-05-31 推广页（官网存档）"
       ],
-      "image": "",
-      "image_status": "missing",
+      "image": "assets/products/durian_flavor.png",
+      "image_status": "unverified",
       "image_source_url": "",
-      "image_source_name": "",
-      "image_rights": "",
-      "image_confidence": "",
-      "image_note": ""
+      "image_source_name": "未知",
+      "image_rights": "用户 2026-10-13 直接提供（docs/替换产品图/），原始出处与授权待补录",
+      "image_confidence": "medium",
+      "image_note": "2026-10-13 用户提供的替换实拍图（docs/替换产品图/），已缩放至最长边 900px；出处与授权待人工补录后再评估是否升为 verified。"
     },
     {
       "id": "five_color_veggie_roll",
@@ -140,13 +140,13 @@
       "vote_eligible": true,
       "evidence_level": "C",
       "sources": [],
-      "image": "",
-      "image_status": "missing",
+      "image": "assets/products/five_color_chicken_roll.png",
+      "image_status": "unverified",
       "image_source_url": "",
-      "image_source_name": "",
-      "image_rights": "",
-      "image_confidence": "",
-      "image_note": ""
+      "image_source_name": "未知",
+      "image_rights": "用户 2026-10-13 直接提供（docs/替换产品图/），原始出处与授权待补录",
+      "image_confidence": "medium",
+      "image_note": "2026-10-13 用户提供的替换实拍图（docs/替换产品图/），已缩放至最长边 900px；出处与授权待人工补录后再评估是否升为 verified。"
     },
     {
       "id": "five_color_beef_roll",
@@ -168,13 +168,13 @@
       "vote_eligible": true,
       "evidence_level": "C",
       "sources": [],
-      "image": "",
-      "image_status": "missing",
+      "image": "assets/products/five_color_beef_roll.png",
+      "image_status": "unverified",
       "image_source_url": "",
-      "image_source_name": "",
-      "image_rights": "",
-      "image_confidence": "",
-      "image_note": ""
+      "image_source_name": "未知",
+      "image_rights": "用户 2026-10-13 直接提供（docs/替换产品图/），原始出处与授权待补录",
+      "image_confidence": "medium",
+      "image_note": "2026-10-13 用户提供的替换实拍图（docs/替换产品图/），已缩放至最长边 900px；出处与授权待人工补录后再评估是否升为 verified。"
     },
     {
       "id": "five_color_happy_roll",
@@ -353,9 +353,9 @@
       "image_status": "unverified",
       "image_source_url": "",
       "image_source_name": "未知",
-      "image_rights": "未知（未留存出处，复用前需人工确认）",
-      "image_confidence": "low",
-      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
+      "image_rights": "用户 2026-10-13 直接提供（docs/替换产品图/），原始出处与授权待补录",
+      "image_confidence": "medium",
+      "image_note": "2026-10-13 用户提供的替换实拍图（docs/替换产品图/），已缩放至最长边 900px；出处与授权待人工补录后再评估是否升为 verified。"
     },
     {
       "id": "angus_burger",
@@ -467,13 +467,13 @@
       "sources": [
         "麦当劳中国官网《麦当劳开启派DAY狂欢》2019-03-07 新闻稿 https://www.mcdonalds.com.cn/news/pie-day-2019-top-pie-cities-in-china（「全年供应菠萝派和香芋派」）"
       ],
-      "image": "assets/products/taro_pie.gif",
+      "image": "assets/products/taro_pie.png",
       "image_status": "unverified",
       "image_source_url": "",
       "image_source_name": "未知",
-      "image_rights": "未知（未留存出处，复用前需人工确认）",
-      "image_confidence": "low",
-      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
+      "image_rights": "用户 2026-10-13 直接提供（docs/替换产品图/），原始出处与授权待补录",
+      "image_confidence": "medium",
+      "image_note": "2026-10-13 用户提供的替换实拍图（docs/替换产品图/），已缩放至最长边 900px；出处与授权待人工补录后再评估是否升为 verified。"
     },
     {
       "id": "crayfish_burger",

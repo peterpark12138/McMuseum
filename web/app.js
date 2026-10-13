@@ -11,8 +11,6 @@ const DEADLINE = "2026-10-25T23:59:59+08:00"; // 大赛投票截止（与报名�
    HALL_IMG 仅作为历史兜底（迁移期安全网）。无图/加载失败一律走占位卡，绝不留破图。 */
 const HALL_IMG = {
   // 麦当劳官方菜单图（menu-img.mcd.cn）
-  shake_fries: "assets/products/shake_fries.png",
-  taro_pie: "assets/products/taro_pie.gif",
   big_chicken_steak: "assets/products/big_chicken_steak.png",
   twisty_fries: "assets/products/twisty_fries.png",
   apple_pie: "assets/products/apple_pie.gif",
@@ -22,8 +20,6 @@ const HALL_IMG = {
   braised_spicy_burger: "assets/products/braised_spicy_burger.png",
   grilled_chicken_burger: "assets/products/grilled_chicken_burger.png",
   // 网络搜集实物照（已逐张核对并白底化）
-  sakura_mcfloat: "assets/products/sakura_mcfloat.jpg",
-  garlic_chili_sauce: "assets/products/garlic_chili_sauce.jpg",
   mc_rice_wrap: "assets/products/mc_rice_wrap.jpg",
   angus_burger: "assets/products/angus_burger.jpg",
   cilantro_mcfloat: "assets/products/cilantro_mcfloat.jpg",
@@ -36,6 +32,14 @@ const HALL_IMG = {
   vcut_wedges: "assets/products/vcut_wedges.jpg",
   curry_wing: "assets/products/curry_wing.jpg",
   maple_pancake_burger: "assets/products/maple_pancake_burger.jpg",
+  // 用户实拍替换图（2026-10-13 用户提供 docs/替换产品图/，unverified，出处待补录）
+  shake_fries: "assets/products/shake_fries.png",
+  taro_pie: "assets/products/taro_pie.png",
+  sakura_mcfloat: "assets/products/sakura_mcfloat.png",
+  garlic_chili_sauce: "assets/products/garlic_chili_sauce.png",
+  durian_flavor: "assets/products/durian_flavor.png",
+  five_color_chicken_roll: "assets/products/five_color_chicken_roll.png",
+  five_color_beef_roll: "assets/products/five_color_beef_roll.png",
   // 设计稿手绘插画（真实设计素材）
   kakazu_crispy_chicken: "assets/v-crispy.png",
   matcha_mcfloat: "assets/v-mcflurry.png",
