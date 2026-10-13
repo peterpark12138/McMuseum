@@ -85,6 +85,16 @@ let rankLoaded = false, nowLoaded = false;
    公开部署默认 voting_available=false —— 按钮置灰并引导本机投票，绝不假成功。 */
 let VOTE_CAPS = { voting_available: false, mode: "unknown", code: "", msg: "", how_to_vote: "", demo: false };
 
+/* 云端服务客户端（麦麦复活赛 · WorkBuddy Cloud Service）。
+   仅用前端安全的 publicConfig；若 SDK 或配置未加载，则 CLOUD=null，榜单回退到 /api/leaderboard。 */
+const CLOUD = (window.WorkBuddyCloud && window.CLOUD_CONFIG)
+  ? window.WorkBuddyCloud.createWorkBuddyCloud({
+      endpoint: window.CLOUD_CONFIG.endpoint,
+      oauthRelayBaseUrl: window.CLOUD_CONFIG.oauthRelayBaseUrl,
+      publishableKey: window.CLOUD_CONFIG.publishableKey,
+    })
+  : null;
+
 async function loadVoteCapabilities() {
   try {
     VOTE_CAPS = await (await fetch("/api/vote-capabilities")).json();
@@ -370,6 +380,9 @@ async function doVote() {
     const data = await res.json();
     if (data.ok) {
       markVoted(voteTarget);
+      // 官方计票以 GitHub 共享榜为准（方案 B）；云端仅作独立社区热度，由服务端 service_role 写入，前端不直写。
+      // 投票成功后稍后刷新官方复活榜（GitHub 回流有延迟，best-effort）。
+      setTimeout(loadRank, 800);
       // 诚实回报：本地已计票 ≠ 共享榜已更新，未回流时必须明说
       const shared = data.shared_board_reported;
       $("#modalBody").innerHTML = `
@@ -413,37 +426,106 @@ async function doVote() {
 /* ---------------- 复活榜 ---------------- */
 async function loadRank() {
   const province = $("#provinceFilter").value;
-  const url = "/api/leaderboard" + (province ? `?province=${encodeURIComponent(province)}` : "");
-  let d;
+  // 官方复活榜（方案 B）：始终以 GitHub 可信汇总为首选口径；
+  // 云端 vote_tally 仅作独立社区热度数据源，不并入官方榜、也不切换为官方首选来源。
+  let totals = {};
+  let source = "local";
   try {
-    d = await (await fetch(url)).json();
-  } catch (e) {
-    $("#rankEmpty").classList.remove("hidden");
-    return;
-  }
-  const items = d.items || [];
-  const total = items.reduce((s, x) => s + (x.votes || 0), 0);
-  const votedCnt = items.filter(x => (x.votes || 0) > 0).length;
+    const d = await (await fetch("/api/leaderboard" + (province ? `?province=${encodeURIComponent(province)}` : ""))).json();
+    (d.items || []).forEach(it => { totals[it.id] = it.votes || 0; });
+    source = d.source || "local";
+  } catch (e) { source = "unavailable"; }
 
+  // 合并 81 款产品目录（名称/图片/是否可投票），与官方票数对齐
+  let products = [];
+  try { products = await (await fetch("/api/products")).json(); } catch (e) { products = []; }
+  const merged = (products || []).map(p => ({ ...p, votes: totals[p.id] || 0 }));
+  // 稳定排序：票数降序 + 官方名/ID 次级（同票不乱序）
+  merged.sort((a, b) => (b.votes - a.votes)
+    || (a.official_name || a.name).localeCompare(b.official_name || b.name)
+    || String(a.id).localeCompare(String(b.id)));
+  const eligible = merged.filter(p => p.vote_eligible !== false);
+
+  const total = merged.reduce((s, x) => s + (x.votes || 0), 0);
+  const votedCnt = merged.filter(x => (x.votes || 0) > 0).length;
   $("#stTotal").textContent = fmt(total);
   $("#stVoted").textContent = fmt(votedCnt);
+  const stC = $("#stCandidates"); if (stC) stC.textContent = fmt(merged.length);
   $("#rankUpdated").textContent = "数据更新于 " + new Date().toTimeString().slice(0, 5);
-  $("#rankSource").textContent = d.source === "github"
-    ? "（GitHub 共享榜 · 匿名票数聚合）"
-    : (d.source === "demo"
-        ? "（⚠️ 演示数据 · 示例票数，非真实投票结果）"
-        : "（本地榜 · " + (d.source || "local") + "）");
+  const srcEl = $("#rankSource");
+  if (srcEl) {
+    srcEl.textContent = source === "github"
+      ? "（GitHub 共享榜 · 官方口径）"
+      : source === "unavailable"
+        ? "（本地缓存 · 数据暂不可用）"
+        : "（本地回退 · 云端不可用时）";
+  }
   const note = $("#rankNote");
-  if (d.fallback && province) {
-    note.textContent = `「${province}」暂无投票记录，已为你回退展示全国榜。`;
+  if (source === "unavailable") {
+    note.textContent = "⚠️ 投票数据暂时不可用，已展示本地缓存，稍后刷新恢复。";
     note.classList.remove("hidden");
   } else {
     note.classList.add("hidden");
   }
 
-  renderPodium(items, total);
-  renderRankRows(items, total);
-  $("#rankEmpty").classList.toggle("hidden", items.length > 0);
+  renderPodium(eligible, total);
+  renderRankRows(eligible, total);
+  renderMuseum(merged, total);
+  $("#rankEmpty").classList.toggle("hidden", eligible.length > 0);
+
+  // 云端社区热度：独立数据源，单独加载，不与官方复活榜合并/混算
+  loadCommunityHeat();
+}
+
+/* 云端社区热度（独立数据源，方案 B）：仅读取展示，不与官方 GitHub 复活榜合并、不切换为官方首选。
+   字段 heat 与官方 votes 分离；来源标识 / 前端文案均明确标注「非官方、独立」。 */
+async function loadCommunityHeat() {
+  const grid = $("#heatGrid");
+  const note = $("#heatNote");
+  if (!grid) return;
+  if (!CLOUD) {
+    grid.innerHTML = "";
+    if (note) { note.textContent = "社区热度模块未加载（未配置云端）。不影响官方复活榜。"; note.classList.remove("hidden"); }
+    return;
+  }
+  try {
+    const { data, error } = await CLOUD.database.from("vote_tally").select("product_id, votes");
+    if (error || !data) {
+      grid.innerHTML = "";
+      if (note) { note.textContent = "社区热度（云端）暂不可用，不影响官方复活榜。"; note.classList.remove("hidden"); }
+      return;
+    }
+    const map = {};
+    data.forEach(r => { if (r && r.product_id) map[r.product_id] = r.votes || 0; });
+    let products = [];
+    try { products = await (await fetch("/api/products")).json(); } catch (e) { products = []; }
+    const items = (products || [])
+      .filter(p => p.vote_eligible !== false)
+      .map(p => ({ ...p, heat: map[p.id] || 0 }))
+      .sort((a, b) => (b.heat - a.heat)
+        || (a.official_name || a.name).localeCompare(b.official_name || b.name));
+    if (!items.length) { grid.innerHTML = ""; return; }
+    grid.innerHTML = items.map((it, idx) => {
+      const img = it.image || PODIUM_IMG[it.id] || HALL_IMG[it.id];
+      const _fb = escapeHtml(iconFor(it));
+      const prodHtml = img
+        ? `<div class="h-img"><img alt="${escapeHtml(it.name)}" class="hprod" src="${img}" data-fail-mode="self" data-fallback="${_fb}" onerror="window.__mcImgFail(this)"></div>`
+        : `<div class="h-img emoji">${iconFor(it)}</div>`;
+      return `<div class="h-card">
+        <div class="h-rank">${idx + 1}</div>
+        ${prodHtml}
+        <div class="h-name">${escapeHtml(it.name)}</div>
+        <div class="h-heat">${fmt(it.heat)} 热度</div>
+      </div>`;
+    }).join("");
+    if (note) {
+      note.textContent = "云端独立社区信号 · 非官方计票，与 GitHub 复活榜分开统计、不合并。当前为 0 表示尚无社区热度写入。";
+      note.classList.remove("hidden");
+    }
+  } catch (e) {
+    grid.innerHTML = "";
+    if (note) { note.textContent = "社区热度（云端）暂不可用，不影响官方复活榜。"; note.classList.remove("hidden"); }
+  }
 }
 
 function renderPodium(items, total) {
@@ -483,6 +565,28 @@ function renderRankRows(items, total) {
       <div class="rank-info"><div class="name">${escapeHtml(it.name)}</div><div class="votes">${fmt(it.votes)} 票 · 占 ${pct}%</div></div>
       <div class="progress"><i style="width:${bar}%"></i></div>
       ${voteBtnHtml(it.id, isVoted, "rank-vote")}
+    </div>`;
+  }).join("");
+}
+
+function renderMuseum(items, total) {
+  const grid = $("#museumGrid");
+  if (!grid) return;
+  grid.innerHTML = items.map((it, idx) => {
+    const img = it.image || PODIUM_IMG[it.id] || HALL_IMG[it.id];
+    const _pFb = escapeHtml(iconFor(it));
+    const prodHtml = img
+      ? `<img alt="${escapeHtml(it.name)}" class="mprod" src="${img}" data-fail-mode="self" data-fallback="${_pFb}" onerror="window.__mcImgFail(this)">`
+      : `<div class="mprod emoji">${iconFor(it)}</div>`;
+    const noVote = it.vote_eligible === false
+      ? `<span class="m-badge">不参与本轮投票</span>` : "";
+    const pct = total ? Math.round((it.votes || 0) / total * 100) : 0;
+    return `<div class="m-card">
+      <div class="m-rank">${idx + 1}</div>
+      <div class="m-img">${prodHtml}</div>
+      <div class="m-name">${escapeHtml(it.name)}</div>
+      ${noVote}
+      <div class="m-votes">${fmt(it.votes)} 票${pct ? " · 占 " + pct + "%" : ""}</div>
     </div>`;
   }).join("");
 }
