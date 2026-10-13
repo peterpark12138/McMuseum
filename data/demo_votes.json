@@ -6,7 +6,6 @@
     "sakura_mcfloat": 128,
     "taro_pie": 96,
     "shake_fries": 87,
-    "purple_sweet_potato_pie": 74,
     "kakazu_crispy_chicken": 63,
     "garlic_chili_sauce": 58,
     "angus_burger": 51,
@@ -25,10 +24,33 @@
     "malay_satay": 7
   },
   "province_totals": {
-    "上海": {"sakura_mcfloat": 31, "taro_pie": 22, "shake_fries": 18, "purple_sweet_potato_pie": 12},
-    "广东": {"sakura_mcfloat": 24, "shake_fries": 19, "kakazu_crispy_chicken": 15, "angus_burger": 11},
-    "北京": {"taro_pie": 18, "sakura_mcfloat": 14, "big_chicken_steak": 9, "apple_pie": 7},
-    "四川": {"purple_sweet_potato_pie": 16, "garlic_chili_sauce": 13, "sakura_mcfloat": 10, "twisty_fries": 6},
-    "浙江": {"matcha_mcfloat": 12, "sakura_mcfloat": 9, "shake_fries": 8, "mc_rice_wrap": 5}
+    "上海": {
+      "sakura_mcfloat": 31,
+      "taro_pie": 22,
+      "shake_fries": 18
+    },
+    "广东": {
+      "sakura_mcfloat": 24,
+      "shake_fries": 19,
+      "kakazu_crispy_chicken": 15,
+      "angus_burger": 11
+    },
+    "北京": {
+      "taro_pie": 18,
+      "sakura_mcfloat": 14,
+      "big_chicken_steak": 9,
+      "apple_pie": 7
+    },
+    "四川": {
+      "garlic_chili_sauce": 13,
+      "sakura_mcfloat": 10,
+      "twisty_fries": 6
+    },
+    "浙江": {
+      "matcha_mcfloat": 12,
+      "sakura_mcfloat": 9,
+      "shake_fries": 8,
+      "mc_rice_wrap": 5
+    }
   }
 }

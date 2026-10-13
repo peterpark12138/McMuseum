@@ -1,8 +1,8 @@
-# 缺失产品图清单（53 款，更新于 2026-10-12）
+# 缺失产品图清单（50 款，更新于 2026-10-13）
 
-> 数据模型升级后产品库共 81 款，已接入图片 28 款（官方菜单图 12 + 实物白底图 16），
+> 数据模型升级后产品库共 76 款，已接入图片 26 款（官方菜单图 10 + 实物白底图 14），
 > 咔滋脆鸡堡/抹茶麦旋风 2 款暂用设计稿插画。
-> 以下 53 款待补图，找到后放入 `web/assets/products/`（文件名用左侧 id），告诉我一声即可接入。
+> 以下 50 款待补图，找到后放入 `web/assets/products/`（文件名用左侧 id），告诉我一声即可接入。
 
 | id（文件名） | 产品名 | 备注 |
 |---|---|---|
@@ -11,12 +11,9 @@
 | five_color_chicken_roll | 五色嫩鸡麦饭卷 | 五色系列拆分款，无图 |
 | five_color_beef_roll | 五色至牛麦饭卷 | 五色系列拆分款，无图 |
 | five_color_happy_roll | 五色开心卷 | 五色系列拆分款，无图 |
-| lime_thai_chili | 青柠味泰椒酱 | 图难搜 |
-| singapore_honey_mustard | 新加坡蜜糖芥末酱 | 图难搜 |
-| french_cheese | 法式芝士酱 | 图难搜 |
+| singapore_honey_mustard | 法式蜂蜜芥末酱 | 图难搜 |
 | malay_satay | 马来沙嗲酱 | 图难搜 |
 | mc_rice_bowl | 麦趣饭 | 图难搜 |
-| salted_egg_yolk_mooncake | 咸蛋黄鸡腿月饼 | 图难搜 |
 | crayfish_burger | 小龙虾堡 | 图难搜 |
 | roujiamo | 肉夹馍（金招牌） | 图难搜 |
 | hotcakes | 热香饼 | 图难搜 |

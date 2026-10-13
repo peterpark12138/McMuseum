@@ -11,8 +11,8 @@ os.makedirs(OUT, exist_ok=True)
 
 # 已有图的单品（官方 12 + 设计稿 3）
 HAVE = {
-    "shake_fries", "purple_sweet_potato_pie", "taro_pie", "big_chicken_steak",
-    "twisty_fries", "apple_pie", "shake_fries_fun", "peach_pie", "mango_pie",
+    "shake_fries", "taro_pie", "big_chicken_steak",
+    "twisty_fries", "apple_pie", "peach_pie", "mango_pie",
     "custard_pie", "braised_spicy_burger", "grilled_chicken_burger",
     "kakazu_crispy_chicken", "matcha_mcfloat",
 }

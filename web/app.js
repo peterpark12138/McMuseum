@@ -12,12 +12,10 @@ const DEADLINE = "2026-10-25T23:59:59+08:00"; // 大赛投票截止（与报名�
 const HALL_IMG = {
   // 麦当劳官方菜单图（menu-img.mcd.cn）
   shake_fries: "assets/products/shake_fries.png",
-  purple_sweet_potato_pie: "assets/products/purple_sweet_potato_pie.gif",
   taro_pie: "assets/products/taro_pie.gif",
   big_chicken_steak: "assets/products/big_chicken_steak.png",
   twisty_fries: "assets/products/twisty_fries.png",
   apple_pie: "assets/products/apple_pie.gif",
-  shake_fries_fun: "assets/products/shake_fries_fun.png",
   peach_pie: "assets/products/peach_pie.gif",
   mango_pie: "assets/products/mango_pie.gif",
   custard_pie: "assets/products/custard_pie.gif",
@@ -436,7 +434,7 @@ async function loadRank() {
     source = d.source || "local";
   } catch (e) { source = "unavailable"; }
 
-  // 合并 81 款产品目录（名称/图片/是否可投票），与官方票数对齐
+  // 合并 76 款产品目录（名称/图片/是否可投票），与官方票数对齐
   let products = [];
   try { products = await (await fetch("/api/products")).json(); } catch (e) { products = []; }
   const merged = (products || []).map(p => ({ ...p, votes: totals[p.id] || 0 }));

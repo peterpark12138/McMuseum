@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-12",
-  "note": "怀旧单品博物馆名录。verified=true 表示已结合麦当劳官方历史资料/官网新闻核实确凿发售或限定过；verified=false 表示待核实（社区提名/疑似非官方），赛前需人工确认或移除。下架/限定状态经 2026-10-10 联网核实（麦当劳中国官网 mcdonalds.com.cn 及公开报道）；标注「仍在售」者为常供经典，列入以作对比参照。 2026-10-12 数据模型升级：每款含 official_name/market/status/first_seen/last_confirmed_sale/vote_eligible/evidence_level/sources；status=on_sale/regional_on_sale/needs_verification 的款为在售参照（vote_eligible=false），不可投票；evidence_level A=官方原文/B=权威报道/C=社区资料待补证。",
+  "updated": "2026-10-13",
+  "note": "怀旧单品博物馆名录。verified=true 表示已结合麦当劳官方历史资料/官网新闻核实确凿发售或限定过；verified=false 表示待核实（社区提名/疑似非官方），赛前需人工确认或移除。下架/限定状态经 2026-10-10 联网核实（麦当劳中国官网 mcdonalds.com.cn 及公开报道）；标注「仍在售」者为常供经典，列入以作对比参照。 2026-10-12 数据模型升级：每款含 official_name/market/status/first_seen/last_confirmed_sale/vote_eligible/evidence_level/sources；status=on_sale/regional_on_sale/needs_verification 的款为在售参照（vote_eligible=false），不可投票；evidence_level A=官方原文/B=权威报道/C=社区资料待补证。 2026-10-13 全网核验：下架 5 款——青柠味泰椒酱（无大陆上线证据）、法式芝士酱（确认仅马来西亚限定）、紫薯派（无证据、不在官方派清单）、咸蛋黄鸡腿月饼（无证据，现存者为咸蛋黄鸡腿蛋月堡汉堡）、薯条摇摇乐（与摇摇薯条重复收录）；马来沙嗲酱与新加坡蜜糖芥末酱经中国调味品协会 2007 年报道与收藏者实物记录双重证实为 2007 年麦乐鸡四款风味蘸酱成员，年代由误写的「2018–2019 全球风味酱」更正为 2007，后者名称更正为「法式蜂蜜芥末酱」。名录 81→76 款（投票池 68→63）。",
   "products": [
     {
       "id": "sakura_mcfloat",
@@ -205,86 +205,28 @@
       "image_note": ""
     },
     {
-      "id": "lime_thai_chili",
-      "name": "青柠味泰椒酱",
-      "era": "2018–2019 全球风味酱限定",
-      "category": "蘸酱",
-      "story": "麦当劳中国「全球风味酱」系列之一，酸辣清新的青柠+泰椒风味，配麦乐鸡限定时段供应，后随系列结束下架。",
-      "verified": true,
-      "tags": [
-        "蘸酱",
-        "限定",
-        "全球风味"
-      ],
-      "official_name": "青柠味泰椒酱",
-      "market": "中国内地",
-      "status": "limited_ended",
-      "first_seen": "2018",
-      "last_confirmed_sale": null,
-      "vote_eligible": true,
-      "evidence_level": "B",
-      "sources": [
-        "「全球风味酱」系列公开报道"
-      ],
-      "image": "",
-      "image_status": "missing",
-      "image_source_url": "",
-      "image_source_name": "",
-      "image_rights": "",
-      "image_confidence": "",
-      "image_note": ""
-    },
-    {
       "id": "singapore_honey_mustard",
-      "name": "新加坡蜜糖芥末酱",
-      "era": "2018–2019 全球风味酱限定",
+      "name": "法式蜂蜜芥末酱",
+      "era": "2007 麦乐鸡蘸酱系列（四款风味酱之一）",
       "category": "蘸酱",
-      "story": "「全球风味酱」系列的甜润款，蜜糖与芥末交织，是当时配麦乐鸡的人气蘸酱之一。",
+      "story": "2007 年麦当劳中国麦乐鸡四款风味蘸酱中的甜润款，蜂蜜与芥末交织；2020 年底还曾以「蜂蜜芥末麦乐鸡」形式返场，是麦乐鸡蘸酱里的人气口味。",
       "verified": true,
       "tags": [
         "蘸酱",
         "限定",
-        "全球风味"
+        "2007 四酱"
       ],
-      "official_name": "新加坡蜜糖芥末酱",
+      "official_name": "法式蜂蜜芥末酱",
       "market": "中国内地",
       "status": "limited_ended",
-      "first_seen": "2018",
+      "first_seen": "2007",
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "B",
       "sources": [
-        "「全球风味酱」系列公开报道"
-      ],
-      "image": "",
-      "image_status": "missing",
-      "image_source_url": "",
-      "image_source_name": "",
-      "image_rights": "",
-      "image_confidence": "",
-      "image_note": ""
-    },
-    {
-      "id": "french_cheese",
-      "name": "法式芝士酱",
-      "era": "2018–2019 全球风味酱限定",
-      "category": "蘸酱",
-      "story": "「全球风味酱」系列中的咸香芝士款，浓郁奶香，限定供应后随系列下架。",
-      "verified": true,
-      "tags": [
-        "蘸酱",
-        "限定",
-        "全球风味"
-      ],
-      "official_name": "法式芝士酱",
-      "market": "中国内地",
-      "status": "limited_ended",
-      "first_seen": "2018",
-      "last_confirmed_sale": null,
-      "vote_eligible": true,
-      "evidence_level": "B",
-      "sources": [
-        "「全球风味酱」系列公开报道"
+        "中国调味品协会《麦当劳：新添四款风味蘸蘸酱》2007-08-30 https://www.chinacondiment.com/interview/1038",
+        "现食研《麦乐鸡的蘸酱编年史》（收藏者留存当年酱盒与广告）https://www.xianshiyan.com/other/2010",
+        "麦当劳中国官网 2020 纪念徽章新闻（蜂蜜芥末麦乐鸡曾售）https://www.mcdonalds.com.cn/news/20201216-Badge"
       ],
       "image": "",
       "image_status": "missing",
@@ -297,24 +239,25 @@
     {
       "id": "malay_satay",
       "name": "马来沙嗲酱",
-      "era": "2018–2019 全球风味酱限定",
+      "era": "2007 麦乐鸡蘸酱系列（四款风味酱之一）",
       "category": "蘸酱",
-      "story": "「全球风味酱」系列的南洋风味，沙嗲烤肉酱香，限定供应，是麦乐鸡蘸酱里的异域记忆。",
+      "story": "2007 年麦当劳中国为麦乐鸡一次性推出四款风味蘸酱，马来沙嗲酱是其中的南洋风味款，花生椰香的烤肉酱气息配麦乐鸡；收藏者留存了当年的酱盒与广告，2002 年还出现过更早的沙嗲酱。",
       "verified": true,
       "tags": [
         "蘸酱",
         "限定",
-        "全球风味"
+        "2007 四酱"
       ],
       "official_name": "马来沙嗲酱",
       "market": "中国内地",
       "status": "limited_ended",
-      "first_seen": "2018",
+      "first_seen": "2007",
       "last_confirmed_sale": null,
       "vote_eligible": true,
       "evidence_level": "B",
       "sources": [
-        "「全球风味酱」系列公开报道"
+        "中国调味品协会《麦当劳：新添四款风味蘸蘸酱》2007-08-30 https://www.chinacondiment.com/interview/1038",
+        "现食研《麦乐鸡的蘸酱编年史》（收藏者留存当年酱盒与广告）https://www.xianshiyan.com/other/2010"
       ],
       "image": "",
       "image_status": "missing",
@@ -503,34 +446,6 @@
       "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
     },
     {
-      "id": "purple_sweet_potato_pie",
-      "name": "紫薯派",
-      "era": "限定",
-      "category": "甜品",
-      "story": "紫薯馅的限定派，绵密香甜的紫色外衣，是不少人惦记的节令甜点。",
-      "verified": true,
-      "tags": [
-        "甜品",
-        "限定",
-        "派"
-      ],
-      "official_name": "紫薯派",
-      "market": "中国内地",
-      "status": "limited_ended",
-      "first_seen": null,
-      "last_confirmed_sale": null,
-      "vote_eligible": true,
-      "evidence_level": "C",
-      "sources": [],
-      "image": "assets/products/purple_sweet_potato_pie.gif",
-      "image_status": "unverified",
-      "image_source_url": "",
-      "image_source_name": "未知",
-      "image_rights": "未知（未留存出处，复用前需人工确认）",
-      "image_confidence": "low",
-      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
-    },
-    {
       "id": "taro_pie",
       "name": "香芋派",
       "era": "春节限定（常轮回）",
@@ -559,34 +474,6 @@
       "image_rights": "未知（未留存出处，复用前需人工确认）",
       "image_confidence": "low",
       "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
-    },
-    {
-      "id": "salted_egg_yolk_mooncake",
-      "name": "咸蛋黄鸡腿月饼",
-      "era": "中秋限定",
-      "category": "小食",
-      "story": "麦当劳中秋限定，将咸蛋黄与鸡腿入月饼，脑洞与争议齐飞，是年度话题单品。",
-      "verified": true,
-      "tags": [
-        "小食",
-        "中秋限定",
-        "脑洞"
-      ],
-      "official_name": "咸蛋黄鸡腿月饼",
-      "market": "中国内地",
-      "status": "limited_ended",
-      "first_seen": null,
-      "last_confirmed_sale": null,
-      "vote_eligible": true,
-      "evidence_level": "C",
-      "sources": [],
-      "image": "",
-      "image_status": "missing",
-      "image_source_url": "",
-      "image_source_name": "",
-      "image_rights": "",
-      "image_confidence": "",
-      "image_note": ""
     },
     {
       "id": "crayfish_burger",
@@ -1019,34 +906,6 @@
       ],
       "supply_note": "区域供应（约 15 城 44 店，2026-10 用户提示），非全国常供",
       "image": "assets/products/milkshake.jpg",
-      "image_status": "unverified",
-      "image_source_url": "",
-      "image_source_name": "未知",
-      "image_rights": "未知（未留存出处，复用前需人工确认）",
-      "image_confidence": "low",
-      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
-    },
-    {
-      "id": "shake_fries_fun",
-      "name": "薯条摇摇乐",
-      "era": "限定",
-      "category": "小食",
-      "story": "配粉包自摇的趣味薯条玩法，与摇摇薯条同源，限定期间带来「摇一摇更入味」的乐趣。",
-      "verified": true,
-      "tags": [
-        "小食",
-        "限定",
-        "趣味"
-      ],
-      "official_name": "薯条摇摇乐",
-      "market": "中国内地",
-      "status": "limited_ended",
-      "first_seen": null,
-      "last_confirmed_sale": null,
-      "vote_eligible": true,
-      "evidence_level": "C",
-      "sources": [],
-      "image": "assets/products/shake_fries_fun.png",
       "image_status": "unverified",
       "image_source_url": "",
       "image_source_name": "未知",
