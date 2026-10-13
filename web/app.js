@@ -729,8 +729,9 @@ async function loadLottery() {
 }
 
 async function loadNutrition(name) {
-  const box = $("#nutList");
+  const box = $("#nutList"), moreBtn = $("#nutMore");
   box.innerHTML = `<div class="state-box">营养数据加载中…</div>`;
+  moreBtn.classList.add("hidden");
   try {
     const url = name ? `/api/nutrition?name=${encodeURIComponent(name)}` : "/api/nutrition";
     const d = await (await fetch(url)).json();
@@ -738,7 +739,13 @@ async function loadNutrition(name) {
       box.innerHTML = nowFallback(name ? "未找到匹配的营养数据，换个关键词试试。" : "🥗 营养库需要连接麦当劳账号后实时展示。");
       return;
     }
-    box.innerHTML = d.items.slice(0, 40).map(it => `
+    // 与「在售对比」一致：默认收起前 10 条，点「展开更多」看全部，避免营养库把页面拉得过长
+    const rows = d.items;
+    const COLLAPSED = 10;
+    let expanded = false;
+    const render = () => {
+      const show = expanded ? rows : rows.slice(0, COLLAPSED);
+      box.innerHTML = show.map(it => `
       <div class="nut-card" data-name="${escapeHtml(it.productName)}">
         <div class="hd"><span class="ico">${iconFor(it)}</span><div class="t" title="${escapeHtml(it.productName)}">${escapeHtml(it.productName)}</div></div>
         <div class="kcal"><span class="lab">能量</span><span><span class="v">${escapeHtml(it.energyKcal)}</span> <span class="u">kcal</span></span></div>
@@ -746,6 +753,13 @@ async function loadNutrition(name) {
         <div class="nr"><span class="k">脂肪</span><span class="val">${escapeHtml(it.fat)} g</span></div>
         <div class="nr"><span class="k">碳水化合物</span><span class="val">${escapeHtml(it.carbohydrate)} g</span></div>
       </div>`).join("");
+      if (rows.length > COLLAPSED) {
+        moreBtn.classList.remove("hidden");
+        moreBtn.textContent = expanded ? "收起" : `展开更多（共 ${rows.length} 款）`;
+      }
+    };
+    moreBtn.onclick = () => { expanded = !expanded; render(); };
+    render();
   } catch (e) {
     box.innerHTML = nowFallback("营养库加载失败，请确认服务运行中。");
   }
