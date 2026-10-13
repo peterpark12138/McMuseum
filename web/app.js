@@ -438,7 +438,7 @@ async function loadRank() {
     source = d.source || "local";
   } catch (e) { source = "unavailable"; }
 
-  // 合并 76 款产品目录（名称/图片/是否可投票），与官方票数对齐
+  // 合并 79 款产品目录（名称/图片/是否可投票），与官方票数对齐
   let products = [];
   try { products = await (await fetch("/api/products")).json(); } catch (e) { products = []; }
   const merged = (products || []).map(p => ({ ...p, votes: totals[p.id] || 0 }));

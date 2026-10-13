@@ -1,6 +1,6 @@
 {
   "updated": "2026-10-13",
-  "note": "怀旧单品博物馆名录。verified=true 表示已结合麦当劳官方历史资料/官网新闻核实确凿发售或限定过；verified=false 表示待核实（社区提名/疑似非官方），赛前需人工确认或移除。下架/限定状态经 2026-10-10 联网核实（麦当劳中国官网 mcdonalds.com.cn 及公开报道）；标注「仍在售」者为常供经典，列入以作对比参照。 2026-10-12 数据模型升级：每款含 official_name/market/status/first_seen/last_confirmed_sale/vote_eligible/evidence_level/sources；status=on_sale/regional_on_sale/needs_verification 的款为在售参照（vote_eligible=false），不可投票；evidence_level A=官方原文/B=权威报道/C=社区资料待补证。 2026-10-13 全网核验：下架 5 款——青柠味泰椒酱（无大陆上线证据）、法式芝士酱（确认仅马来西亚限定）、紫薯派（无证据、不在官方派清单）、咸蛋黄鸡腿月饼（无证据，现存者为咸蛋黄鸡腿蛋月堡汉堡）、薯条摇摇乐（与摇摇薯条重复收录）；马来沙嗲酱与新加坡蜜糖芥末酱经中国调味品协会 2007 年报道与收藏者实物记录双重证实为 2007 年麦乐鸡四款风味蘸酱成员，年代由误写的「2018–2019 全球风味酱」更正为 2007，后者名称更正为「法式蜂蜜芥末酱」。名录 81→76 款（投票池 68→63）。",
+  "note": "怀旧单品博物馆名录。verified=true 表示已结合麦当劳官方历史资料/官网新闻核实确凿发售或限定过；verified=false 表示待核实（社区提名/疑似非官方），赛前需人工确认或移除。下架/限定状态经 2026-10-10 联网核实（麦当劳中国官网 mcdonalds.com.cn 及公开报道）；标注「仍在售」者为常供经典，列入以作对比参照。 2026-10-12 数据模型升级：每款含 official_name/market/status/first_seen/last_confirmed_sale/vote_eligible/evidence_level/sources；status=on_sale/regional_on_sale/needs_verification 的款为在售参照（vote_eligible=false），不可投票；evidence_level A=官方原文/B=权威报道/C=社区资料待补证。 2026-10-13 全网核验：下架 5 款——青柠味泰椒酱（无大陆上线证据）、法式芝士酱（确认仅马来西亚限定）、紫薯派（无证据、不在官方派清单）、咸蛋黄鸡腿月饼（无证据，现存者为咸蛋黄鸡腿蛋月堡汉堡）、薯条摇摇乐（与摇摇薯条重复收录）；马来沙嗲酱与新加坡蜜糖芥末酱经中国调味品协会 2007 年报道与收藏者实物记录双重证实为 2007 年麦乐鸡四款风味蘸酱成员，年代由误写的「2018–2019 全球风味酱」更正为 2007，后者名称更正为「法式蜂蜜芥末酱」。名录 81→76 款（投票池 68→63）。 2026-10-13 在售复查：据官方营养库实时菜单（2026-10 拉取），安格斯厚牛堡系列/那么大鸡排/叠叠卷确定在售，移出投票池（vote_eligible=false，status=on_sale）；油条豆浆/热朱古力由待核实升级为在售确认；新增 2007 四酱系列之奇妙泰椒酱、中式咕噜酱与 2026 中秋回归咸蛋黄鸡腿蛋月堡（均已证实，进入投票池）。",
   "products": [
     {
       "id": "sakura_mcfloat",
@@ -360,7 +360,7 @@
     {
       "id": "angus_burger",
       "name": "安格斯牛肉堡",
-      "era": "安格斯系列（多数市场已下市）",
+      "era": "安格斯厚牛堡系列（2026-10 官方营养库在售：培根/芝士/双牛/经典安格斯厚牛堡等 4 款）",
       "category": "主食",
       "story": "以安格斯牛肉主打的 premium 汉堡线，2013 年前后在多地陆续下市（美国 2013、澳洲 2026 停售），中国曾售现已难觅。",
       "verified": true,
@@ -371,13 +371,14 @@
       ],
       "official_name": "安格斯牛肉堡",
       "market": "中国内地",
-      "status": "limited_ended",
+      "status": "on_sale",
       "first_seen": "2009 前后（全球高端线）",
-      "last_confirmed_sale": null,
-      "vote_eligible": true,
-      "evidence_level": "B",
+      "last_confirmed_sale": "2026-10",
+      "vote_eligible": false,
+      "evidence_level": "A",
       "sources": [
-        "安格斯系列公开报道（美国 2013 下市等）"
+        "安格斯系列公开报道（美国 2013 下市等）",
+        "麦当劳中国官方营养库（WorkBuddy Cloud MCP 实时菜单，2026-10-13 拉取 160 条）"
       ],
       "image": "assets/products/angus_burger.jpg",
       "image_status": "unverified",
@@ -506,7 +507,7 @@
     {
       "id": "big_chicken_steak",
       "name": "那么大鸡排",
-      "era": "限定",
+      "era": "常供小食（2026-10 官方营养库在售）",
       "category": "小食",
       "story": "主打「那么大」份量的炸鸡排，外脆里嫩，是限定的大口满足款。",
       "verified": true,
@@ -517,13 +518,14 @@
       ],
       "official_name": "那么大鸡排",
       "market": "中国内地",
-      "status": "limited_ended",
+      "status": "on_sale",
       "first_seen": "2017",
-      "last_confirmed_sale": null,
-      "vote_eligible": true,
-      "evidence_level": "B",
+      "last_confirmed_sale": "2026-10",
+      "vote_eligible": false,
+      "evidence_level": "A",
       "sources": [
-        "「那么大鸡排」公开报道"
+        "「那么大鸡排」公开报道",
+        "麦当劳中国官方营养库（WorkBuddy Cloud MCP 实时菜单，2026-10-13 拉取 160 条）"
       ],
       "image": "assets/products/big_chicken_steak.png",
       "image_status": "unverified",
@@ -566,7 +568,7 @@
     {
       "id": "youtiao_doujiang",
       "name": "油条 + 豆浆",
-      "era": "早餐常供（仍在售）",
+      "era": "早餐常供（2026-10 官方营养库在售：脆香油条 + 优品豆浆大杯/小杯）",
       "category": "早餐",
       "story": "麦当劳中国早餐常供的「脆香油条」与「优品豆浆」，属于仍在售的经典早餐组合（非下架品，列入以作对比参照）。",
       "verified": true,
@@ -577,12 +579,14 @@
       ],
       "official_name": "油条 + 豆浆",
       "market": "中国内地",
-      "status": "needs_verification",
+      "status": "on_sale",
       "first_seen": null,
-      "last_confirmed_sale": null,
+      "last_confirmed_sale": "2026-10",
       "vote_eligible": false,
-      "evidence_level": "B",
-      "sources": [],
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官方营养库（WorkBuddy Cloud MCP 实时菜单，2026-10-13 拉取 160 条）"
+      ],
       "supply_note": "供应状态待核实（2026-10 用户提示，早餐菜单城市差异大）",
       "image": "assets/products/youtiao_doujiang.jpg",
       "image_status": "unverified",
@@ -1258,7 +1262,7 @@
     {
       "id": "hot_chocolate",
       "name": "热朱古力",
-      "era": "McCafé 常供（仍在售）",
+      "era": "McCafé 常供（2026-10 官方营养库在售：热朱古力）",
       "category": "饮品",
       "story": "麦当劳 McCafé 的温热朱古力饮品，醇厚可可香，是秋冬常供的暖饮（仍在售）。",
       "verified": true,
@@ -1269,12 +1273,14 @@
       ],
       "official_name": "热朱古力",
       "market": "中国内地",
-      "status": "needs_verification",
+      "status": "on_sale",
       "first_seen": null,
-      "last_confirmed_sale": null,
+      "last_confirmed_sale": "2026-10",
       "vote_eligible": false,
-      "evidence_level": "B",
-      "sources": [],
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官方营养库（WorkBuddy Cloud MCP 实时菜单，2026-10-13 拉取 160 条）"
+      ],
       "supply_note": "供应状态待核实（2026-10 用户提示）",
       "image": "",
       "image_status": "missing",
@@ -2124,10 +2130,10 @@
     {
       "id": "die_die_roll",
       "name": "叠叠卷",
-      "era": "限定（早餐卷）",
+      "era": "常供早餐卷（2026-10 官方营养库在售：鲜蔬蛋沙拉叠叠卷/鸡肉蛋沙拉叠叠卷）",
       "category": "早餐",
       "story": "层层叠起的早餐蛋饼卷类限定，口感层层递进，是早餐本土化的趣味尝试。",
-      "verified": false,
+      "verified": true,
       "tags": [
         "早餐",
         "限定",
@@ -2135,12 +2141,14 @@
       ],
       "official_name": "叠叠卷",
       "market": "中国内地",
-      "status": "limited_ended",
+      "status": "on_sale",
       "first_seen": null,
-      "last_confirmed_sale": null,
-      "vote_eligible": true,
-      "evidence_level": "C",
-      "sources": [],
+      "last_confirmed_sale": "2026-10",
+      "vote_eligible": false,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官方营养库（WorkBuddy Cloud MCP 实时菜单，2026-10-13 拉取 160 条）"
+      ],
       "image": "",
       "image_status": "missing",
       "image_source_url": "",
@@ -2226,6 +2234,100 @@
       "evidence_level": "B",
       "sources": [
         "麦当劳新品品鉴会实测记录（百度百家号 2025–2026）"
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
+    },
+    {
+      "id": "thai_chili_mayo",
+      "name": "奇妙泰椒酱",
+      "era": "2007 麦乐鸡蘸酱系列（四款风味酱之一）",
+      "category": "蘸酱",
+      "story": "2007 年麦当劳中国为麦乐鸡一次性推出四款风味蘸酱，奇妙泰椒酱是其中的泰式酸辣款，甜辣清爽配麦乐鸡；与马来沙嗲酱同批上市，收藏者留存了当年的酱盒与广告。",
+      "verified": true,
+      "tags": [
+        "蘸酱",
+        "限定",
+        "2007 四酱"
+      ],
+      "official_name": "奇妙泰椒酱",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2007",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "中国调味品协会《麦当劳：新添四款风味蘸蘸酱》2007-08-30 https://www.chinacondiment.com/interview/1038",
+        "现食研《麦乐鸡的蘸酱编年史》（收藏者留存当年酱盒与广告）https://www.xianshiyan.com/other/2010"
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
+    },
+    {
+      "id": "gulu_sauce",
+      "name": "中式咕噜酱",
+      "era": "2007 麦乐鸡蘸酱系列（四款风味酱之一）",
+      "category": "蘸酱",
+      "story": "2007 年麦当劳中国为麦乐鸡一次性推出四款风味蘸酱，中式咕噜酱是其中的本土化款，咕噜肉的酸甜口配麦乐鸡；与马来沙嗲酱同批上市，收藏者留存了当年的酱盒与广告。",
+      "verified": true,
+      "tags": [
+        "蘸酱",
+        "限定",
+        "2007 四酱"
+      ],
+      "official_name": "中式咕噜酱",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2007",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "中国调味品协会《麦当劳：新添四款风味蘸蘸酱》2007-08-30 https://www.chinacondiment.com/interview/1038",
+        "现食研《麦乐鸡的蘸酱编年史》（收藏者留存当年酱盒与广告）https://www.xianshiyan.com/other/2010"
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
+    },
+    {
+      "id": "salted_egg_yolk_moon_burger",
+      "name": "咸蛋黄鸡腿蛋月堡",
+      "era": "2025 中秋首推 / 2026 中秋限时回归（2026-09-16~10-07）",
+      "category": "主食",
+      "story": "麦当劳中国中秋限定汉堡，咸蛋黄风味酱配鸡腿排，形似月牙的「蛋月堡」造型；2025 年中秋首推后广受好评，2026 年中秋（2026-09-16 至 10-07）限时回归，麦当劳中国官网发布回归新闻。",
+      "verified": true,
+      "tags": [
+        "主食",
+        "限定",
+        "中秋",
+        "咸蛋黄"
+      ],
+      "official_name": "咸蛋黄鸡腿蛋月堡",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2025",
+      "last_confirmed_sale": "2026-10-07",
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网新闻《咸蛋黄鸡腿蛋月堡限时回归》2026-09-14（https://www.mcdonalds.com.cn）",
+        "麦当劳中国 2025 中秋「蛋月堡」首推公开报道"
       ],
       "image": "",
       "image_status": "missing",

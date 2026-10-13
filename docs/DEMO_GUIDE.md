@@ -187,7 +187,7 @@ vote mcp +3 上海 2026-10-13 rid=9f2c1a4b77e1
 
 | 缺失项 | 仍然可用 | 不可用 |
 |---|---|---|
-| 无 `MCD_MCP_TOKEN` | 浏览 76 款单品、单品详情、看本地榜 / 演示榜 / 真实共享榜（只读公开 Issue）、公开演示模式 | **真实投票**（CLI/Skill 与网页都不行，会明确提示先连接账号，不降级、不匿名兜底） |
+| 无 `MCD_MCP_TOKEN` | 浏览 79 款单品、单品详情、看本地榜 / 演示榜 / 真实共享榜（只读公开 Issue）、公开演示模式 | **真实投票**（CLI/Skill 与网页都不行，会明确提示先连接账号，不降级、不匿名兜底） |
 | 无 `GITHUB_REPO` | 本地投票、本地看榜 | 共享榜读写（`ranking --from-github` 会提示未配置，而不是假装 0 票） |
 | 无 `GITHUB_TOKEN` | 读真实共享榜（公开 Issue 只读即可，需 `GITHUB_BOT_LOGIN` 锚定信任） | 写共享榜（本地票照算，回执如实写"未回流"） |
 | 两者都无 | 完整浏览 + 演示模式 | 一切真实投票与共享榜写入 |
@@ -253,7 +253,7 @@ MCMUSEUM_REAL_INTEGRATION=1 python3 scripts/test_scenarios.py
 | `test_scenarios.py --real` | ✅18 / ❌0 / ⏭️0（真实 MCP 认证成功；真实 GitHub 榜读取成功，46 款已绑定） |
 | `smoke_http.py` | ✅15 / ❌0 |
 | `selfcheck.py` | ✅63 / ❌0 / ⚠️1（提醒项为 8 款单品 `verified=false` 待核实） |
-| `image_research.py verify` | ✅ 76 款 / 24 张引用图自洽（另有 plan / report 子命令） |
+| `image_research.py verify` | ✅ 79 款 / 27 张引用图自洽（另有 plan / report 子命令） |
 
 > 数字会随后续新增检查而变，以你实际跑出来的输出为准。
 
@@ -271,7 +271,7 @@ MCMUSEUM_REAL_INTEGRATION=1 python3 scripts/test_scenarios.py
   - 想让自己的票上榜，需 fork 后配置自己的 bot 凭证并跑 `report_github.py setup` 自建 Issue。
   （这是当前架构的取舍：信任锚点换来"他人无法伪造灌票"，代价是牺牲了多写方。）
 - **跨实例全局去重未实现**（原因见第 4 节边界说明）。
-- 名录全网核实验证后为 76 款，其中 **35 款尚未在 GitHub 建投票 Issue**，
+- 名录全网核实验证后为 79 款，**已全部在 GitHub 建投票 Issue**（2026-10-13 setup 补齐），
   作者需执行 `python3 scripts/report_github.py setup` 补建并更新 `data/issue_map.json`；
   未绑定的单品在共享榜上没有对应条目（本地榜不受影响）。
 - ~~孤儿 Issue~~（**已处理 2026-10-13**）：此前 GitHub 有 51 个 Issue、而 `data/issue_map.json`
