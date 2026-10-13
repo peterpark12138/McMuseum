@@ -485,7 +485,7 @@ async function loadCommunityHeat() {
   if (!grid) return;
   if (!CLOUD) {
     grid.innerHTML = "";
-    if (note) { note.textContent = "社区热度模块未加载（未配置云端）。不影响官方复活榜。"; note.classList.remove("hidden"); }
+    if (note) { note.textContent = "社区热度暂不可用（未配置云端）。不影响官方复活榜。"; note.classList.remove("hidden"); }
     return;
   }
   try {
@@ -504,7 +504,13 @@ async function loadCommunityHeat() {
       .map(p => ({ ...p, heat: map[p.id] || 0 }))
       .sort((a, b) => (b.heat - a.heat)
         || (a.official_name || a.name).localeCompare(b.official_name || b.name));
-    if (!items.length) { grid.innerHTML = ""; return; }
+    if (!items.length) {
+      grid.innerHTML = "";
+      // 云端读到数据但无法与产品元数据对齐（如 /api/products 不可用）时，
+      // 明确提示“暂不可用”，绝不以空网格伪装成 0 票。
+      if (note) { note.textContent = "社区热度暂不可用，不影响官方复活榜。"; note.classList.remove("hidden"); }
+      return;
+    }
     grid.innerHTML = items.map((it, idx) => {
       const img = it.image || PODIUM_IMG[it.id] || HALL_IMG[it.id];
       const _fb = escapeHtml(iconFor(it));
