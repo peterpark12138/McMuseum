@@ -97,7 +97,8 @@ export GITHUB_TOKEN="你的GitHubToken"   # 仅作者/机器人持有，绝不�
 python3 scripts/report_github.py setup --repo owner/repo
 ```
 
-> 未配置 GitHub 后端时，投票与榜单在本地照常运行；只是"全民聚合榜"为空。
+> 未配置 GitHub 后端时，投票与榜单在本地照常运行，只是看不到"他方回流过来的那些票"（本地票不丢）。
+> 反之也要注意：配了 GitHub 后端也不代表能替别人投票 —— 能回流的是持有该写权限凭证的那一方，见「3.3」。
 
 ---
 
