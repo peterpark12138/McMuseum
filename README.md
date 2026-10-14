@@ -328,7 +328,7 @@ McMuseum/
 ├── docs/
 │   ├── DEMO_GUIDE.md        # 评审可复现流程（模式 A/B、看榜、去重验证、清理测试数据）
 │   ├── DEMO_SCRIPT.md       # 60–90 秒演示脚本 + 现有 demo.gif 的评估
-│   ├── demo.gif             # 现有演示片段（约 22 秒，仅覆盖浏览）
+│   ├── demo.gif             # 现有演示动图（12.5 秒产品轮播，展示 14 款已配图单品）
 │   └── promotion.md         # 宣传渠道整理
 ├── data/
 │   ├── nostalgic_products.json  # 怀旧单品名录（已核实）
