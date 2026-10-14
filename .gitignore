@@ -33,3 +33,5 @@ docs/替换产品图/
 .video_assets/
 # 工作日志/记忆目录
 .workbuddy/
+# showcase.mp4 高清母带仅保留在本地（.video_assets/），仓库内使用 showcase.gif
+docs/showcase.mp4
