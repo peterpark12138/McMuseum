@@ -151,6 +151,9 @@ button,.nav a,.tag,.card-badge,.cd-cell,.stat-box,.hero-tag,.banner-tag,.votes-p
 .content-head .desc{font-size:16px;color:var(--gray);line-height:22px}
 .hall-note{font-size:13px;color:var(--gray-b);line-height:20px;margin:14px 2px 0}
 .hall-note code{background:#F5EFE6;border-radius:4px;padding:1px 6px;font-size:12px}
+.hall-loading{display:flex;align-items:center;justify-content:center;gap:10px;padding:64px 0;color:var(--gray);font-size:15px;font-weight:700}
+.spinner{width:22px;height:22px;border:3px solid #F0E4D2;border-top-color:#DA291C;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .tools{display:flex;gap:12px;flex-wrap:wrap}
 .search-box{
   display:flex;align-items:center;gap:8px;width:200px;height:46px;padding:0 18px;
@@ -659,9 +662,8 @@ button,.nav a,.tag,.card-badge,.cd-cell,.stat-box,.hero-tag,.banner-tag,.votes-p
           <svg fill="none" height="16" viewBox="0 0 16 16" width="16"><circle cx="7" cy="7" r="5" stroke="#8A7F72" stroke-width="1.6"/><path d="M11 11l3.2 3.2" stroke="#8A7F72" stroke-linecap="round" stroke-width="1.6"/></svg>
           <input id="searchInput" placeholder="搜索产品名" type="text">
         </div>
-          <select class="select-pill" id="hallSort">
-            <option value="img" selected>有图优先</option>
-            <option value="hot">热度优先</option>
+          <select class="select-pill" id="hallSort" title="有图单品始终优先展示（背景规则，不参与筛选）">
+            <option value="hot" selected>热度优先</option>
             <option value="few">票数最少</option>
             <option value="name">按名称</option>
           </select>
@@ -672,15 +674,17 @@ button,.nav a,.tag,.card-badge,.cd-cell,.stat-box,.hero-tag,.banner-tag,.votes-p
       </div>
     </div>
 
+    <div id="hallLoading" class="hall-loading"><span class="spinner"></span>正在加载复活赛单品…</div>
+
+    <div class="grid" id="voteGrid"></div>
+    <div id="hallEmpty" class="state-box hidden">没有匹配的单品，换个关键词试试。</div>
+
     <div class="hall-note">ℹ️ 仍在售 / 待核实的单品不参与本轮复活赛，故不在大厅展示；97 款完整名录与证据等级见仓库 <code>data/nostalgic_products.json</code>。</div>
 
     <div class="vote-tip hidden" id="voteTip">
       <span>🔒</span>
       <div id="voteTipText"></div>
     </div>
-
-    <div class="grid" id="voteGrid"></div>
-    <div id="hallEmpty" class="state-box hidden">没有匹配的单品，换个关键词试试。</div>
   </section>
 
   <footer class="footer">

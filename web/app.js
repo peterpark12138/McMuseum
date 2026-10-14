@@ -249,6 +249,8 @@ $("#modal").addEventListener("click", e => { if (e.target.id === "modal") closeM
 
 /* ---------------- 投票大厅 ---------------- */
 async function loadProducts() {
+  const loading = $("#hallLoading");
+  if (loading) loading.classList.remove("hidden");
   try {
     PRODUCTS = await (await fetch("/api/products")).json();
   } catch (e) {
@@ -275,11 +277,11 @@ function renderHall() {
   const voted = votedSet();
   // 只渲染投票池内的单品：在售 / 待核实（vote_eligible=false）一律移出大厅
   let list = eligibleProducts().filter(p => !q || p.name.includes(q));
-  if (sort === "hot") list = [...list].sort((a, b) => (b.votes || 0) - (a.votes || 0));
-  if (sort === "few") list = [...list].sort((a, b) => (a.votes || 0) - (b.votes || 0));
-  if (sort === "name") list = [...list].sort((a, b) => a.name.localeCompare(b.name, "zh"));
-  if (sort === "img") list = [...list].sort((a, b) => (hasImg(b) - hasImg(a))
-    || (b.votes || 0) - (a.votes || 0) || a.name.localeCompare(b.name, "zh"));
+  // 「有图优先」是背景规则、不做成筛选项：热度 / 票数排序下，有图单品始终排在前面
+  const byImg = (a, b) => (hasImg(b) - hasImg(a)) || a.name.localeCompare(b.name, "zh");
+  if (sort === "few") list = [...list].sort((a, b) => (a.votes || 0) - (b.votes || 0) || byImg(a, b));
+  else if (sort === "name") list = [...list].sort((a, b) => a.name.localeCompare(b.name, "zh"));
+  else list = [...list].sort((a, b) => (b.votes || 0) - (a.votes || 0) || byImg(a, b)); // 热度优先（默认）
 
   const total = eligibleProducts().reduce((s, p) => s + (p.votes || 0), 0);
   const topId = [...eligibleProducts()].sort((a, b) => (b.votes || 0) - (a.votes || 0))[0];
@@ -308,6 +310,8 @@ function renderHall() {
       ${voteBtnHtml(p.id, isVoted, "vote-btn")}
     </div>`;
   }).join("");
+  const loading = $("#hallLoading");
+  if (loading) loading.classList.add("hidden");
 }
 
 $("#searchInput").addEventListener("input", renderHall);
