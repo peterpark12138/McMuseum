@@ -450,6 +450,8 @@ async function doVote() {
 
 /* ---------------- 复活榜 ---------------- */
 async function loadRank() {
+  const rl = $("#rankLoading");
+  if (rl) rl.classList.remove("hidden");
   const province = $("#provinceFilter").value;
   // 官方复活榜（方案 B）：始终以 GitHub 可信汇总为首选口径；
   // 云端 vote_tally 仅作独立社区热度数据源，不并入官方榜、也不切换为官方首选来源。
@@ -614,6 +616,8 @@ function renderRankRows(items, total) {
       ? "⬆️ 收起榜单"
       : `⬇️ 展开全部 ${rest.length} 名（还有 ${rest.length - shown.length} 名）`;
   }
+  const rl = $("#rankLoading");
+  if (rl) rl.classList.add("hidden");
 }
 
 $("#rankMore").addEventListener("click", () => {
