@@ -21,9 +21,7 @@
 - 📊 **GitHub 复活榜**：匿名票数回流 Issue 后由站点只读聚合，透明可核、不可伪造。
 - 🔒 **只读红线**：所有麦当劳 MCP 调用只读取、绝不扣减 / 下单。
 
-![在线站点首页 · 投票大厅](docs/site_home.png)
-
-![功能演示 · 产品轮播](docs/demo.gif)
+![功能展示视频（28 秒）](docs/showcase.mp4)
 
 ---
 
@@ -267,8 +265,9 @@ python3 scripts/selfcheck.py        # 全项目自检：内容充分性 + MCP �
 
 **演示相关**：评审一键复现流程见 [docs/DEMO_GUIDE.md](docs/DEMO_GUIDE.md)，
 60–90 秒演示脚本见 [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)。
-现有 `docs/demo.gif` 是 960×540 / 16 帧 / **约 12.5 秒循环**的产品轮播（展示珍宝三角、香菜冰旋风等 14 款已配图单品），
-**不能**单独代表完整演示（未覆盖投票、去重与共享榜区分），完整流程见 [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)。
+`docs/showcase.mp4` 是 **28 秒功能展示短视频**（3 秒怀旧钩子 → 真实会员投票演示 → GitHub 官方计票 → 产品照片墙 → WorkBuddy 开发与 GitHub 反馈入口），
+由 `scripts/build_showcase_video.py` 离线逐帧合成（产品图取自用户提供的 `docs/替换产品图/`，站点截图为真实渲染）。
+`docs/demo.gif` 是 12.5 秒产品轮播（备用静图版）。视频与 GIF **都不能**单独代表完整演示（未覆盖投票、去重与共享榜区分），完整流程见 [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)。
 
 ---
 
@@ -330,8 +329,9 @@ McMuseum/
 ├── docs/
 │   ├── DEMO_GUIDE.md        # 评审可复现流程（模式 A/B、看榜、去重验证、清理测试数据）
 │   ├── DEMO_SCRIPT.md       # 60–90 秒演示脚本 + 现有 demo.gif 的评估
-│   ├── demo.gif             # 现有演示动图（12.5 秒产品轮播，展示 14 款已配图单品）
-│   ├── site_home.png        # 在线站点首页截图（真实渲染，README 首屏展示）
+│   ├── showcase.mp4         # 28 秒功能展示短视频（README 首屏；scripts/build_showcase_video.py 合成）
+│   ├── demo.gif             # 12.5 秒产品轮播（备用静图版）
+│   ├── site_home.png        # 在线站点首页截图（视频合成素材）
 │   └── promotion.md         # 宣传渠道整理
 ├── data/
 │   ├── nostalgic_products.json  # 怀旧单品名录（已核实）

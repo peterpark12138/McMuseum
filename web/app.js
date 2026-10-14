@@ -495,6 +495,8 @@ async function loadRank() {
   }
 
   renderPodium(eligible, total);
+  lastRankItems = eligible;
+  lastRankTotal = total;
   renderRankRows(eligible, total);
   renderMuseum(merged, total);
   $("#rankEmpty").classList.toggle("hidden", eligible.length > 0);
@@ -584,11 +586,17 @@ function renderPodium(items, total) {
   }).join("");
 }
 
+/* 复活榜收纳：默认只展开前 10 名，点按钮看全部（避免 81 行刷屏） */
+let rankExpanded = false;
+let lastRankItems = [], lastRankTotal = 0;
+const RANK_PREVIEW = 10;
+
 function renderRankRows(items, total) {
   const voted = votedSet();
   const top1 = items.length ? (items[0].votes || 1) : 1;
   const rest = items.slice(3);
-  $("#rankList").innerHTML = rest.map((it, idx) => {
+  const shown = rankExpanded ? rest : rest.slice(0, RANK_PREVIEW);
+  $("#rankList").innerHTML = shown.map((it, idx) => {
     const pct = total ? Math.round((it.votes || 0) / total * 100) : 0;
     const bar = Math.max(2, Math.round((it.votes || 0) / top1 * 100));
     const isVoted = voted.has(it.id);
@@ -599,7 +607,19 @@ function renderRankRows(items, total) {
       ${voteBtnHtml(it.id, isVoted, "rank-vote")}
     </div>`;
   }).join("");
+  const more = $("#rankMore");
+  if (more) {
+    more.classList.toggle("hidden", rest.length <= RANK_PREVIEW);
+    more.textContent = rankExpanded
+      ? "⬆️ 收起榜单"
+      : `⬇️ 展开全部 ${rest.length} 名（还有 ${rest.length - shown.length} 名）`;
+  }
 }
+
+$("#rankMore").addEventListener("click", () => {
+  rankExpanded = !rankExpanded;
+  renderRankRows(lastRankItems, lastRankTotal);
+});
 
 function renderMuseum(items, total) {
   const grid = $("#museumGrid");

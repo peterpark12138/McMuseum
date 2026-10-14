@@ -301,6 +301,11 @@ button,.nav a,.tag,.card-badge,.cd-cell,.stat-box,.hero-tag,.banner-tag,.votes-p
 .rank-sec h2 .src{font-size:13px;font-weight:500;color:var(--gray);margin-left:10px}
 .rank-note{font-size:13px;font-weight:500;color:var(--rank-num);background:var(--pill-y);border-radius:10px;padding:10px 14px;align-self:flex-start}
 .rank-list{display:flex;flex-direction:column;gap:14px}
+.rank-more{
+  align-self:center;display:inline-flex;align-items:center;height:46px;padding:0 30px;border-radius:23px;
+  background:#fff;border:2px solid #E8DCC8;color:var(--dark);font-size:15px;font-weight:900;cursor:pointer;transition:.15s;
+}
+.rank-more:hover{background:var(--yellow);border-color:var(--yellow);color:#fff}
 .rank-row{
   display:flex;align-items:center;gap:20px;background:#fff;border-radius:16px;
   border:1.5px solid var(--border);padding:18px 20px;box-shadow:var(--card-shadow);min-width:0;
@@ -788,6 +793,7 @@ button,.nav a,.tag,.card-badge,.cd-cell,.stat-box,.hero-tag,.banner-tag,.votes-p
     <h2>其余候选 · 完整榜单<span class="src" id="rankSource"></span></h2>
     <div class="rank-note hidden" id="rankNote"></div>
     <div class="rank-list" id="rankList"></div>
+    <button class="rank-more hidden" id="rankMore" type="button">⬇️ 展开全部</button>
     <div id="rankEmpty" class="state-box hidden">还没有人投票，快来当第一个！</div>
   </section>
 
