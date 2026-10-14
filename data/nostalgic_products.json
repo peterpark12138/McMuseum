@@ -406,13 +406,13 @@
       "sources": [
         "麦当劳中国官方新品公告（香菜新地/冰旋风话题事件）"
       ],
-      "image": "assets/products/cilantro_mcfloat.jpg",
+      "image": "assets/products/cilantro_mcfloat.png",
       "image_status": "unverified",
       "image_source_url": "",
       "image_source_name": "未知",
-      "image_rights": "未知（未留存出处，复用前需人工确认）",
-      "image_confidence": "low",
-      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
+      "image_rights": "用户 2026-10-14 直接提供（docs/替换产品图/），原始出处与授权待补录",
+      "image_confidence": "medium",
+      "image_note": ""
     },
     {
       "id": "taro_pie",
@@ -587,13 +587,13 @@
       "vote_eligible": true,
       "evidence_level": "C",
       "sources": [],
-      "image": "assets/products/treasure_triangle.jpg",
+      "image": "assets/products/treasure_triangle.png",
       "image_status": "unverified",
       "image_source_url": "",
       "image_source_name": "未知",
-      "image_rights": "未知（未留存出处，复用前需人工确认）",
-      "image_confidence": "low",
-      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
+      "image_rights": "用户 2026-10-14 直接提供（docs/替换产品图/），原始出处与授权待补录",
+      "image_confidence": "medium",
+      "image_note": ""
     },
     {
       "id": "strawberry_milkshake",
@@ -619,36 +619,6 @@
       ],
       "supply_note": "区域供应（约 15 城 44 店，2026-10 用户提示），非全国常供",
       "image": "assets/products/strawberry_milkshake.jpg",
-      "image_status": "unverified",
-      "image_source_url": "",
-      "image_source_name": "未知",
-      "image_rights": "未知（未留存出处，复用前需人工确认）",
-      "image_confidence": "low",
-      "image_note": "本图随仓库早期开发保存，原始出处与授权未留存；已从 web/app.js 的 HALL_IMG 迁移，待人工补录 provenance 后再评估是否升为 verified。"
-    },
-    {
-      "id": "twisty_fries",
-      "name": "扭扭薯条（双酱薯条）",
-      "era": "限定（扭扭造型+双酱）",
-      "category": "小食",
-      "story": "扭成螺旋状的薯条，配双酱蘸食，造型与口感都不同于普通薯条，属限定趣味小食。",
-      "verified": true,
-      "tags": [
-        "小食",
-        "限定",
-        "趣味"
-      ],
-      "official_name": "扭扭薯条",
-      "market": "中国内地",
-      "status": "limited_ended",
-      "first_seen": null,
-      "last_confirmed_sale": null,
-      "vote_eligible": true,
-      "evidence_level": "B",
-      "sources": [
-        "2019-01/2018-01 新品清单（食研百科等）"
-      ],
-      "image": "assets/products/twisty_fries.png",
       "image_status": "unverified",
       "image_source_url": "",
       "image_source_name": "未知",
