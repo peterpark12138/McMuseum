@@ -3,6 +3,16 @@
 > 麦当劳 × 腾讯 WorkBuddy 程序员创意开发大赛 · 参赛作品
 > 用一次"投票"，让那些年我们爱过的麦当劳老产品，打一场复活赛。
 
+<p align="center">
+  <a href="https://mcmuseum-revival.app.workbuddy.host/">
+    <img alt="🌐 在线试用 · 麦麦复活赛" src="https://img.shields.io/badge/🌐%20在线试用-麦麦复活赛-FFC72C?style=for-the-badge&logoColor=ffffff&color=FFC72C">
+  </a>
+</p>
+
+> ### 🚀 在线试用（无需安装，点开即玩）
+> 直接打开 **[麦麦复活赛 · 在线体验](https://mcmuseum-revival.app.workbuddy.host/)**，即可浏览 98 款怀旧单品博物馆、查看实时复活榜。
+> ⚠️ 网页为演示模式，**不能投真实票**（真实投票需在你本机用麦当劳会员身份完成，见下方能力边界第 1 条）。
+
 ![功能演示](docs/demo.gif)
 
 > ### ⚠️ 先看：三条能力边界（别把"设计目标"当成"已上线功能"）
