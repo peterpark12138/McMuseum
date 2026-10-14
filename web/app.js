@@ -259,6 +259,11 @@ async function loadProducts() {
   $("#heroStat").textContent = `已投出 ${fmt(total)} 张复活票 · 候选 ${PRODUCTS.length} 款老味道等你召回`;
 }
 
+// 是否有可视化图片（产品图字段，或 HALL_IMG/PODIUM_IMG 兜底图）
+function hasImg(p) {
+  return !!(p && (p.image || PODIUM_IMG[p.id] || HALL_IMG[p.id]));
+}
+
 function renderHall() {
   const q = ($("#searchInput").value || "").trim();
   const sort = $("#hallSort").value;
@@ -267,6 +272,8 @@ function renderHall() {
   if (sort === "hot") list = [...list].sort((a, b) => (b.votes || 0) - (a.votes || 0));
   if (sort === "few") list = [...list].sort((a, b) => (a.votes || 0) - (b.votes || 0));
   if (sort === "name") list = [...list].sort((a, b) => a.name.localeCompare(b.name, "zh"));
+  if (sort === "img") list = [...list].sort((a, b) => (hasImg(b) - hasImg(a))
+    || (b.votes || 0) - (a.votes || 0) || a.name.localeCompare(b.name, "zh"));
 
   const total = PRODUCTS.reduce((s, p) => s + (p.votes || 0), 0);
   const topId = [...PRODUCTS].sort((a, b) => (b.votes || 0) - (a.votes || 0))[0];
@@ -438,12 +445,13 @@ async function loadRank() {
     source = d.source || "local";
   } catch (e) { source = "unavailable"; }
 
-  // 合并 79 款产品目录（名称/图片/是否可投票），与官方票数对齐
+  // 合并 98 款产品目录（名称/图片/是否可投票），与官方票数对齐
   let products = [];
   try { products = await (await fetch("/api/products")).json(); } catch (e) { products = []; }
   const merged = (products || []).map(p => ({ ...p, votes: totals[p.id] || 0 }));
-  // 稳定排序：票数降序 + 官方名/ID 次级（同票不乱序）
+  // 稳定排序：票数降序 + 同票有图优先 + 官方名/ID 次级（同票不乱序）
   merged.sort((a, b) => (b.votes - a.votes)
+    || (hasImg(b) - hasImg(a))
     || (a.official_name || a.name).localeCompare(b.official_name || b.name)
     || String(a.id).localeCompare(String(b.id)));
   const eligible = merged.filter(p => p.vote_eligible !== false);
@@ -580,6 +588,11 @@ function renderRankRows(items, total) {
 function renderMuseum(items, total) {
   const grid = $("#museumGrid");
   if (!grid) return;
+  // 首页博物馆默认排序：有图片的优先，其次票数，再名称（同票有图优先）
+  items = [...items].sort((a, b) => (hasImg(b) - hasImg(a))
+    || (b.votes - a.votes)
+    || (a.official_name || a.name).localeCompare(b.official_name || b.name)
+    || String(a.id).localeCompare(String(b.id)));
   grid.innerHTML = items.map((it, idx) => {
     const img = it.image || PODIUM_IMG[it.id] || HALL_IMG[it.id];
     const _pFb = escapeHtml(iconFor(it));

@@ -444,9 +444,10 @@ button,.nav a,.tag,.card-badge,.cd-cell,.stat-box,.hero-tag,.banner-tag,.votes-p
 .store-row .t{font-size:14px;font-weight:700}
 .store-row .a{font-size:12px;font-weight:500;color:var(--gray)}
 .footer-c{
-  background:var(--dark);padding:32px clamp(20px,7vw,120px);display:flex;align-items:center;justify-content:center;
+  background:var(--dark);padding:32px clamp(20px,7vw,120px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
   font-size:13px;font-weight:500;color:var(--pill-y);text-align:center;
 }
+.footer-c .copyright-declare{font-size:11px;font-weight:400;color:var(--muted);line-height:1.7;}
 
 /* ================= 弹窗 / Toast（功能补充，沿用设计令牌） ================= */
 .modal{position:fixed;inset:0;background:rgba(30,27,24,.55);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
@@ -654,11 +655,12 @@ button,.nav a,.tag,.card-badge,.cd-cell,.stat-box,.hero-tag,.banner-tag,.votes-p
           <svg fill="none" height="16" viewBox="0 0 16 16" width="16"><circle cx="7" cy="7" r="5" stroke="#8A7F72" stroke-width="1.6"/><path d="M11 11l3.2 3.2" stroke="#8A7F72" stroke-linecap="round" stroke-width="1.6"/></svg>
           <input id="searchInput" placeholder="搜索产品名" type="text">
         </div>
-        <select class="select-pill" id="hallSort">
-          <option value="hot">热度优先</option>
-          <option value="few">票数最少</option>
-          <option value="name">按名称</option>
-        </select>
+          <select class="select-pill" id="hallSort">
+            <option value="img" selected>有图优先</option>
+            <option value="hot">热度优先</option>
+            <option value="few">票数最少</option>
+            <option value="name">按名称</option>
+          </select>
         <button class="refresh-btn" onclick="refreshHall(this)">
           <svg fill="none" height="16" viewBox="0 0 16 16" width="16"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9" stroke="#fff" stroke-linecap="round" stroke-width="1.7"/><path d="M13.8 1.8v3h-3" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"/></svg>
           刷新
@@ -782,7 +784,7 @@ button,.nav a,.tag,.card-badge,.cd-cell,.stat-box,.hero-tag,.banner-tag,.votes-p
   <section class="museum-sec">
     <div class="sec-head">
       <div class="titles">
-        <h2>完整怀旧博物馆（79 款）</h2>
+        <h2>完整怀旧博物馆（98 款）</h2>
         <div class="sub">全部下架 / 在售怀旧单品 · 含真实复活榜票数</div>
       </div>
     </div>
@@ -823,7 +825,7 @@ button,.nav a,.tag,.card-badge,.cd-cell,.stat-box,.hero-tag,.banner-tag,.votes-p
       </div>
     </div>
     <div class="footer-b-line"></div>
-    <div class="footer-b-bottom">2026 麦麦复活赛 · 老麦返场计划 · 本页面为参赛作品（概念演示），非麦当劳官方活动</div>
+    <div class="footer-b-bottom">2026 麦麦复活赛 · 老麦返场计划 · 参赛作品（概念演示），非麦当劳官方活动；部分素材由 AI 生成，如有侵权请联系删除</div>
   </footer>
 </main>
 
@@ -908,7 +910,13 @@ button,.nav a,.tag,.card-badge,.cd-cell,.stat-box,.hero-tag,.banner-tag,.votes-p
     </section>
   </div>
 
-  <footer class="footer-c">麦麦复活赛 · 老麦返场许愿池&nbsp;&nbsp;|&nbsp;&nbsp;参赛作品（概念演示），非麦当劳官方活动</footer>
+  <footer class="footer-c">
+    麦麦复活赛 · 老麦返场许愿池&nbsp;&nbsp;|&nbsp;&nbsp;参赛作品（概念演示），非麦当劳官方活动
+    <div class="copyright-declare">
+      本页面为参赛作品（概念演示），非麦当劳官方活动，与麦当劳（中国）有限公司无隶属或合作关系。<br>
+      部分素材由 AI 生成；产品图若涉及版权，请联系我们核实并删除。
+    </div>
+  </footer>
 </main>
 
 <!-- 投票确认弹窗 -->

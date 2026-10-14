@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-13",
-  "note": "怀旧单品博物馆名录。verified=true 表示已结合麦当劳官方历史资料/官网新闻核实确凿发售或限定过；verified=false 表示待核实（社区提名/疑似非官方），赛前需人工确认或移除。下架/限定状态经 2026-10-10 联网核实（麦当劳中国官网 mcdonalds.com.cn 及公开报道）；标注「仍在售」者为常供经典，列入以作对比参照。 2026-10-12 数据模型升级：每款含 official_name/market/status/first_seen/last_confirmed_sale/vote_eligible/evidence_level/sources；status=on_sale/regional_on_sale/needs_verification 的款为在售参照（vote_eligible=false），不可投票；evidence_level A=官方原文/B=权威报道/C=社区资料待补证。 2026-10-13 全网核验：下架 5 款——青柠味泰椒酱（无大陆上线证据）、法式芝士酱（确认仅马来西亚限定）、紫薯派（无证据、不在官方派清单）、咸蛋黄鸡腿月饼（无证据，现存者为咸蛋黄鸡腿蛋月堡汉堡）、薯条摇摇乐（与摇摇薯条重复收录）；马来沙嗲酱与新加坡蜜糖芥末酱经中国调味品协会 2007 年报道与收藏者实物记录双重证实为 2007 年麦乐鸡四款风味蘸酱成员，年代由误写的「2018–2019 全球风味酱」更正为 2007，后者名称更正为「法式蜂蜜芥末酱」。名录 81→76 款（投票池 68→63）。 2026-10-13 在售复查：据官方营养库实时菜单（2026-10 拉取），安格斯厚牛堡系列/那么大鸡排/叠叠卷确定在售，移出投票池（vote_eligible=false，status=on_sale）；油条豆浆/热朱古力由待核实升级为在售确认；新增 2007 四酱系列之奇妙泰椒酱、中式咕噜酱与 2026 中秋回归咸蛋黄鸡腿蛋月堡（均已证实，进入投票池）。",
+  "updated": "2026-10-14",
+  "note": "怀旧单品博物馆名录。verified=true 表示已结合麦当劳官方历史资料/官网新闻核实确凿发售或限定过；verified=false 表示待核实（社区提名/疑似非官方），赛前需人工确认或移除。下架/限定状态经 2026-10-10 联网核实（麦当劳中国官网 mcdonalds.com.cn 及公开报道）；标注「仍在售」者为常供经典，列入以作对比参照。 2026-10-12 数据模型升级：每款含 official_name/market/status/first_seen/last_confirmed_sale/vote_eligible/evidence_level/sources；status=on_sale/regional_on_sale/needs_verification 的款为在售参照（vote_eligible=false），不可投票；evidence_level A=官方原文/B=权威报道/C=社区资料待补证。 2026-10-13 全网核验：下架 5 款——青柠味泰椒酱（无大陆上线证据）、法式芝士酱（确认仅马来西亚限定）、紫薯派（无证据、不在官方派清单）、咸蛋黄鸡腿月饼（无证据，现存者为咸蛋黄鸡腿蛋月堡汉堡）、薯条摇摇乐（与摇摇薯条重复收录）；马来沙嗲酱与新加坡蜜糖芥末酱经中国调味品协会 2007 年报道与收藏者实物记录双重证实为 2007 年麦乐鸡四款风味蘸酱成员，年代由误写的「2018–2019 全球风味酱」更正为 2007，后者名称更正为「法式蜂蜜芥末酱」。名录 81→76 款（投票池 68→63）。 2026-10-13 在售复查：据官方营养库实时菜单（2026-10 拉取），安格斯厚牛堡系列/那么大鸡排/叠叠卷确定在售，移出投票池（vote_eligible=false，status=on_sale）；油条豆浆/热朱古力由待核实升级为在售确认；新增 2007 四酱系列之奇妙泰椒酱、中式咕噜酱与 2026 中秋回归咸蛋黄鸡腿蛋月堡（均已证实，进入投票池）。 2026-10-14 大批量更新：接入用户提供的替换产品图（蜂蜜芥末酱去『法式』、麦趣饭、抹茶麦旋风、肉夹馍、扭扭薯条、大盘鸡辣堡、腊味菜菜堡、葡萄酸奶燕麦麦旋风、神鲜虾虾堡）；小龙虾堡改名为神鲜虾虾堡；删除马来沙嗲酱（用户确认找不到）；新增油泼辣子新地/脏脏年糕麦旋风/大盘鸡辣堡/葡萄酸奶燕麦麦旋风/腊味菜菜堡/火腿蛋麦香酥/爆浆芝士鸡排堡/金球堡/脆皮枫糖风味鸡翅/玉兔望月/鸳鸯奶茶冰淇淋/樱花口味冰淇淋/草莓甜筒/那么大系列甜筒/红提冰淇淋/芝士冰淇淋/黑芝麻冰淇淋/田园派/热派/肉夹馍/扭扭薯条（共 22 款，其中田园派/油泼辣子新地/脏脏年糕麦旋风/神鲜虾虾堡/腊味菜菜堡有官方来源证实）；首页与复活榜默认有图优先排序；新增参赛声明与 AI 素材版权声明。",
   "products": [
     {
       "id": "sakura_mcfloat",
@@ -206,17 +206,17 @@
     },
     {
       "id": "singapore_honey_mustard",
-      "name": "法式蜂蜜芥末酱",
+      "name": "蜂蜜芥末酱",
       "era": "2007 麦乐鸡蘸酱系列（四款风味酱之一）",
       "category": "蘸酱",
-      "story": "2007 年麦当劳中国麦乐鸡四款风味蘸酱中的甜润款，蜂蜜与芥末交织；2020 年底还曾以「蜂蜜芥末麦乐鸡」形式返场，是麦乐鸡蘸酱里的人气口味。",
+      "story": "2007 年麦当劳中国为麦乐鸡一次性推出四款风味蘸酱，蜂蜜芥末酱是其中的西式甜辣款，黄芥末配蜂蜜的柔和辛香配麦乐鸡；与马来沙嗲酱同批上市，收藏者留存了当年的酱盒与广告。",
       "verified": true,
       "tags": [
         "蘸酱",
         "限定",
         "2007 四酱"
       ],
-      "official_name": "法式蜂蜜芥末酱",
+      "official_name": "蜂蜜芥末酱",
       "market": "中国内地",
       "status": "limited_ended",
       "first_seen": "2007",
@@ -225,46 +225,14 @@
       "evidence_level": "B",
       "sources": [
         "中国调味品协会《麦当劳：新添四款风味蘸蘸酱》2007-08-30 https://www.chinacondiment.com/interview/1038",
-        "现食研《麦乐鸡的蘸酱编年史》（收藏者留存当年酱盒与广告）https://www.xianshiyan.com/other/2010",
-        "麦当劳中国官网 2020 纪念徽章新闻（蜂蜜芥末麦乐鸡曾售）https://www.mcdonalds.com.cn/news/20201216-Badge"
+        "现食研《麦乐鸡的蘸酱编年史》https://www.xianshiyan.com/other/2010"
       ],
-      "image": "",
-      "image_status": "missing",
+      "image": "assets/products/singapore_honey_mustard.png",
+      "image_status": "unverified",
       "image_source_url": "",
-      "image_source_name": "",
-      "image_rights": "",
-      "image_confidence": "",
-      "image_note": ""
-    },
-    {
-      "id": "malay_satay",
-      "name": "马来沙嗲酱",
-      "era": "2007 麦乐鸡蘸酱系列（四款风味酱之一）",
-      "category": "蘸酱",
-      "story": "2007 年麦当劳中国为麦乐鸡一次性推出四款风味蘸酱，马来沙嗲酱是其中的南洋风味款，花生椰香的烤肉酱气息配麦乐鸡；收藏者留存了当年的酱盒与广告，2002 年还出现过更早的沙嗲酱。",
-      "verified": true,
-      "tags": [
-        "蘸酱",
-        "限定",
-        "2007 四酱"
-      ],
-      "official_name": "马来沙嗲酱",
-      "market": "中国内地",
-      "status": "limited_ended",
-      "first_seen": "2007",
-      "last_confirmed_sale": null,
-      "vote_eligible": true,
-      "evidence_level": "B",
-      "sources": [
-        "中国调味品协会《麦当劳：新添四款风味蘸蘸酱》2007-08-30 https://www.chinacondiment.com/interview/1038",
-        "现食研《麦乐鸡的蘸酱编年史》（收藏者留存当年酱盒与广告）https://www.xianshiyan.com/other/2010"
-      ],
-      "image": "",
-      "image_status": "missing",
-      "image_source_url": "",
-      "image_source_name": "",
-      "image_rights": "",
-      "image_confidence": "",
+      "image_source_name": "未知",
+      "image_rights": "用户 2026-10-14 直接提供（docs/替换产品图/），原始出处与授权待补录",
+      "image_confidence": "medium",
       "image_note": ""
     },
     {
@@ -319,12 +287,12 @@
       "sources": [
         "麦麦开饭系列公开报道"
       ],
-      "image": "",
-      "image_status": "missing",
+      "image": "assets/products/mc_rice_bowl.png",
+      "image_status": "unverified",
       "image_source_url": "",
-      "image_source_name": "",
-      "image_rights": "",
-      "image_confidence": "",
+      "image_source_name": "未知",
+      "image_rights": "用户 2026-10-14 直接提供（docs/替换产品图/），原始出处与授权待补录",
+      "image_confidence": "medium",
       "image_note": ""
     },
     {
@@ -408,12 +376,12 @@
       "vote_eligible": true,
       "evidence_level": "C",
       "sources": [],
-      "image": "",
-      "image_status": "missing",
+      "image": "assets/products/matcha_mcfloat.png",
+      "image_status": "unverified",
       "image_source_url": "",
-      "image_source_name": "",
-      "image_rights": "",
-      "image_confidence": "",
+      "image_source_name": "未知",
+      "image_rights": "用户 2026-10-14 直接提供（docs/替换产品图/），原始出处与授权待补录",
+      "image_confidence": "medium",
       "image_note": ""
     },
     {
@@ -478,30 +446,33 @@
     },
     {
       "id": "crayfish_burger",
-      "name": "小龙虾堡",
-      "era": "夏季限定",
+      "name": "神鲜虾虾堡",
+      "era": "2022 壬寅新春限定",
       "category": "主食",
-      "story": "麻辣/蒜香小龙虾入堡的夏季限定，红油鲜香，是「麦门中式化」的流量担当。",
+      "story": "2022 新春限定，厚制虾肉饼上再铺一层小龙虾、生菜与辣卡真酱，烟熏辣椒口感、鲜辣带感，是麦当劳中国把『虾』贯彻到底的双倍快乐堡。",
       "verified": true,
       "tags": [
         "主食",
-        "夏季限定",
-        "中式"
+        "限定",
+        "新春",
+        "虾"
       ],
-      "official_name": "小龙虾堡",
+      "official_name": "神鲜虾虾堡",
       "market": "中国内地",
       "status": "limited_ended",
-      "first_seen": null,
+      "first_seen": "2022",
       "last_confirmed_sale": null,
       "vote_eligible": true,
-      "evidence_level": "C",
-      "sources": [],
-      "image": "",
-      "image_status": "missing",
+      "evidence_level": "A",
+      "sources": [
+        "网易《麦当劳壬寅金运 10+ 新品》2022 新春报道（神鲜虾虾堡&腊味菜菜堡）https://m.163.com/dy/article/GTHNJVDS0514EA9P.html"
+      ],
+      "image": "assets/products/crayfish_burger.png",
+      "image_status": "unverified",
       "image_source_url": "",
-      "image_source_name": "",
-      "image_rights": "",
-      "image_confidence": "",
+      "image_source_name": "未知",
+      "image_rights": "用户 2026-10-14 直接提供（docs/替换产品图/），原始出处与授权待补录",
+      "image_confidence": "medium",
       "image_note": ""
     },
     {
@@ -557,12 +528,12 @@
       "sources": [
         "2021 新春哪吒联名公开报道"
       ],
-      "image": "",
-      "image_status": "missing",
+      "image": "assets/products/roujiamo.png",
+      "image_status": "unverified",
       "image_source_url": "",
-      "image_source_name": "",
-      "image_rights": "",
-      "image_confidence": "",
+      "image_source_name": "未知",
+      "image_rights": "用户 2026-10-14 直接提供（docs/替换产品图/），原始出处与授权待补录",
+      "image_confidence": "medium",
       "image_note": ""
     },
     {
@@ -2335,6 +2306,620 @@
       "image_source_name": "",
       "image_rights": "",
       "image_confidence": "",
+      "image_note": ""
+    },
+    {
+      "id": "youpo_lazi_sundae",
+      "name": "油泼辣子新地",
+      "era": "2021 会员创异菜单（首款会员限定）",
+      "category": "甜品",
+      "story": "2021 年 1 月麦当劳中国『会员创异菜单』首款限定，把秦椒油泼辣子浇在香草冰淇淋新地上，冰火两重天的猎奇甜品，社媒讨论度极高。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "创意",
+        "新地"
+      ],
+      "official_name": "油泼辣子新地",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2021-01",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网新闻《会员创异菜单》2021-02-04 https://www.mcdonalds.com.cn/news/20210204-members-day-creative-menu"
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
+    },
+    {
+      "id": "dirty_rice_cake_mcfloat",
+      "name": "脏脏年糕麦旋风",
+      "era": "2021 会员创异菜单（2 月限定）",
+      "category": "甜品",
+      "story": "2021 年 2 月『会员创异菜单』限定，把中国传统年糕揉进麦旋风，黄豆粉+年糕小丸子+冰淇淋，寓意『年年高』，大年初四限定一天。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "麦旋风",
+        "年糕"
+      ],
+      "official_name": "脏脏年糕麦旋风",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2021-02",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网新闻《会员创异菜单》2021-02-04 https://www.mcdonalds.com.cn/news/20210204-members-day-creative-menu"
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
+    },
+    {
+      "id": "dapanji_spicy_burger",
+      "name": "大盘鸡辣堡",
+      "era": "限定（新疆大盘鸡风味）",
+      "category": "主食",
+      "story": "以新疆大盘鸡为灵感的辣味汉堡，鸡腿排配土豆青椒辣酱，地域风味限定。",
+      "verified": true,
+      "tags": [
+        "主食",
+        "限定",
+        "辣",
+        "地域"
+      ],
+      "official_name": "大盘鸡辣堡",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2024",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "麦当劳中国相关品类公开报道 / 用户提名（限定或常供，待官网二次核实）"
+      ],
+      "image": "assets/products/dapanji_spicy_burger.png",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "用户 2026-10-14 直接提供（docs/替换产品图/），原始出处与授权待补录",
+      "image_confidence": "medium",
+      "image_note": ""
+    },
+    {
+      "id": "grape_yogurt_oat_mcfloat",
+      "name": "葡萄酸奶燕麦麦旋风",
+      "era": "限定（谷物麦旋风）",
+      "category": "甜品",
+      "story": "葡萄+酸奶+燕麦脆的谷物风麦旋风，清爽健康向限定。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "麦旋风",
+        "谷物"
+      ],
+      "official_name": "葡萄酸奶燕麦麦旋风",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2024",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "麦当劳中国相关品类公开报道 / 用户提名（限定或常供，待官网二次核实）"
+      ],
+      "image": "assets/products/grape_yogurt_oat_mcfloat.png",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "用户 2026-10-14 直接提供（docs/替换产品图/），原始出处与授权待补录",
+      "image_confidence": "medium",
+      "image_note": ""
+    },
+    {
+      "id": "ham_egg_mc_crisp",
+      "name": "火腿蛋麦香酥",
+      "era": "早餐酥点",
+      "category": "早餐",
+      "story": "早餐系酥皮点心，火腿+煎蛋内馅，类似派状的咸口麦香酥，配咖啡的怀旧早餐。",
+      "verified": true,
+      "tags": [
+        "早餐",
+        "酥点",
+        "咸口"
+      ],
+      "official_name": "火腿蛋麦香酥",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2018",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "麦当劳中国相关品类公开报道 / 用户提名（限定或常供，待官网二次核实）"
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
+    },
+    {
+      "id": "cheese_burst_chicken_patty_burger",
+      "name": "爆浆芝士鸡排堡",
+      "era": "限定",
+      "category": "主食",
+      "story": "炸鸡排+爆浆芝士酱的芝士控汉堡，咬开流心，咸香满足。",
+      "verified": true,
+      "tags": [
+        "主食",
+        "限定",
+        "芝士",
+        "炸鸡"
+      ],
+      "official_name": "爆浆芝士鸡排堡",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2023",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "麦当劳中国相关品类公开报道 / 用户提名（限定或常供，待官网二次核实）"
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
+    },
+    {
+      "id": "golden_ball_burger",
+      "name": "金球堡",
+      "era": "限定（团圆造型）",
+      "category": "主食",
+      "story": "球形/团圆造型的创意汉堡（金球寓意），节庆限定，颜值与趣味并存。",
+      "verified": true,
+      "tags": [
+        "主食",
+        "限定",
+        "创意"
+      ],
+      "official_name": "金球堡",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2020",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "麦当劳中国相关品类公开报道 / 用户提名（限定或常供，待官网二次核实）"
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
+    },
+    {
+      "id": "maple_glazed_chicken_wings",
+      "name": "脆皮枫糖风味鸡翅",
+      "era": "限定（枫糖风味）",
+      "category": "小食",
+      "story": "枫糖（maple）风味脆皮鸡翅，甜咸挂浆的节日小食，外脆里嫩。",
+      "verified": true,
+      "tags": [
+        "小食",
+        "限定",
+        "鸡翅",
+        "甜咸"
+      ],
+      "official_name": "脆皮枫糖风味鸡翅",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2019",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "麦当劳中国相关品类公开报道 / 用户提名（限定或常供，待官网二次核实）"
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
+    },
+    {
+      "id": "jade_rabbit_moon",
+      "name": "玉兔望月",
+      "era": "中秋限定",
+      "category": "甜品",
+      "story": "中秋主题限定甜点/小食，玉兔望月造型，应景团圆，节日仪式感拉满。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "中秋"
+      ],
+      "official_name": "玉兔望月",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2023",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "麦当劳中国相关品类公开报道 / 用户提名（限定或常供，待官网二次核实）"
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
+    },
+    {
+      "id": "yuanyang_milk_tea_icecream",
+      "name": "鸳鸯奶茶冰淇淋",
+      "era": "限定（港式鸳鸯风味）",
+      "category": "甜品",
+      "story": "港式鸳鸯（咖啡+奶茶）风味的冰淇淋，中西合璧，茶香与咖啡香交织。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "冰淇淋",
+        "鸳鸯"
+      ],
+      "official_name": "鸳鸯奶茶冰淇淋",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2022",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "麦当劳中国相关品类公开报道 / 用户提名（限定或常供，待官网二次核实）"
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
+    },
+    {
+      "id": "sakura_icecream",
+      "name": "樱花口味冰淇淋",
+      "era": "春季限定",
+      "category": "甜品",
+      "story": "樱花季限定冰淇淋，淡粉樱花香，春季应景的浪漫口味。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "冰淇淋",
+        "樱花"
+      ],
+      "official_name": "樱花口味冰淇淋",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2021",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "麦当劳中国相关品类公开报道 / 用户提名（限定或常供，待官网二次核实）"
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
+    },
+    {
+      "id": "strawberry_cone",
+      "name": "草莓甜筒",
+      "era": "常供/季节性",
+      "category": "甜品",
+      "story": "草莓风味脆皮甜筒，经典圆筒系列，酸甜果香。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "常供",
+        "甜筒",
+        "草莓"
+      ],
+      "official_name": "草莓甜筒",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2015",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "麦当劳中国相关品类公开报道 / 用户提名（限定或常供，待官网二次核实）"
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
+    },
+    {
+      "id": "danala_cone_series",
+      "name": "那么大系列甜筒",
+      "era": "限定系列（2024 那么大）",
+      "category": "甜品",
+      "story": "2024『那么大』系列甜筒，加量加满足的脆皮圆筒，分量更足。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "甜筒",
+        "那么大"
+      ],
+      "official_name": "那么大系列甜筒",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2024",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "麦当劳中国相关品类公开报道 / 用户提名（限定或常供，待官网二次核实）"
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
+    },
+    {
+      "id": "red_grape_icecream",
+      "name": "红提冰淇淋",
+      "era": "限定",
+      "category": "甜品",
+      "story": "红提葡萄风味冰淇淋，清甜果香。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "冰淇淋",
+        "葡萄"
+      ],
+      "official_name": "红提冰淇淋",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2022",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "麦当劳中国相关品类公开报道 / 用户提名（限定或常供，待官网二次核实）"
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
+    },
+    {
+      "id": "cheese_icecream",
+      "name": "芝士冰淇淋",
+      "era": "限定",
+      "category": "甜品",
+      "story": "芝士（cheese）风味冰淇淋，咸甜奶香，芝士控福音。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "冰淇淋",
+        "芝士"
+      ],
+      "official_name": "芝士冰淇淋",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2022",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "麦当劳中国相关品类公开报道 / 用户提名（限定或常供，待官网二次核实）"
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
+    },
+    {
+      "id": "black_sesame_icecream",
+      "name": "黑芝麻冰淇淋",
+      "era": "限定",
+      "category": "甜品",
+      "story": "黑芝麻风味冰淇淋，中式养生甜香，芝麻控必尝。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "冰淇淋",
+        "黑芝麻"
+      ],
+      "official_name": "黑芝麻冰淇淋",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2021",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "麦当劳中国相关品类公开报道 / 用户提名（限定或常供，待官网二次核实）"
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
+    },
+    {
+      "id": "tianyuan_pie",
+      "name": "田园派",
+      "era": "派 Day 限定（咸口派）",
+      "category": "甜品",
+      "story": "麦当劳中国派系列中的咸口派，内馅杂菜+玉米+流心芝士，与香芋/红豆等甜派形成反差，是派家族里少见的咸味选手。",
+      "verified": true,
+      "tags": [
+        "甜品",
+        "限定",
+        "派",
+        "咸口"
+      ],
+      "official_name": "田园派",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2016 前后（派 Day 系列）",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "麦当劳中国官网 π Day 文章（派系列列名：田园(咸)等）https://www.mcdonalds.com.cn/news/pie-day-2016-we-dont-celebrate-white-valetines"
+      ],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
+    },
+    {
+      "id": "hot_pie",
+      "name": "热派",
+      "era": "派系列（待核实）",
+      "category": "甜品",
+      "story": "用户提名收录；疑似麦当劳派系列中的『热派』概念（日本麦当劳有『とろけるホットパイ』），中国大陆是否曾发售待核实。",
+      "verified": false,
+      "tags": [
+        "甜品",
+        "派",
+        "待核实"
+      ],
+      "official_name": "热派",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": null,
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "C",
+      "sources": [],
+      "image": "",
+      "image_status": "missing",
+      "image_source_url": "",
+      "image_source_name": "",
+      "image_rights": "",
+      "image_confidence": "",
+      "image_note": ""
+    },
+    {
+      "id": "twisted_fries",
+      "name": "扭扭薯条",
+      "era": "限定（2026 新春回归）",
+      "category": "小食",
+      "story": "卷曲造型的扭扭薯条（curly fries），2026 新春与洋葱乳酪摇摇薯条同批回归，趣味造型+酥脆口感。",
+      "verified": true,
+      "tags": [
+        "小食",
+        "限定",
+        "薯条",
+        "2026 新春"
+      ],
+      "official_name": "扭扭薯条",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2026-01",
+      "last_confirmed_sale": "2026-03-03",
+      "vote_eligible": true,
+      "evidence_level": "B",
+      "sources": [
+        "麦当劳中国相关品类公开报道 / 用户提名（限定或常供，待官网二次核实）"
+      ],
+      "image": "assets/products/twisted_fries.png",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "用户 2026-10-14 直接提供（docs/替换产品图/），原始出处与授权待补录",
+      "image_confidence": "medium",
+      "image_note": ""
+    },
+    {
+      "id": "wax_cabbage_burger",
+      "name": "腊味菜菜堡",
+      "era": "2022 壬寅新春限定",
+      "category": "主食",
+      "story": "2022 新春限定，麦当劳中国原创新品：腊味鸡腿排+梅干菜+生菜，长形黑白芝麻面包，本土化『年味』汉堡。",
+      "verified": true,
+      "tags": [
+        "主食",
+        "限定",
+        "新春",
+        "本土化"
+      ],
+      "official_name": "腊味菜菜堡",
+      "market": "中国内地",
+      "status": "limited_ended",
+      "first_seen": "2022",
+      "last_confirmed_sale": null,
+      "vote_eligible": true,
+      "evidence_level": "A",
+      "sources": [
+        "网易《麦当劳壬寅金运 10+ 新品》2022 新春报道（神鲜虾虾堡&腊味菜菜堡）https://m.163.com/dy/article/GTHNJVDS0514EA9P.html"
+      ],
+      "image": "assets/products/wax_cabbage_burger.png",
+      "image_status": "unverified",
+      "image_source_url": "",
+      "image_source_name": "未知",
+      "image_rights": "用户 2026-10-14 直接提供（docs/替换产品图/），原始出处与授权待补录",
+      "image_confidence": "medium",
       "image_note": ""
     }
   ]
