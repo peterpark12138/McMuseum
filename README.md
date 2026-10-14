@@ -21,7 +21,9 @@
 - 📊 **GitHub 复活榜**：匿名票数回流 Issue 后由站点只读聚合，透明可核、不可伪造。
 - 🔒 **只读红线**：所有麦当劳 MCP 调用只读取、绝不扣减 / 下单。
 
-![功能演示](docs/demo.gif)
+![在线站点首页 · 投票大厅](docs/site_home.png)
+
+![功能演示 · 产品轮播](docs/demo.gif)
 
 ---
 
@@ -329,6 +331,7 @@ McMuseum/
 │   ├── DEMO_GUIDE.md        # 评审可复现流程（模式 A/B、看榜、去重验证、清理测试数据）
 │   ├── DEMO_SCRIPT.md       # 60–90 秒演示脚本 + 现有 demo.gif 的评估
 │   ├── demo.gif             # 现有演示动图（12.5 秒产品轮播，展示 14 款已配图单品）
+│   ├── site_home.png        # 在线站点首页截图（真实渲染，README 首屏展示）
 │   └── promotion.md         # 宣传渠道整理
 ├── data/
 │   ├── nostalgic_products.json  # 怀旧单品名录（已核实）
