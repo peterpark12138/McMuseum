@@ -255,8 +255,13 @@ async function loadProducts() {
     PRODUCTS = [];
   }
   renderHall();
-  const total = PRODUCTS.reduce((s, p) => s + (p.votes || 0), 0);
-  $("#heroStat").textContent = `已投出 ${fmt(total)} 张复活票 · 候选 ${PRODUCTS.length} 款老味道等你召回`;
+  const total = eligibleProducts().reduce((s, p) => s + (p.votes || 0), 0);
+  $("#heroStat").textContent = `已投出 ${fmt(total)} 张复活票 · 候选 ${eligibleProducts().length} 款老味道等你召回`;
+}
+
+// 投票池口径（与复活榜 / 领奖台一致）：在售、待核实等不参与复活赛的单品不进大厅
+function eligibleProducts() {
+  return PRODUCTS.filter(p => p.vote_eligible !== false);
 }
 
 // 是否有可视化图片（产品图字段，或 HALL_IMG/PODIUM_IMG 兜底图）
@@ -268,15 +273,16 @@ function renderHall() {
   const q = ($("#searchInput").value || "").trim();
   const sort = $("#hallSort").value;
   const voted = votedSet();
-  let list = PRODUCTS.filter(p => !q || p.name.includes(q));
+  // 只渲染投票池内的单品：在售 / 待核实（vote_eligible=false）一律移出大厅
+  let list = eligibleProducts().filter(p => !q || p.name.includes(q));
   if (sort === "hot") list = [...list].sort((a, b) => (b.votes || 0) - (a.votes || 0));
   if (sort === "few") list = [...list].sort((a, b) => (a.votes || 0) - (b.votes || 0));
   if (sort === "name") list = [...list].sort((a, b) => a.name.localeCompare(b.name, "zh"));
   if (sort === "img") list = [...list].sort((a, b) => (hasImg(b) - hasImg(a))
     || (b.votes || 0) - (a.votes || 0) || a.name.localeCompare(b.name, "zh"));
 
-  const total = PRODUCTS.reduce((s, p) => s + (p.votes || 0), 0);
-  const topId = [...PRODUCTS].sort((a, b) => (b.votes || 0) - (a.votes || 0))[0];
+  const total = eligibleProducts().reduce((s, p) => s + (p.votes || 0), 0);
+  const topId = [...eligibleProducts()].sort((a, b) => (b.votes || 0) - (a.votes || 0))[0];
   const grid = $("#voteGrid");
   $("#hallEmpty").classList.toggle("hidden", list.length > 0);
 
@@ -345,6 +351,12 @@ function showVoteUnavailable(pid) {
 
 async function startVote(pid) {
   if (votedSet().has(pid)) return;
+  const _p = PRODUCTS.find(x => x.id === pid);
+  // 在售 / 待核实单品不参与复活赛：即使从其他入口进入也不给投
+  if (_p && _p.vote_eligible === false) {
+    toast(`《${_p.name || pid}》仍在售 / 待核实，不参与本轮复活赛`, "err");
+    return;
+  }
   if (!VOTE_CAPS.voting_available) { showVoteUnavailable(pid); return; }
   voteTarget = pid;
   const p = PRODUCTS.find(x => x.id === pid) || { name: pid };
